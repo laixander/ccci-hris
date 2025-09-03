@@ -4,8 +4,8 @@ export const navigationMenuItemsByRole: Record<string, NavigationMenuItem[]> = {
     'Employee': [
         [
             { label: 'MAIN NAVIGATION', type: 'label' },
-            { label: 'Menu 1', icon: 'i-lucide-pie-chart', to: '/dashboard' },
-            { label: 'Menu 2', icon: 'i-lucide-inbox',  },
+            { label: 'Dashboard', icon: 'i-lucide-pie-chart', to: '/dashboard' },
+            { label: 'Inbox', icon: 'i-lucide-inbox', to: '/inbox'  },
             { label: 'Menu 3', icon: 'i-lucide-git-branch',  },
             { label: 'Menu 4', icon: 'i-lucide-users',  },
             { label: 'Menu 5', icon: 'i-lucide-file-text',  },

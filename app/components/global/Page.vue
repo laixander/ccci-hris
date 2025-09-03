@@ -15,9 +15,11 @@ defineProps<PageProps>()
         <div v-if="title || description || $slots.actions"
             class="relative flex flex-col gap-5 lg:flex-row lg:items-center">
             <div :class="['flex-1 space-y-1', alignCenter ? 'text-center' : undefined]">
-                <div class="text-2xl text-pretty font-bold text-highlighted">
-                    {{ title }}
-                </div>
+                <slot name="title">
+                    <div class="text-2xl text-pretty font-bold text-highlighted">
+                        {{ title }}
+                    </div>
+                </slot>
                 <div class="text-sm text-pretty text-muted">
                     {{ description }}
                 </div>

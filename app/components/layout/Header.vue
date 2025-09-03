@@ -37,7 +37,13 @@ watch(() => route.fullPath, () => {
 // notif logic
 import { notificationItems } from '~/data'
 import { useNotifications } from '~/composables/useNotifications'
-const { notifications, handleClick, unreadCount } = useNotifications(notificationItems)
+const { notifications, handleClick, limitedNotifications, unreadCount } = useNotifications(notificationItems)
+const closeDrawerAndNavigate = (path: string) => {
+  navigateTo(path)
+  useTimeoutFn(() => {
+    drawerOpen.value = false
+  }, 300)
+}
 const drawerOpen = ref(false)
 </script>
 <template>
@@ -63,14 +69,27 @@ const drawerOpen = ref(false)
 
         <div class="flex items-center shrink-0 gap-3">
             <UDrawer v-model:open="drawerOpen" direction="right" inset>
-                <UChip size="lg" inset>
+                <UChip
+                    v-if="unreadCount > 0"
+                    size="lg"
+                    color="error"
+                    inset
+                >
                     <UButton icon="i-lucide-bell" variant="ghost" color="neutral" />
                 </UChip>
+
+                <!-- fallback without chip -->
+                <UButton
+                    v-else
+                    icon="i-lucide-bell"
+                    variant="ghost"
+                    color="neutral"
+                />
                 <template #content>
-                    <div class="p-4">
+                    <div class="grid p-4 h-full overflow-auto">
                         <ListGroup class="lg:w-[320px]">
                             <ListItem
-                                v-for="n in notifications"
+                                v-for="n in limitedNotifications"
                                 :key="n.id"
                                 :title="n.title"
                                 :description="typeof n.description === 'string' ? n.description : undefined"
@@ -87,6 +106,18 @@ const drawerOpen = ref(false)
                                 </template>
                             </ListItem>
                         </ListGroup>
+                        <!-- View All button -->
+                        <div v-if="notifications.length > 10" class="mt-auto">
+                            <UButton
+                                block
+                                size="lg"
+                                variant="ghost"
+                                color="primary"
+                                @click="closeDrawerAndNavigate('/notifications')"
+                            >
+                                View all notifications
+                            </UButton>
+                        </div>
                     </div>
                 </template>
             </UDrawer>

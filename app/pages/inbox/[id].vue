@@ -25,19 +25,25 @@ watchEffect(() => {
 <template>
     <div class="py-6 space-y-6">
         <UContainer class="mx-auto">
-            <UButton label="Back to Notifications" icon="i-lucide-arrow-left" variant="outline" @click="$router.back()" />
+            <!-- <UButton label="Back to Notifications" icon="i-lucide-arrow-left" variant="outline" @click="$router.back()" /> -->
+             <UButton label="Back to Inbox" icon="i-lucide-arrow-left" variant="outline" @click="navigateTo('/inbox')" />
         </UContainer>
         <UContainer class="mx-auto">
             <UCard>
-                <div v-if="notif" class="space-y-4">
+                <div v-if="notif" class="space-y-2">
                     <h1 class="text-xl font-bold text-highlighted">
                         {{ notif.title }}
                     </h1>
                     <div class="text-sm text-muted">
-                        <div class="flex items-center gap-1">
+                        <div class="flex items-center">
                             <span class="font-medium">{{ notif.description.name }}</span>
-                            <span class="ml-1">• {{ notif.description.received }}</span>
+                            <UIcon name="i-lucide-dot" class="size-4 hidden lg:inline" />
+                            <span>{{ notif.description.received }}</span>
                         </div>
+                    </div>
+                    <!-- Notification content -->
+                    <div v-if="notif.content" class="mt-4 text-base text-default leading-relaxed">
+                        {{ notif.content }}
                     </div>
                 </div>
                 <div v-else class="text-muted text-center">
