@@ -8,7 +8,7 @@ const { notifications, handleClick, markAllAsRead, unreadCount } = useNotificati
 </script>
 
 <template>
-    <UContainer class="mt-auto">
+    <UContainer>
         <Page>
             <template #title>
                 <div class="flex items-center gap-2">

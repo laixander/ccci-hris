@@ -20,9 +20,11 @@ defineProps<PageProps>()
                         {{ title }}
                     </div>
                 </slot>
-                <div class="text-sm text-pretty text-muted">
-                    {{ description }}
-                </div>
+                <slot name="description">
+                    <div class="text-sm text-pretty text-muted">
+                        {{ description }}
+                    </div>
+                </slot>
             </div>
             <div class="grid gap-1 md:gap-2 md:flex">
                 <slot name="actions" />

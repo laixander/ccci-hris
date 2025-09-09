@@ -15,10 +15,10 @@ export function usePageTitle() {
     const name = String(route.name ?? '')
 
     // if we're in notification detail
-    if (name.startsWith('notifications-id')) {
+    if (name.startsWith('inbox-id')) {
       const id = Number(route.params.id)
       const notif = notifications.value.find(n => n.id === id)
-      return notif ? notif.title : 'Notification'
+      return notif ? notif.title : 'Inbox'
     }
 
     // otherwise fall back to customTitles or route name formatting

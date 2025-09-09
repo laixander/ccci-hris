@@ -8,11 +8,13 @@ import {
 
 // Cards
 import {
+    statDashboardCards
 } from './cards';
 
 // Lists
 import {
-    notificationItems
+    notificationItems,
+    partnerActivities
 } from './lists';
 
 // Options
@@ -30,5 +32,7 @@ import {
 export {
     navigationMenuItemsByRole,
     customTitles,
-    notificationItems
+    notificationItems,
+    statDashboardCards,
+    partnerActivities
 };

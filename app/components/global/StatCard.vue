@@ -9,15 +9,15 @@ const trendDirection = computed(() =>
 )
 </script>
 <template>
-    <!-- <UCard :class="[
+    <UCard :class="[
         useGradient && 'bg-gradient-to-tr from-5% to-default',
         useGradient && color === 'warning' && 'from-warning/10',
         useGradient && color === 'secondary' && 'from-secondary/10',
         useGradient && color === 'success' && 'from-success/10',
         useGradient && color === 'error' && 'from-error/10',
         useGradient && color === 'purple' && 'from-purple/10'
-    ]"> -->
-    <UCard>
+    ]">
+    <!-- <UCard> -->
         <!-- Adjust vertical alignment based on hasDetails -->
         <div :class="['flex justify-between', hasDetails ? 'items-start' : 'items-center']">
             <div>

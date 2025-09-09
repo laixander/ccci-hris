@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import Page from '~/components/global/Page.vue'
 import { useNotifications } from '~/composables/useNotifications'
 import { notificationItems } from '~/data'
 
@@ -23,33 +24,45 @@ watchEffect(() => {
 </script>
 
 <template>
-    <div class="py-6 space-y-6">
-        <UContainer class="mx-auto">
+    <UContainer v-if="notif">
+        <Page>
+            <template #title>
+                <div class="font-semibold text-xl text-highlighted">
+                    {{ notif.title }}
+                </div>
+            </template>
+            <template #description>
+                <div class="flex items-center text-muted">
+                    <span class="text-sm font-medium">{{ notif.description.name }}</span>
+                    <UIcon name="i-lucide-dot" class="size-4 hidden lg:inline" />
+                    <span class="text-sm">{{ notif.description.received }}</span>
+                </div>
+            </template>
             <!-- <UButton label="Back to Notifications" icon="i-lucide-arrow-left" variant="outline" @click="$router.back()" /> -->
-             <UButton label="Back to Inbox" icon="i-lucide-arrow-left" variant="outline" @click="navigateTo('/inbox')" />
-        </UContainer>
-        <UContainer class="mx-auto">
+            <template #actions>
+                <UButton label="Back to Inbox" icon="i-lucide-arrow-left" variant="outline" @click="navigateTo('/inbox')" />
+            </template>
             <UCard>
-                <div v-if="notif" class="space-y-2">
-                    <h1 class="text-xl font-bold text-highlighted">
-                        {{ notif.title }}
-                    </h1>
-                    <div class="text-sm text-muted">
-                        <div class="flex items-center">
-                            <span class="font-medium">{{ notif.description.name }}</span>
-                            <UIcon name="i-lucide-dot" class="size-4 hidden lg:inline" />
-                            <span>{{ notif.description.received }}</span>
-                        </div>
-                    </div>
-                    <!-- Notification content -->
-                    <div v-if="notif.content" class="mt-4 text-base text-default leading-relaxed">
-                        {{ notif.content }}
-                    </div>
+                <div v-if="notif.content" class="text-sm leading-relaxed">
+                    {{ notif.content }}
                 </div>
                 <div v-else class="text-muted text-center">
                     Notification not found.
                 </div>
             </UCard>
-        </UContainer>
-    </div>
+        </Page>
+    </UContainer>
+    <UContainer v-else>
+        <Page>
+            <!-- <UButton label="Back to Notifications" icon="i-lucide-arrow-left" variant="outline" @click="$router.back()" /> -->
+            <template #actions>
+                <UButton label="Back to Inbox" icon="i-lucide-arrow-left" variant="outline" @click="navigateTo('/inbox')" />
+            </template>
+            <UCard>
+                <div class="text-muted text-center">
+                    Notification not found.
+                </div>
+            </UCard>
+        </Page>
+    </UContainer>
 </template>
