@@ -23,7 +23,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Approvals',
-            icon: 'i-lucide-clipboard-list'
+            icon: 'i-lucide-clipboard-list',
+            to: '/approvals'
         },
         {
             label: 'Timesheet',
@@ -103,6 +104,25 @@ const items = computed<NavigationMenuItem[][]>(() => [
         }
     ]
 ])
+
+const route = useRoute()
+const pageTitle = computed(() => {
+    if (route.meta.title) return route.meta.title as string
+    
+    for (const group of items.value) {
+        for (const item of group) {
+            if ('to' in item && item.to === route.path) {
+                return item.label
+            }
+        }
+    }
+    
+    const path = route.path
+    if (path === '/') return 'Dashboard'
+    
+    const segment = path.split('/').filter(Boolean).pop() || ''
+    return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
+})
 </script>
 
 <template>
@@ -133,6 +153,10 @@ const items = computed<NavigationMenuItem[][]>(() => [
                 list: 'space-y-0.5',
                 separator: 'my-2.5',
             }" />
+
+            <template #footer>
+                <UserMenu :collapsed="isCollapsed" />
+            </template>
         </USidebar>
 
         <div
@@ -143,9 +167,12 @@ const items = computed<NavigationMenuItem[][]>(() => [
             ]">
                 <UButton :icon="side === 'left' ? 'i-lucide-panel-left' : 'i-lucide-panel-right'" color="neutral"
                     variant="ghost" aria-label="Toggle sidebar" @click="open = !open" class="lg:hidden" />
+
+                <!-- page title -->
+                <h1 class="text-lg font-semibold">{{ pageTitle }}</h1>
             </div>
 
-            <div class="flex-1 p-4">
+            <div class="flex-1 p-4 overflow-y-auto scrollbar">
                 <slot />
             </div>
         </div>
