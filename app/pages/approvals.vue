@@ -110,6 +110,8 @@ const modalAction = ref<'approve' | 'reject'>('approve')
 const activeRequestId = ref<number | null>(null)
 const actionComment = ref('')
 
+const toast = useToast()
+
 const openConfirmModal = (id: number, action: 'approve' | 'reject') => {
   activeRequestId.value = id
   modalAction.value = action
@@ -129,6 +131,13 @@ const confirmAction = () => {
       date: new Date().toISOString().split('T')[0] || '',
       icon: modalAction.value === 'approve' ? 'i-lucide-check-circle' : 'i-lucide-x-circle',
       color: modalAction.value === 'approve' ? 'green' : 'red'
+    })
+    
+    toast.add({
+      title: modalAction.value === 'approve' ? 'Request Approved' : 'Request Rejected',
+      description: `The request has been successfully ${modalAction.value}ed.`,
+      color: modalAction.value === 'approve' ? 'success' : 'error',
+      icon: modalAction.value === 'approve' ? 'i-lucide-check-circle' : 'i-lucide-x-circle'
     })
   }
   isModalOpen.value = false
@@ -266,7 +275,7 @@ const openDrawer = (req: any) => {
   <!-- Confirmation Modal -->
   <UModal v-model:open="isModalOpen" :title="`${modalAction === 'approve' ? 'Approve' : 'Reject'} Request`" description="Please provide a comment for your action." close>
     <template #body>
-      <UTextarea v-model="actionComment" placeholder="Add a comment... (optional)" :rows="4" autofocus />
+      <UTextarea v-model="actionComment" placeholder="Add a comment... (optional)" :rows="4" autofocus class="w-full" />
     </template>
 
     <template #footer>
