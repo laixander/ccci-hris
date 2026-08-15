@@ -1,4 +1,7 @@
 export const useDemoAuth = () => {
+    const router = useRouter()
+    const toast = useToast()
+    
     const currentUser = ref({
         name: 'John Doe',
         email: 'john@example.com',
@@ -10,7 +13,13 @@ export const useDemoAuth = () => {
     
     const logout = () => {
         console.log('User logged out')
-        // router.push('/login')
+        toast.add({
+            title: 'Logged Out',
+            description: 'You have been successfully logged out.',
+            color: 'info',
+            icon: 'i-lucide-info'
+        })
+        router.push('/login')
     }
     
     return {

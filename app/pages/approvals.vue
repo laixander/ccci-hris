@@ -16,8 +16,8 @@ const leaveRequests = ref([
       { role: 'HR', name: 'Carol White', status: 'pending', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
     ],
     timeline: [
-      { title: 'Leave Request Submitted', description: 'Annual family trip', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray' },
-      { title: 'Manager Approved', description: 'Have a great trip!', date: '2026-08-11', icon: 'i-lucide-check-circle', color: 'green' }
+      { title: 'Leave Request Submitted', description: 'Annual family trip', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Alice' },
+      { title: 'Manager Approved', description: 'Have a great trip!', date: '2026-08-11', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' }
     ]
   },
   {
@@ -34,7 +34,7 @@ const leaveRequests = ref([
       { role: 'Director', name: 'Frank Miller', status: 'pending', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' },
     ],
     timeline: [
-      { title: 'Leave Request Submitted', description: 'Flu and high fever', date: '2026-08-14', icon: 'i-lucide-file-text', color: 'gray' }
+      { title: 'Leave Request Submitted', description: 'Flu and high fever', date: '2026-08-14', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=David' }
     ]
   },
   {
@@ -52,8 +52,8 @@ const leaveRequests = ref([
       { role: 'HR', name: 'Carol White', status: 'approved', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
     ],
     timeline: [
-      { title: 'Leave Request Submitted', description: 'Maternity leave', date: '2026-07-01', icon: 'i-lucide-file-text', color: 'gray' },
-      { title: 'Fully Approved', description: 'All approvers have signed off.', date: '2026-07-05', icon: 'i-lucide-check-circle', color: 'green' }
+      { title: 'Leave Request Submitted', description: 'Maternity leave', date: '2026-07-01', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Eve' },
+      { title: 'Fully Approved', description: 'All approvers have signed off.', date: '2026-07-05', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' }
     ]
   },
   {
@@ -69,8 +69,8 @@ const leaveRequests = ref([
       { role: 'Manager', name: 'Bob Jones', status: 'rejected', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
     ],
     timeline: [
-      { title: 'Leave Request Submitted', description: 'Personal errands', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray' },
-      { title: 'Manager Rejected', description: 'Need you during this critical release phase.', date: '2026-08-11', icon: 'i-lucide-x-circle', color: 'red' }
+      { title: 'Leave Request Submitted', description: 'Personal errands', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Charlie' },
+      { title: 'Manager Rejected', description: 'Need you during this critical release phase.', date: '2026-08-11', icon: 'i-lucide-x-circle', color: 'red', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' }
     ]
   }
 ])
@@ -111,6 +111,7 @@ const activeRequestId = ref<number | null>(null)
 const actionComment = ref('')
 
 const toast = useToast()
+const { currentUser } = useDemoAuth()
 
 const openConfirmModal = (id: number, action: 'approve' | 'reject') => {
   activeRequestId.value = id
@@ -130,7 +131,8 @@ const confirmAction = () => {
       description: actionComment.value || (modalAction.value === 'approve' ? 'Approved without comment' : 'Rejected without comment'),
       date: new Date().toISOString().split('T')[0] || '',
       icon: modalAction.value === 'approve' ? 'i-lucide-check-circle' : 'i-lucide-x-circle',
-      color: modalAction.value === 'approve' ? 'green' : 'red'
+      color: modalAction.value === 'approve' ? 'green' : 'red',
+      avatar: currentUser.value.avatar
     })
     
     toast.add({
@@ -342,11 +344,12 @@ const openDrawer = (req: any) => {
               date: 'float-end font-medium text-muted bg-elevated px-2 py-0.5 rounded-full text-xs',
               title: 'text-sm font-semibold text-highlighted mb-2',
               description: 'text-sm text-toned bg-muted/80 p-3 rounded-lg border border-default/50',
-              indicator: 'flex p-1.5 rounded-full bg-default border-2 border-muted transition-colors group-hover:border-primary z-10'
+              indicator: 'flex p-0.5 rounded-full bg-default border-2 border-muted transition-colors group-hover:border-primary z-10'
             }"
           >
             <template #indicator="{ item }">
-                <UIcon :name="item.icon" class="w-4 h-4" :class="`text-${item.color}-500`" />
+                <UAvatar v-if="item.avatar" :src="item.avatar" size="xs" />
+                <UIcon v-else :name="item.icon" class="w-4 h-4 m-1" :class="`text-${item.color}-500`" />
             </template>
           </UTimeline>
         </div>
