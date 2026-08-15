@@ -16,8 +16,8 @@ const leaveRequests = ref([
       { role: 'HR', name: 'Carol White', status: 'pending', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
     ],
     timeline: [
-      { title: 'Leave Request Submitted', description: 'Annual family trip', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Alice' },
-      { title: 'Manager Approved', description: 'Have a great trip!', date: '2026-08-11', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' }
+      { title: 'Manager Approved', description: 'Have a great trip!', date: '2026-08-11', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
+      { title: 'Leave Request Submitted', description: 'Annual family trip', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Alice' }
     ]
   },
   {
@@ -52,8 +52,8 @@ const leaveRequests = ref([
       { role: 'HR', name: 'Carol White', status: 'approved', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
     ],
     timeline: [
-      { title: 'Leave Request Submitted', description: 'Maternity leave', date: '2026-07-01', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Eve' },
-      { title: 'Fully Approved', description: 'All approvers have signed off.', date: '2026-07-05', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' }
+      { title: 'Fully Approved', description: 'All approvers have signed off.', date: '2026-07-05', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' },
+      { title: 'Leave Request Submitted', description: 'Maternity leave', date: '2026-07-01', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Eve' }
     ]
   },
   {
@@ -69,8 +69,8 @@ const leaveRequests = ref([
       { role: 'Manager', name: 'Bob Jones', status: 'rejected', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
     ],
     timeline: [
-      { title: 'Leave Request Submitted', description: 'Personal errands', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Charlie' },
-      { title: 'Manager Rejected', description: 'Need you during this critical release phase.', date: '2026-08-11', icon: 'i-lucide-x-circle', color: 'red', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' }
+      { title: 'Manager Rejected', description: 'Need you during this critical release phase.', date: '2026-08-11', icon: 'i-lucide-x-circle', color: 'red', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
+      { title: 'Leave Request Submitted', description: 'Personal errands', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Charlie' }
     ]
   }
 ])
@@ -126,7 +126,7 @@ const confirmAction = () => {
   if (req) {
     req.status = modalAction.value
     // Add activity to timeline
-    req.timeline.push({
+    req.timeline.unshift({
       title: modalAction.value === 'approve' ? 'Request Approved' : 'Request Rejected',
       description: actionComment.value || (modalAction.value === 'approve' ? 'Approved without comment' : 'Rejected without comment'),
       date: new Date().toISOString().split('T')[0] || '',
@@ -223,7 +223,7 @@ const openDrawer = (req: any) => {
             <span class="font-medium text-dimmed">Reason:</span> {{ request.reason }}
           </div>
 
-          <UDivider />
+          <USeparator />
 
           <!-- Multiple Approvers Pipeline -->
           <div>
@@ -293,7 +293,7 @@ const openDrawer = (req: any) => {
   <!-- Timeline Drawer -->
   <UDrawer v-model:open="isDrawerOpen" direction="right" title="Activity Logs" inset close class="min-w-[600px]">
     <template #body>
-      <div v-if="selectedRequest" class="flex flex-col space-y-6">
+      <div v-if="selectedRequest" class="flex flex-col space-y-4">
         <!-- Header Profile Area -->
         <UCard variant="subtle" :ui="{ root: 'shadow-sm', body: 'sm:p-4' }">
           <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -309,33 +309,33 @@ const openDrawer = (req: any) => {
             </UBadge>
           </div>
         </UCard>
-
-        <!-- Scrollable Content -->
-        <div class="flex-1 overflow-y-auto space-y-8">
-          <!-- <div class="grid grid-cols-2 gap-4">
-            <div class="p-4 rounded-xl bg-muted/50 border border-default transition-colors hover:bg-muted">
+        
+          <div class="grid grid-cols-2 gap-4">
+            <UCard variant="subtle" :ui="{ body: 'sm:p-4' }">
               <div class="text-xs font-semibold text-muted uppercase tracking-wider mb-1">Leave Type</div>
               <div class="font-medium flex items-center gap-2 text-highlighted">
                 <UIcon name="i-lucide-calendar" class="w-4 h-4 text-primary" />
                 {{ selectedRequest.type }}
               </div>
-            </div>
-            <div class="p-4 rounded-xl bg-muted/50 border border-default transition-colors hover:bg-muted">
+            </UCard>
+            <UCard variant="subtle" :ui="{ body: 'sm:p-4' }">
               <div class="text-xs font-semibold text-muted uppercase tracking-wider mb-1">Duration</div>
               <div class="font-medium text-highlighted flex items-center gap-2">
                 <UIcon name="i-lucide-clock" class="w-4 h-4 text-primary" />
                 {{ selectedRequest.duration }}
               </div>
               <div class="text-xs text-dimmed font-normal mt-1">{{ selectedRequest.startDate }} &rarr; {{ selectedRequest.endDate }}</div>
-            </div>
-            <div class="col-span-2 p-4 rounded-xl bg-muted/50 border border-default">
+            </UCard>
+            <UCard variant="subtle" class="col-span-2" :ui="{ body: 'sm:p-4' }">
               <div class="text-xs font-semibold text-muted uppercase tracking-wider mb-2">Reason for Leave</div>
               <p class="text-sm text-toned leading-relaxed">{{ selectedRequest.reason }}</p>
-            </div>
-          </div> -->
+            </UCard>
+          </div>
 
-          <!-- <USeparator label="Timeline" /> -->
+          <USeparator label="Timeline" />
 
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto">
           <!-- Timeline -->
           <UTimeline
             :items="selectedRequest.timeline"
@@ -348,7 +348,7 @@ const openDrawer = (req: any) => {
             }"
           >
             <template #indicator="{ item }">
-                <UAvatar v-if="item.avatar" :src="item.avatar" size="xs" />
+                <UAvatar v-if="item.avatar" :src="(item.avatar as any)" size="xs" />
                 <UIcon v-else :name="item.icon" class="w-4 h-4 m-1" :class="`text-${item.color}-500`" />
             </template>
           </UTimeline>
