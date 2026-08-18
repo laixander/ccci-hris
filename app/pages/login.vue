@@ -23,6 +23,7 @@ const onSubmit = async () => {
   console.log('Login submitted:', state.email)
   
   toast.add({
+    id: 'login',
     title: 'Login Successful',
     description: 'Welcome back to the dashboard.',
     color: 'success',

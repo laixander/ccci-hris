@@ -76,6 +76,7 @@ const leaveRequests = ref([
 ])
 
 const filterStatus = ref('pending')
+const search = ref('')
 const tabs = [
   { label: 'Pending', value: 'pending' },
   { label: 'Approved', value: 'approved' },
@@ -84,8 +85,22 @@ const tabs = [
 ]
 
 const filteredRequests = computed(() => {
-  if (filterStatus.value === 'all') return leaveRequests.value
-  return leaveRequests.value.filter(req => req.status === filterStatus.value)
+  let result = leaveRequests.value
+
+  if (filterStatus.value !== 'all') {
+    result = result.filter(req => req.status === filterStatus.value)
+  }
+
+  if (search.value) {
+    const searchTerm = search.value.toLowerCase()
+    result = result.filter(req => 
+      req.employee.name.toLowerCase().includes(searchTerm) ||
+      req.type.toLowerCase().includes(searchTerm) ||
+      req.reason.toLowerCase().includes(searchTerm)
+    )
+  }
+
+  return result
 })
 
 const getStatusColor = (status: string) => {
@@ -136,8 +151,9 @@ const confirmAction = () => {
     })
     
     toast.add({
+      id: `approval_${activeRequestId.value}`,
       title: modalAction.value === 'approve' ? 'Request Approved' : 'Request Rejected',
-      description: `The request has been successfully ${modalAction.value}ed.`,
+      description: `The request has been successfully ${modalAction.value === 'approve' ? 'approved' : 'rejected'}.`,
       color: modalAction.value === 'approve' ? 'success' : 'error',
       icon: modalAction.value === 'approve' ? 'i-lucide-check-circle' : 'i-lucide-x-circle'
     })
@@ -165,16 +181,20 @@ const openDrawer = (req: any) => {
       </UPageCard>
       
       <!-- Controls -->
-      <div class="flex flex-wrap gap-2">
-        <UButton
-          v-for="tab in tabs"
-          :key="tab.value"
-          :label="tab.label"
-          :variant="filterStatus === tab.value ? 'solid' : 'soft'"
-          :color="filterStatus === tab.value ? 'primary' : 'neutral'"
-          class="rounded-full"
-          @click="filterStatus = tab.value"
-        />
+      <!-- add searchbar here -->
+       <div class="flex items-center gap-4">
+        <UInput v-model="search" placeholder="Search requests" icon="i-lucide-search" class="flex-1" />
+        <div class="flex flex-wrap gap-2">
+          <UButton
+            v-for="tab in tabs"
+            :key="tab.value"
+            :label="tab.label"
+            :variant="filterStatus === tab.value ? 'solid' : 'soft'"
+            :color="filterStatus === tab.value ? 'primary' : 'neutral'"
+            class="rounded-full"
+            @click="filterStatus = tab.value"
+          />
+        </div>
       </div>
     </div>
 
@@ -324,7 +344,7 @@ const openDrawer = (req: any) => {
                 <UIcon name="i-lucide-clock" class="w-4 h-4 text-primary" />
                 {{ selectedRequest.duration }}
               </div>
-              <div class="text-xs text-dimmed font-normal mt-1">{{ selectedRequest.startDate }} &rarr; {{ selectedRequest.endDate }}</div>
+              <div class="text-xs text-dimmed font-normal mt-1">{{ selectedRequest.startDate }} to {{ selectedRequest.endDate }}</div>
             </UCard>
             <UCard variant="subtle" class="col-span-2" :ui="{ body: 'sm:p-4' }">
               <div class="text-xs font-semibold text-muted uppercase tracking-wider mb-2">Reason for Leave</div>

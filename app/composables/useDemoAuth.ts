@@ -14,6 +14,7 @@ export const useDemoAuth = () => {
     const logout = () => {
         console.log('User logged out')
         toast.add({
+            id: 'logout',
             title: 'Logged Out',
             description: 'You have been successfully logged out.',
             color: 'info',
