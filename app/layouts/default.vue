@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { alert } from '#build/ui';
 import type { NavigationMenuItem, SidebarProps } from '@nuxt/ui'
 
 // Ignore the props for the example
@@ -7,6 +8,7 @@ const variant = ref<SidebarProps['variant']>('inset')
 const collapsible = ref<SidebarProps['collapsible']>('icon')
 
 const open = ref(true)
+const { alertMsg, clearAlert } = useAlert()
 
 const isCollapsed = computed(() => collapsible.value === 'icon' && !open.value)
 
@@ -28,7 +30,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Timesheet',
-            icon: 'i-lucide-timer'
+            icon: 'i-lucide-timer',
+            to: '/timesheet'
         },
         {
             label: 'DTR Evaluation',
@@ -123,6 +126,9 @@ const pageTitle = computed(() => {
     const segment = path.split('/').filter(Boolean).pop() || ''
     return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
 })
+
+// add isTable to definePageMeta
+const isTable = computed(() => route.meta.isTable || false)
 </script>
 
 <template>
@@ -171,8 +177,35 @@ const pageTitle = computed(() => {
                 <!-- page title -->
                 <h1 class="text-lg font-semibold">{{ pageTitle }}</h1>
             </div>
+            
+            <UAlert 
+                color="error"
+                variant="soft" 
+                orientation="horizontal"
+                close
+                @update:open="(val) => !val && clearAlert()"
+                :ui="{
+                    root: 'rounded-none border-b border-error/20',
+                    title: 'flex w-full items-center gap-3',
+                }" 
+                :actions="[
+                {
+                    label: 'Review Timesheet',
+                    color: 'error',
+                    variant: 'subtle'
+                }
+                ]" v-if="alertMsg && !isCollapsed">
+                <template #title>
+                    <span class="relative flex size-4">
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-error opacity-75"></span>
+                        <UIcon name="i-lucide-circle-alert" class="size-4 text-error" />
+                    </span>
+                    {{ alertMsg }}
+                </template>
+            </UAlert>
 
-            <div class="flex-1 p-4 overflow-y-auto scrollbar">
+            <!-- if isTable true, no padding -->
+            <div :class="[ isTable ? 'flex flex-col overflow-hidden min-h-0' : 'p-4 overflow-y-auto scrollbar' ]" class="flex-1">
                 <slot />
             </div>
         </div>

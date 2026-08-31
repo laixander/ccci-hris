@@ -94,6 +94,8 @@ const birthdayItems = computed(() => [
         badge: { label: upcomingBirthdaysList.length, variant: 'soft' as const, color: 'neutral' as const }
     }
 ])
+
+
 </script>
 
 <template>
