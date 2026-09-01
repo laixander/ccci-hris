@@ -33,13 +33,14 @@ const items = computed<NavigationMenuItem[][]>(() => [
             icon: 'i-lucide-timer',
             to: '/timesheet'
         },
-        {
-            label: 'DTR Evaluation',
-            icon: 'i-lucide-clipboard-check'
-        },
+        // {
+        //     label: 'DTR Evaluation',
+        //     icon: 'i-lucide-clipboard-check'
+        // },
         {
             label: 'Leaves',
-            icon: 'i-lucide-calendar'
+            icon: 'i-lucide-calendar',
+            to: '/leaves'
         },
         {
             label: 'Overtime',
@@ -176,6 +177,8 @@ const isTable = computed(() => route.meta.isTable || false)
 
                 <!-- page title -->
                 <h1 class="text-lg font-semibold">{{ pageTitle }}</h1>
+                <!-- color mode -->
+                <UColorModeButton class="ml-auto" />
             </div>
             
             <UAlert 

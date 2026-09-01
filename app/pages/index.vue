@@ -113,7 +113,7 @@ const birthdayItems = computed(() => [
         <!-- Top Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Time Card -->
-            <UCard variant="subtle"
+            <UCard 
                 :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
                 <template #header>
                     <div class="flex items-center justify-between">
@@ -134,7 +134,7 @@ const birthdayItems = computed(() => [
             </UCard>
 
             <!-- Leaves Card -->
-            <UCard variant="subtle"
+            <UCard 
                 :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
                 <template #header>
                     <div class="flex items-center justify-between">
@@ -154,7 +154,7 @@ const birthdayItems = computed(() => [
             </UCard>
 
             <!-- Overtime Card -->
-            <UCard variant="subtle"
+            <UCard 
                 :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
                 <template #header>
                     <div class="flex items-center justify-between">
@@ -174,7 +174,7 @@ const birthdayItems = computed(() => [
             </UCard>
 
             <!-- Tasks for Approval Card -->
-            <UCard variant="subtle"
+            <UCard 
                 :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
                 <template #header>
                     <div class="flex items-center justify-between">
@@ -209,7 +209,7 @@ const birthdayItems = computed(() => [
             <!-- Left Column -->
             <div class="xl:col-span-2 space-y-6">
                 <!-- Employee Attendance -->
-                <UCard variant="subtle" :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
+                <UCard  :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
                     <template #header>
                         <div class="flex items-center gap-2">
                             <UIcon name="i-lucide-users" class="text-primary size-5" />
@@ -270,7 +270,7 @@ const birthdayItems = computed(() => [
                 </UCard>
 
                 <!-- Leave Schedule -->
-                <UCard variant="subtle" :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
+                <UCard  :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
                     <template #header>
                         <div class="flex items-center gap-2">
                             <UIcon name="i-lucide-calendar" class="text-orange-500 size-5" />
@@ -332,7 +332,7 @@ const birthdayItems = computed(() => [
                 </UCard>
 
                 <!-- Birthdays -->
-                <UCard variant="subtle" :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
+                <UCard  :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
                     <template #header>
                         <div class="flex items-center gap-2">
                             <UIcon name="i-lucide-cake" class="text-pink-500 size-5" />
@@ -397,7 +397,7 @@ const birthdayItems = computed(() => [
             <!-- Right Column -->
             <div class="space-y-6">
                 <!-- Recent Activities -->
-                <UCard variant="subtle" :ui="{ root: 'shadow-sm h-full' }">
+                <UCard  :ui="{ root: 'shadow-sm h-full' }">
                     <template #header>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">

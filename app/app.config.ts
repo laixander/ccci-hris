@@ -21,6 +21,16 @@ export default defineAppConfig({
       fuchsia: 'fuchsia',
       pink: 'pink',
       rose: 'rose',
+    },
+    select: {
+      slots: {
+        viewport: 'scrollbar',
+      },
+    },
+    table: {
+      slots: {
+        root: 'scrollbar',
+      }
     }
   }
 })
