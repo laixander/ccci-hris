@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, h, resolveComponent } from 'vue'
-import type { TabsItem, TableColumn, TableRow } from '@nuxt/ui'
+import type { TableColumn, TableRow } from '@nuxt/ui'
 
-const UBadge = resolveComponent('UBadge')
 const UButton = resolveComponent('UButton')
+const StatusBadge = resolveComponent('StatusBadge')
 
 definePageMeta({
     isTable: true,
@@ -11,7 +11,7 @@ definePageMeta({
 
 const activeTab = ref('dtr')
 
-const items = ref<TabsItem[]>([
+const items = [
   {
     label: 'Daily Time Record',
     icon: 'i-lucide-clock',
@@ -27,14 +27,14 @@ const items = ref<TabsItem[]>([
     icon: 'i-lucide-list-checks',
     value: 'evaluation'
   }
-])
+]
 
 type TimesheetRecord = {
   day: number
   timeIn: string | null
   timeOut: string | null
   duration: number
-  status: 'Present' | 'Holiday' | 'Weekend' | 'LWOP' | 'On Leave'
+  status: 'PRESENT' | 'HOLIDAY' | 'WEEKEND' | 'LWOP' | 'ON LEAVE'
   overtime: number
   late: number
   undertime: number
@@ -54,70 +54,60 @@ type TimeAdjustmentRecord = {
 type EvaluationRecord = {
   cutoffPeriod: string
   confirmedDate: string
-  status: 'Pending' | 'Confirmed'
+  status: 'PENDING' | 'CONFIRMED'
 }
 
 const timeAdjustmentData = ref<TimeAdjustmentRecord[]>([])
 
 const data = ref<TimesheetRecord[]>([
-  { day: 31, timeIn: null, timeOut: null, duration: 0, status: 'Holiday', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 30, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 29, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 28, timeIn: '07:21:00 AM', timeOut: '05:13:00 PM', duration: 9.87, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 27, timeIn: '08:08:00 AM', timeOut: '05:01:00 PM', duration: 8.88, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 26, timeIn: '08:06:00 AM', timeOut: '05:00:00 PM', duration: 8.90, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 25, timeIn: '07:37:00 AM', timeOut: '05:01:00 PM', duration: 9.40, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 24, timeIn: '08:04:00 AM', timeOut: '05:02:00 PM', duration: 8.97, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 23, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 22, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 21, timeIn: null, timeOut: null, duration: 0, status: 'Holiday', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 20, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 19, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 18, timeIn: '07:31:00 AM', timeOut: '05:11:00 PM', duration: 9.67, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 31, timeIn: null, timeOut: null, duration: 0, status: 'HOLIDAY', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 30, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 29, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 28, timeIn: '07:21:00 AM', timeOut: '05:13:00 PM', duration: 9.87, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 27, timeIn: '08:08:00 AM', timeOut: '05:01:00 PM', duration: 8.88, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 26, timeIn: '08:06:00 AM', timeOut: '05:00:00 PM', duration: 8.90, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 25, timeIn: '07:37:00 AM', timeOut: '05:01:00 PM', duration: 9.40, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 24, timeIn: '08:04:00 AM', timeOut: '05:02:00 PM', duration: 8.97, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 23, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 22, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 21, timeIn: null, timeOut: null, duration: 0, status: 'HOLIDAY', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 20, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 19, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 18, timeIn: '07:31:00 AM', timeOut: '05:11:00 PM', duration: 9.67, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
   { day: 17, timeIn: null, timeOut: null, duration: 0, status: 'LWOP', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 8.00 },
-  { day: 16, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 15, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 14, timeIn: '07:32:00 AM', timeOut: '05:23:00 PM', duration: 9.85, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 13, timeIn: '08:06:00 AM', timeOut: '05:01:00 PM', duration: 8.92, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 12, timeIn: '08:06:00 AM', timeOut: '05:02:00 PM', duration: 8.93, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 11, timeIn: null, timeOut: null, duration: 0, status: 'On Leave', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
-  { day: 10, timeIn: '07:30:00 AM', timeOut: '05:05:00 PM', duration: 9.58, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 9, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 8, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 7, timeIn: '07:32:00 AM', timeOut: '05:08:00 PM', duration: 9.60, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 6, timeIn: '07:55:00 AM', timeOut: '05:04:00 PM', duration: 9.15, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 5, timeIn: '08:07:00 AM', timeOut: '05:00:00 PM', duration: 8.88, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 4, timeIn: null, timeOut: null, duration: 0, status: 'On Leave', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
-  { day: 3, timeIn: '08:08:00 AM', timeOut: '05:02:00 PM', duration: 8.90, status: 'Present', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 2, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 1, timeIn: null, timeOut: null, duration: 0, status: 'Weekend', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 16, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 15, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 14, timeIn: '07:32:00 AM', timeOut: '05:23:00 PM', duration: 9.85, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 13, timeIn: '08:06:00 AM', timeOut: '05:01:00 PM', duration: 8.92, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 12, timeIn: '08:06:00 AM', timeOut: '05:02:00 PM', duration: 8.93, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 11, timeIn: null, timeOut: null, duration: 0, status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
+  { day: 10, timeIn: '07:30:00 AM', timeOut: '05:05:00 PM', duration: 9.58, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 9, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 8, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 7, timeIn: '07:32:00 AM', timeOut: '05:08:00 PM', duration: 9.60, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 6, timeIn: '07:55:00 AM', timeOut: '05:04:00 PM', duration: 9.15, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 5, timeIn: '08:07:00 AM', timeOut: '05:00:00 PM', duration: 8.88, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 4, timeIn: null, timeOut: null, duration: 0, status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
+  { day: 3, timeIn: '08:08:00 AM', timeOut: '05:02:00 PM', duration: 8.90, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 2, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+  { day: 1, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
 ])
 
 const columns: TableColumn<TimesheetRecord>[] = [
   { accessorKey: 'day', header: 'Day' },
   { accessorKey: 'timeIn', header: 'Time In', cell: ({ row }) => row.getValue('timeIn') || '--:--' },
   { accessorKey: 'timeOut', header: 'Time Out', cell: ({ row }) => row.getValue('timeOut') || '--:--' },
-  { accessorKey: 'duration', header: 'Duration', cell: ({ row }) => Number(row.getValue('duration')).toFixed(2) },
+  { accessorKey: 'duration', header: 'Duration', meta: { class: { th: 'text-right', td: 'text-right font-medium text-neutral-600 dark:text-neutral-400' } }, cell: ({ row }) => Number(row.getValue('duration')).toFixed(2) },
   { 
     accessorKey: 'status', 
     header: 'Status', 
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string;
-      const colorMap: Record<string, any> = {
-        Present: 'success',
-        Holiday: 'primary',
-        Weekend: 'neutral',
-        LWOP: 'error',
-        'On Leave': 'warning'
-      }
-      return h(UBadge, { color: colorMap[status] || 'neutral', variant: 'subtle' }, () => status)
-    }
+    cell: ({ row }) => h(StatusBadge, { status: row.getValue('status') as string })
   },
-  { accessorKey: 'overtime', header: 'Overtime', cell: ({ row }) => Number(row.getValue('overtime')).toFixed(2) },
-  { accessorKey: 'late', header: 'Late', cell: ({ row }) => Number(row.getValue('late')).toFixed(2) },
-  { accessorKey: 'undertime', header: 'Undertime', cell: ({ row }) => Number(row.getValue('undertime')).toFixed(2) },
-  { accessorKey: 'leave', header: 'Leave', cell: ({ row }) => Number(row.getValue('leave')).toFixed(2) },
-  { accessorKey: 'lwop', header: 'LWOP', cell: ({ row }) => Number(row.getValue('lwop')).toFixed(2) },
+  { accessorKey: 'overtime', header: 'Overtime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('overtime')).toFixed(2) },
+  { accessorKey: 'late', header: 'Late', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('late')).toFixed(2) },
+  { accessorKey: 'undertime', header: 'Undertime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('undertime')).toFixed(2) },
+  { accessorKey: 'leave', header: 'Leave', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('leave')).toFixed(2) },
+  { accessorKey: 'lwop', header: 'LWOP', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('lwop')).toFixed(2) },
 ]
 
 const timeAdjustmentColumns: TableColumn<TimeAdjustmentRecord>[] = [
@@ -130,41 +120,33 @@ const timeAdjustmentColumns: TableColumn<TimeAdjustmentRecord>[] = [
 ]
 
 const evaluationData = ref<EvaluationRecord[]>([
-  { cutoffPeriod: 'August 14, 2026 – August 27, 2026', confirmedDate: 'Not yet confirmed', status: 'Pending' },
-  { cutoffPeriod: 'July 31, 2026 – August 13, 2026', confirmedDate: 'August 14, 2026 at 11:58 AM', status: 'Confirmed' },
-  { cutoffPeriod: 'July 15, 2026 – July 30, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'Confirmed' },
-  { cutoffPeriod: 'June 30, 2026 – July 14, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'Confirmed' },
-  { cutoffPeriod: 'June 15, 2026 – June 29, 2026', confirmedDate: 'July 03, 2026 at 07:36 AM', status: 'Confirmed' },
-  { cutoffPeriod: 'May 29, 2026 – June 12, 2026', confirmedDate: 'June 11, 2026 at 06:30 PM', status: 'Confirmed' },
-  { cutoffPeriod: 'May 15, 2026 – May 28, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'Confirmed' },
-  { cutoffPeriod: 'April 30, 2026 – May 14, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'Confirmed' },
-  { cutoffPeriod: 'April 15, 2026 – April 29, 2026', confirmedDate: 'May 11, 2026 at 09:49 AM', status: 'Confirmed' },
-  { cutoffPeriod: 'March 31, 2026 – April 14, 2026', confirmedDate: 'April 30, 2026 at 08:26 AM', status: 'Confirmed' },
+  { cutoffPeriod: 'August 14, 2026 – August 27, 2026', confirmedDate: 'Not yet confirmed', status: 'PENDING' },
+  { cutoffPeriod: 'July 31, 2026 – August 13, 2026', confirmedDate: 'August 14, 2026 at 11:58 AM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'July 15, 2026 – July 30, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'June 30, 2026 – July 14, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'June 15, 2026 – June 29, 2026', confirmedDate: 'July 03, 2026 at 07:36 AM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'May 29, 2026 – June 12, 2026', confirmedDate: 'June 11, 2026 at 06:30 PM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'May 15, 2026 – May 28, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'April 30, 2026 – May 14, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'April 15, 2026 – April 29, 2026', confirmedDate: 'May 11, 2026 at 09:49 AM', status: 'CONFIRMED' },
+  { cutoffPeriod: 'March 31, 2026 – April 14, 2026', confirmedDate: 'April 30, 2026 at 08:26 AM', status: 'CONFIRMED' },
 ])
-
-const evaluationColumns: TableColumn<EvaluationRecord>[] = [
-  { accessorKey: 'cutoffPeriod', header: 'Cut-off Period' },
-  { accessorKey: 'confirmedDate', header: 'Confirmed Date' },
-  { 
-    accessorKey: 'status', 
-    header: 'Status',
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string;
-      const color = status === 'Confirmed' ? 'success' : 'warning';
-      return h(UBadge, { color, variant: 'subtle' }, () => status)
-    }
-  },
-  {
-    accessorKey: 'actions',
-    header: '',
-    cell: ({ row }) => {
-      return h(UButton, { label: 'Review', variant: 'soft', color: 'primary', size: 'xs', onclick: () => isDrawerOpen.value = true })
-    }
-  }
-]
 
 const month = ref(new Date().getMonth() + 1)
 const year = ref(new Date().getFullYear())
+
+function getCutoffHalf(cutoffPeriod: string) {
+  const parts = cutoffPeriod.split('–')
+  if (parts.length === 2) {
+    const endPart = parts[1]
+    if (!endPart) return ''
+    const endDate = new Date(endPart.trim())
+    if (!isNaN(endDate.getTime())) {
+      return endDate.getDate() <= 15 ? '1st Half' : '2nd Half'
+    }
+  }
+  return ''
+}
 
 const months = [
   { label: 'January', value: 1 },
@@ -210,71 +192,105 @@ const evaluationDetailsColumns: TableColumn<TimesheetRecord>[] = [
   { 
     accessorKey: 'status', 
     header: 'Status', 
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string;
-      const colorMap: Record<string, any> = {
-        Present: 'success',
-        Holiday: 'error',
-        Weekend: 'neutral',
-        LWOP: 'error',
-        'On Leave': 'warning'
-      }
-      return h(UBadge, { color: colorMap[status] || 'neutral', variant: 'subtle' }, () => status)
-    }
+    cell: ({ row }) => h(StatusBadge, { status: row.getValue('status') as string })
   },
-  { accessorKey: 'duration', header: 'Duration', cell: ({ row }) => Number(row.getValue('duration')).toFixed(2) },
-  { accessorKey: 'late', header: 'Late', cell: ({ row }) => Number(row.getValue('late')).toFixed(2) },
-  { accessorKey: 'undertime', header: 'Undertime', cell: ({ row }) => Number(row.getValue('undertime')).toFixed(2) },
-  { accessorKey: 'lwop', header: 'LWOP', cell: ({ row }) => Number(row.getValue('lwop')).toFixed(2) },
-  { accessorKey: 'overtime', header: 'Overtime', cell: ({ row }) => Number(row.getValue('overtime')).toFixed(2) },
-  { accessorKey: 'leave', header: 'VL Deductions', cell: ({ row }) => Number(row.getValue('leave')).toFixed(2) },
+  { accessorKey: 'duration', header: 'Duration', meta: { class: { th: 'text-right', td: 'text-right text-neutral-600 dark:text-neutral-400 font-medium' } }, cell: ({ row }) => Number(row.getValue('duration')).toFixed(2) },
+  { accessorKey: 'late', header: 'Late', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('late')).toFixed(2) },
+  { accessorKey: 'undertime', header: 'Undertime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('undertime')).toFixed(2) },
+  { accessorKey: 'lwop', header: 'LWOP', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('lwop')).toFixed(2) },
+  { accessorKey: 'overtime', header: 'Overtime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('overtime')).toFixed(2) },
+  { accessorKey: 'leave', header: 'VL Deductions', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('leave')).toFixed(2) },
 ]
 
 const evaluationDetailsData = computed(() => {
   const allowedDays = [14, 17, 18, 19, 20, 21, 24, 25, 26, 27]
   return data.value.filter(d => allowedDays.includes(d.day)).sort((a, b) => a.day - b.day)
 })
+
+const container = useTemplateRef('container')
+const header = useTemplateRef('header')
+const getScrollElement = () => container.value
+
+const { height: headerHeight } = useElementSize(header, undefined, { box: 'border-box' })
 </script>
 
 <template>
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
-      <UPageCard title="Timesheet Management" description="Review and evaluate your daily time records."
-          variant="naked" orientation="horizontal">
-          <div class="flex justify-end gap-2 flex-1">
+  <div ref="container" class="flex-1 overflow-y-auto scrollbar">
+    <!-- Everything that should scroll away with the table -->
+    <div ref="header">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
+          <UPageCard title="Timesheet Management" description="Review and evaluate your daily time records."
+              variant="naked" orientation="horizontal">
+              <div class="flex justify-end gap-2 flex-1">
+              </div>
+          </UPageCard>
+          <div v-if="activeTab === 'dtr'" class="flex gap-2">
+            <USelect v-model="month" :items="months" class="w-40" />
+            <USelect v-model="year" :items="years" class="w-32" />
           </div>
-      </UPageCard>
-      <div v-if="activeTab === 'dtr'" class="flex gap-2">
-        <USelect v-model="month" :items="months" class="w-40" />
-        <USelect v-model="year" :items="years" class="w-32" />
+          <div v-else-if="activeTab === 'evaluation'" class="flex gap-2">
+            <USelect :items="cutoffs" placeholder="Select Cut-off" class="w-72" />
+          </div>
       </div>
-      <div v-else-if="activeTab === 'evaluation'" class="flex gap-2">
-        <USelect :items="cutoffs" placeholder="Select Cut-off" class="w-72" />
-      </div>
-      <!-- <UButton label="Apply for Time Adjustment" variant="subtle" color="neutral" icon="i-lucide-calendar-check" /> -->
-  </div>
 
-  <UTabs v-model="activeTab" :content="false" :items="items" variant="link" class="w-full pb-[1px]" />
+      <div class="flex flex-wrap gap-2 w-full px-4 pb-4">
+          <UButton v-for="tab in items" :key="tab.value" 
+              :variant="activeTab === tab.value ? 'solid' : 'soft'"
+              :color="activeTab === tab.value ? 'primary' : 'neutral'" class="rounded-full"
+              @click="activeTab = tab.value">
+              <UIcon :name="tab.icon" class="shrink-0 size-4" /> {{ tab.label }}
+          </UButton>
+      </div>
+
+      <USeparator />
+    </div>
 
   <!-- tab: dtr -->
-  <UTable v-if="activeTab === 'dtr'" :data="data" :columns="columns" sticky class="flex-1">
+  <UTable v-if="activeTab === 'dtr'" :data="data" :columns="columns" sticky class="flex-1" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
       <template #empty>
           <UEmpty icon="i-lucide-clock" title="No time records" description="There are no daily time records available for this period." variant="naked" />
       </template>
   </UTable>
 
   <!-- tab: time adjustment -->
-  <UTable v-else-if="activeTab === 'time-adjustment'" :data="timeAdjustmentData" :columns="timeAdjustmentColumns" sticky class="flex-1">
+  <UTable v-else-if="activeTab === 'time-adjustment'" :data="timeAdjustmentData" :columns="timeAdjustmentColumns" sticky class="flex-1" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
       <template #empty>
           <UEmpty icon="i-lucide-calendar-check" title="No time adjustments" description="You haven't applied for any time adjustments yet." variant="naked" />
       </template>
   </UTable>
 
   <!-- tab: evaluation -->
-  <UTable v-else-if="activeTab === 'evaluation'" :data="evaluationData" :columns="evaluationColumns" sticky class="flex-1" @select="onSelect">
-      <template #empty>
+  <div v-else-if="activeTab === 'evaluation'" class="flex-1 flex flex-col p-4">
+      <div v-if="evaluationData.length === 0" class="flex-1 flex items-center justify-center">
           <UEmpty icon="i-lucide-calendar-check" title="No evaluations" description="There are no evaluations available for this period." variant="naked" />
-      </template>
-  </UTable>
+      </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <UCard v-for="evaluation in evaluationData" :key="evaluation.cutoffPeriod" class="shadow-sm cursor-pointer group hover:ring-1 hover:ring-primary/40 transition-all" :ui="{ body: 'group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out' }" @click="selectedEvaluation = evaluation; isDrawerOpen = true">
+              <div class="flex items-start justify-between">
+                  <div class="flex items-start justify-between w-full gap-2">
+                      <div>
+                          <div class="text-xs text-dimmed group-hover:text-primary/60 transition-colors">{{ getCutoffHalf(evaluation.cutoffPeriod) }}</div>
+                          <div class="group-hover:text-primary transition-colors font-semibold text-sm">{{ evaluation.cutoffPeriod }}</div>
+                      </div>
+                      <!-- <UIcon name="i-lucide-panel-right-open" class="text-primary opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 size-5" /> -->
+                  </div>
+              </div>
+              <div class="relative mt-4 sm:mt-6">
+                <!-- Default: status + date -->
+                <div class="flex items-center justify-between transition-all duration-200 group-hover:opacity-0 group-hover:-translate-y-1">
+                  <StatusBadge :status="evaluation.status" />
+                  <div class="text-xs text-dimmed">{{ evaluation.confirmedDate }}</div>
+                </div>
+                <!-- Hover: review button -->
+                <div class="absolute inset-0 flex items-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+                  <UButton block label="Review" variant="soft" :color="evaluation.status === 'CONFIRMED' ? 'success' : 'warning'" @click.stop="selectedEvaluation = evaluation; isDrawerOpen = true" />
+                </div>
+              </div>
+          </UCard>
+      </div>
+  </div>
+
+  </div>
 
   <UDrawer v-model:open="isDrawerOpen" direction="right" title="Review Timesheet" inset close class="w-full max-w-[1200px]" :ui="{container: 'pr-0', header: 'pr-4', footer: 'pr-4', body: 'min-h-0 pr-4 pl-[1px] py-[1px] overflow-y-auto scrollbar'}">
     <template #body>
@@ -331,7 +347,7 @@ const evaluationDetailsData = computed(() => {
     v-model:open="isModalOpen"
     title="Confirmation"
     icon="i-lucide-triangle-alert"
-    color="warning"
+    color="yellow"
     confirm-label="Confirm"
     cancel-label="Cancel"
     description="By clicking 'Confirm', I hereby certify that the information provided in my timesheet is true, accurate, and complete to the best of my knowledge and belief. I understand that this timesheet will serve as the basis for payroll computation, and that no further corrections will be entertained after submission. I also acknowledge that any false or misleading information may be subject to disciplinary action in accordance with company policies."

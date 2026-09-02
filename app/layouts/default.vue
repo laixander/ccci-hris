@@ -195,7 +195,7 @@ const isTable = computed(() => route.meta.isTable || false)
                 {
                     label: 'Review Timesheet',
                     color: 'error',
-                    variant: 'subtle'
+                    variant: 'soft'
                 }
                 ]" v-if="alertMsg && !isCollapsed">
                 <template #title>

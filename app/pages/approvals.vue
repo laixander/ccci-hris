@@ -12,10 +12,10 @@ const leaveRequests = ref([
         duration: '4 Days',
         reason: 'Annual family trip',
         dateApplied: '2026-08-10',
-        status: 'pending',
+        status: 'PENDING',
         approvers: [
-            { role: 'Manager', name: 'Bob Jones', status: 'approved', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
-            { role: 'HR', name: 'Carol White', status: 'pending', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
+            { role: 'Manager', name: 'Bob Jones', status: 'APPROVED', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
+            { role: 'HR', name: 'Carol White', status: 'PENDING', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
         ],
         timeline: [
             { title: 'Manager Approved', description: 'Have a great trip!', date: '2026-08-11', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
@@ -31,10 +31,10 @@ const leaveRequests = ref([
         duration: '2 Days',
         reason: 'Flu and high fever',
         dateApplied: '2026-08-10',
-        status: 'pending',
+        status: 'PENDING',
         approvers: [
-            { role: 'Manager', name: 'Bob Jones', status: 'pending', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
-            { role: 'Director', name: 'Frank Miller', status: 'pending', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' },
+            { role: 'Manager', name: 'Bob Jones', status: 'PENDING', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
+            { role: 'Director', name: 'Frank Miller', status: 'PENDING', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' },
         ],
         timeline: [
             { title: 'Leave Request Submitted', description: 'Flu and high fever', date: '2026-08-14', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=David' }
@@ -49,11 +49,11 @@ const leaveRequests = ref([
         duration: '3 Months',
         reason: 'Maternity leave',
         dateApplied: '2026-08-10',
-        status: 'approved',
+        status: 'APPROVED',
         approvers: [
-            { role: 'Manager', name: 'Bob Jones', status: 'approved', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
-            { role: 'Director', name: 'Frank Miller', status: 'approved', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' },
-            { role: 'HR', name: 'Carol White', status: 'approved', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
+            { role: 'Manager', name: 'Bob Jones', status: 'APPROVED', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
+            { role: 'Director', name: 'Frank Miller', status: 'APPROVED', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Frank' },
+            { role: 'HR', name: 'Carol White', status: 'APPROVED', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
         ],
         timeline: [
             { title: 'HR Approved', description: 'Approved by HR', date: '2026-07-05', icon: 'i-lucide-check-circle', color: 'green', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carol' },
@@ -71,9 +71,9 @@ const leaveRequests = ref([
         duration: '3 Days',
         reason: 'Personal errands',
         dateApplied: '2026-08-10',
-        status: 'rejected',
+        status: 'REJECTED',
         approvers: [
-            { role: 'Manager', name: 'Bob Jones', status: 'rejected', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
+            { role: 'Manager', name: 'Bob Jones', status: 'REJECTED', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
         ],
         timeline: [
             { title: 'Manager Rejected', description: 'Need you during this critical release phase.', date: '2026-08-11', icon: 'i-lucide-x-circle', color: 'red', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
@@ -82,19 +82,19 @@ const leaveRequests = ref([
     }
 ])
 
-const filterStatus = ref('pending')
+const filterStatus = ref('PENDING')
 const search = ref('')
 const tabs = [
-    { label: 'Pending', value: 'pending' },
-    { label: 'Approved', value: 'approved' },
-    { label: 'Rejected', value: 'rejected' },
-    { label: 'All', value: 'all' }
+    { label: 'Pending', value: 'PENDING' },
+    { label: 'Approved', value: 'APPROVED' },
+    { label: 'Rejected', value: 'REJECTED' },
+    { label: 'All', value: 'ALL' }
 ]
 
 const filteredRequests = computed(() => {
     let result = leaveRequests.value
 
-    if (filterStatus.value !== 'all') {
+    if (filterStatus.value !== 'ALL') {
         result = result.filter(req => req.status === filterStatus.value)
     }
 
@@ -111,7 +111,7 @@ const filteredRequests = computed(() => {
 })
 
 const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
         case 'approved': return 'green'
         case 'rejected': return 'red'
         default: return 'orange'
@@ -119,7 +119,7 @@ const getStatusColor = (status: string) => {
 }
 
 const getStatusIcon = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
         case 'approved': return 'i-lucide-check-circle'
         case 'rejected': return 'i-lucide-x-circle'
         default: return 'i-lucide-clock'
@@ -154,7 +154,7 @@ const confirmAction = () => {
     if (activeRequestId.value === null) return
     const req = leaveRequests.value.find(r => r.id === activeRequestId.value)
     if (req) {
-        req.status = modalAction.value
+        req.status = modalAction.value === 'approve' ? 'APPROVED' : 'REJECTED'
         // Add activity to timeline
         req.timeline.unshift({
             title: modalAction.value === 'approve' ? 'Request Approved' : 'Request Rejected',
@@ -230,28 +230,33 @@ const items = [
 
         <!-- Requests Grid -->
         <div v-if="filteredRequests.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <UCard v-for="request in filteredRequests" :key="request.id" :ui="{root: 'shadow-sm flex flex-col cursor-pointer transition-shadow hover:shadow-md', body: 'sm:p-4', footer: 'sm:p-4'}" @click="openDrawer(request)">
-                <div class="flex justify-between items-center">
+            <UCard v-for="request in filteredRequests" :key="request.id"
+                class="shadow-sm cursor-pointer group hover:ring-1 hover:ring-primary/40 transition-all"
+                :ui="{ root: 'flex flex-col', body: 'sm:p-4 group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out', footer: 'sm:p-4' }"
+                @click="openDrawer(request)">
+                <div class="flex justify-between items-start">
                     <div class="space-y-1">
-                        <UBadge size="sm" icon="i-lucide-file-text" :label="`#00${request.id}`" variant="soft" />
-                        <div class="font-bold text-lg">
+                        <UBadge size="sm" :label="`#00${request.id}`" variant="soft" />
+                        <div class="font-semibold group-hover:text-primary transition-colors">
                             {{ request.type }}
                         </div>
                     </div>
-                    <UBadge :color="getStatusColor(request.status)" variant="subtle" class="capitalize">
-                        {{ request.status }}
-                    </UBadge>
+                    <StatusBadge :status="request.status" />
                 </div>
-                <template #footer>
-                    <div class="flex items-center gap-3">
+                <div class="relative mt-4 sm:mt-6">
+                    <!-- Default: employee info -->
+                    <div class="flex items-center gap-3 transition-all duration-200 group-hover:opacity-0 group-hover:-translate-y-1">
                         <UAvatar :src="request.employee.avatar" :alt="request.employee.name" size="sm" />
                         <div>
                             <h3 class="text-sm font-medium">{{ request.employee.name }}</h3>
-                            <!-- request date -->
-                            <p class="text-xs text-dimmed">{{ request.dateApplied }}</p>
+                            <p class="text-xs font-medium text-dimmed">{{ request.employee.role }}</p>
                         </div>
                     </div>
-                </template>
+                    <!-- Hover: review button -->
+                    <div class="absolute inset-0 flex items-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+                        <UButton block label="Review" variant="soft" size="sm" @click.stop="openDrawer(request)" />
+                    </div>
+                </div>
             </UCard>
             <!-- <UCard v-for="request in filteredRequests" :key="request.id" variant="subtle"
                 :ui="{ root: 'shadow-sm flex flex-col cursor-pointer transition-shadow hover:shadow-md', body: 'p-0 sm:p-0 flex-1' }"
@@ -265,9 +270,7 @@ const items = [
                                 <p class="text-sm text-dimmed">{{ request.employee.role }}</p>
                             </div>
                         </div>
-                        <UBadge :color="getStatusColor(request.status)" variant="subtle" class="capitalize">
-                            {{ request.status }}
-                        </UBadge>
+                        <StatusBadge :status="request.status" />
                     </div>
                 </template>
 
@@ -359,9 +362,7 @@ const items = [
                                 </p>
                             </div>
                         </div>
-                        <UBadge :color="getStatusColor(selectedRequest.status)" variant="subtle" class="capitalize">
-                            {{ selectedRequest.status }}
-                        </UBadge>
+                        <StatusBadge :status="selectedRequest.status" />
                     </div>
                 </UCard>
 
@@ -431,9 +432,9 @@ const items = [
                                             <span>{{ approver.role }}</span>
                                         </div>
                                         <div class="flex items-center gap-1.5" :class="{
-                                            'text-green-600 dark:text-green-400': approver.status === 'approved',
-                                            'text-red-600 dark:text-red-400': approver.status === 'rejected',
-                                            'text-orange-500 dark:text-orange-400': approver.status === 'pending'
+                                            'text-green-600 dark:text-green-400': approver.status === 'APPROVED',
+                                            'text-red-600 dark:text-red-400': approver.status === 'REJECTED',
+                                            'text-orange-500 dark:text-orange-400': approver.status === 'PENDING'
                                         }">
                                             <UIcon :name="getStatusIcon(approver.status)" class="w-4 h-4" />
                                             <span class="capitalize text-xs font-medium">{{ approver.status }}</span>
