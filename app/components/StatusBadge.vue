@@ -52,8 +52,8 @@ const label = computed(() => {
     if (props.status.toUpperCase() === 'LWOP') return 'LWOP'
     
     return props.status
-        .toLowerCase()
-        .replace(/\b\w/g, c => c.toUpperCase())
+        // .toLowerCase()
+        // .replace(/\b\w/g, c => c.toUpperCase())
 })
 </script>
 
@@ -64,5 +64,8 @@ const label = computed(() => {
         :size="size"
         :icon="showIcon ? config.icon : undefined"
         :label="label"
+        :ui="{
+            base: 'font-semibold text-[10px] tracking-wider'
+        }"
     />
 </template>

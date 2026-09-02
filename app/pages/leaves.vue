@@ -334,10 +334,16 @@ const isDrawerOpen = ref(false)
             <div class="flex justify-end gap-2 flex-1">
             </div>
         </UPageCard>
+        <div class="flex justify-end gap-2">
+          <UButton variant="ghost" color="neutral" @click="isDrawerOpen = true">
+            <UIcon name="i-lucide-calendar-plus" />
+            Open Ledger
+          </UButton>
         <UButton color="primary" variant="soft">
             <UIcon name="i-lucide-edit" />
             Request Leave
         </UButton>
+        </div>
       </div>
 
       <div class="flex gap-3 px-4 pb-4">
@@ -355,10 +361,6 @@ const isDrawerOpen = ref(false)
                   </div>
               </div>
           </UCard>
-          <UButton color="neutral" variant="soft" class="flex flex-col justify-center items-center gap-1" @click="isDrawerOpen = true">
-            <UIcon name="i-lucide-calendar-plus" class="size-5 text-dimmed" />
-            <span class="text-xs text-dimmed">Open Ledger</span>
-          </UButton>
       </div>
 
       <USeparator />
