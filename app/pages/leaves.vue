@@ -379,14 +379,14 @@ const isDrawerOpen = ref(false)
   <UDrawer
   v-model:open="isDrawerOpen"
   direction="right"
-  title="Review Leave Request"
+  title="Leave Ledger"
   inset
   close
   class="w-full max-w-[460px]"
   :ui="{container: 'pr-0', header: 'pr-4', footer: 'pr-4', body: 'pr-4 overflow-y-auto scrollbar'}"
 >
   <template #body>
-    <div class="flex-1 min-h-0 overflow-y-auto space-y-4 p-[1px] scrollbar">
+    <div class="flex-1 min-h-0 overflow-y-auto space-y-3 p-[1px] scrollbar">
       <UCard
         v-for="(entry, index) in ledgerData"
         :key="index"
@@ -400,7 +400,7 @@ const isDrawerOpen = ref(false)
             :class="entry.credit !== null ? 'bg-success-500/10' : 'bg-error-500/10'"
           >
             <UIcon
-              :name="entry.credit !== null ? 'i-lucide-arrow-down-left' : 'i-lucide-arrow-up-right'"
+              :name="entry.credit !== null ? 'i-lucide-arrow-up-right' : 'i-lucide-arrow-down-left'"
               class="size-4"
               :class="entry.credit !== null ? 'text-success-500' : 'text-error-500'"
             />
