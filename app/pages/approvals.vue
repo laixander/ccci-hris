@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 
-// add request date applied for each leave request
-const leaveRequests = ref([
+// add request date applied for each request
+const approvalRequests = ref([
     {
         id: 1,
+        requestType: 'leave',
         employee: { name: 'Alice Smith', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Alice', role: 'Software Engineer' },
         type: 'Vacation',
         startDate: '2026-08-20',
@@ -24,6 +25,7 @@ const leaveRequests = ref([
     },
     {
         id: 2,
+        requestType: 'leave',
         employee: { name: 'David Brown', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=David', role: 'UX Designer' },
         type: 'Sick Leave',
         startDate: '2026-08-14',
@@ -42,6 +44,7 @@ const leaveRequests = ref([
     },
     {
         id: 3,
+        requestType: 'leave',
         employee: { name: 'Eve Davis', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Eve', role: 'Marketing Specialist' },
         type: 'Maternity',
         startDate: '2026-09-01',
@@ -64,6 +67,7 @@ const leaveRequests = ref([
     },
     {
         id: 4,
+        requestType: 'leave',
         employee: { name: 'Charlie Clark', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Charlie', role: 'QA Tester' },
         type: 'Unpaid Leave',
         startDate: '2026-08-18',
@@ -79,6 +83,25 @@ const leaveRequests = ref([
             { title: 'Manager Rejected', description: 'Need you during this critical release phase.', date: '2026-08-11', icon: 'i-lucide-x-circle', color: 'red', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' },
             { title: 'Leave Request Submitted', description: 'Personal errands', date: '2026-08-10', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Charlie' }
         ]
+    },
+    {
+        id: 5,
+        requestType: 'overtime',
+        employee: { name: 'John Doe', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=John', role: 'Frontend Developer' },
+        type: 'Regular Overtime',
+        date: '2026-08-20',
+        timeStart: '18:00',
+        timeEnd: '22:00',
+        duration: '4 Hours',
+        reason: 'Urgent bug fixes for release',
+        dateApplied: '2026-08-19',
+        status: 'PENDING',
+        approvers: [
+            { role: 'Manager', name: 'Bob Jones', status: 'PENDING', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Bob' }
+        ],
+        timeline: [
+            { title: 'Overtime Request Submitted', description: 'Urgent bug fixes for release', date: '2026-08-19', icon: 'i-lucide-file-text', color: 'gray', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=John' }
+        ]
     }
 ])
 
@@ -92,7 +115,7 @@ const tabs = [
 ]
 
 const filteredRequests = computed(() => {
-    let result = leaveRequests.value
+    let result = approvalRequests.value
 
     if (filterStatus.value !== 'ALL') {
         result = result.filter(req => req.status === filterStatus.value)
@@ -126,11 +149,12 @@ const getStatusIcon = (status: string) => {
     }
 }
 
-const getLeaveTypeIcon = (type: string) => {
+const getRequestTypeIcon = (type: string) => {
     const t = type.toLowerCase()
     if (t.includes('vacation')) return 'i-lucide-plane'
     if (t.includes('sick')) return 'i-lucide-thermometer'
     if (t.includes('birthday')) return 'i-lucide-cake'
+    if (t.includes('overtime')) return 'i-lucide-clock-plus'
     return 'i-lucide-calendar-check'
 }
 
@@ -152,7 +176,7 @@ const openConfirmModal = (id: number, action: 'approve' | 'reject') => {
 
 const confirmAction = () => {
     if (activeRequestId.value === null) return
-    const req = leaveRequests.value.find(r => r.id === activeRequestId.value)
+    const req = approvalRequests.value.find(r => r.id === activeRequestId.value)
     if (req) {
         req.status = modalAction.value === 'approve' ? 'APPROVED' : 'REJECTED'
         // Add activity to timeline
@@ -200,11 +224,11 @@ const items = [
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <UPageCard title="Approval Board" description="Manage and review leave requests from your team."
+            <UPageCard title="Approval Board" description="Manage and review requests from your team."
                 variant="naked" orientation="horizontal" class="w-full">
-                <div class="flex justify-end gap-4 flex-1">
+                <!-- <div class="flex justify-end gap-4 flex-1">
                     <UInput v-model="search" placeholder="Search requests" icon="i-lucide-search" class="flex-1 sm:max-w-64" />
                     <div class="flex flex-wrap gap-2">
                         <UButton v-for="tab in tabs" :key="tab.value" :label="tab.label"
@@ -212,24 +236,23 @@ const items = [
                             :color="filterStatus === tab.value ? 'primary' : 'neutral'" class="rounded-full"
                             @click="filterStatus = tab.value" />
                     </div>
-                </div>
+                </div> -->
             </UPageCard>
+        </div>
 
-            <!-- Controls -->
-            <!-- add searchbar here -->
-            <!-- <div class="flex items-center gap-4">
-                <UInput v-model="search" placeholder="Search requests" icon="i-lucide-search" class="flex-1" />
-                <div class="flex flex-wrap gap-2">
-                    <UButton v-for="tab in tabs" :key="tab.value" :label="tab.label"
-                        :variant="filterStatus === tab.value ? 'solid' : 'soft'"
-                        :color="filterStatus === tab.value ? 'primary' : 'neutral'" class="rounded-full"
-                        @click="filterStatus = tab.value" />
-                </div>
-            </div> -->
+        <!-- Controls -->
+        <div class="flex items-center justify-between gap-4 w-full">
+            <div class="flex flex-wrap gap-2">
+                <UButton v-for="tab in tabs" :key="tab.value" :label="tab.label"
+                    :variant="filterStatus === tab.value ? 'solid' : 'soft'"
+                    :color="filterStatus === tab.value ? 'primary' : 'neutral'" class="rounded-full"
+                    @click="filterStatus = tab.value" />
+            </div>
+            <UInput v-model="search" placeholder="Search requests" icon="i-lucide-search" class="flex-1 sm:max-w-64" />
         </div>
 
         <!-- Requests Grid -->
-        <div v-if="filteredRequests.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div v-if="filteredRequests.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <UCard v-for="request in filteredRequests" :key="request.id"
                 class="shadow-sm cursor-pointer group hover:ring-1 hover:ring-primary/40 transition-all"
                 :ui="{ root: 'flex flex-col', body: 'sm:p-4 group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out', footer: 'sm:p-4' }"
@@ -343,7 +366,7 @@ const items = [
 
         <!-- Empty State -->
         <UEmpty v-else icon="i-lucide-check-circle-2" title="All caught up!"
-            :description="`There are no ${filterStatus !== 'all' ? filterStatus + ' ' : ''}leave requests to review.`" />
+            :description="`There are no ${filterStatus !== 'all' ? filterStatus + ' ' : ''}requests to review.`" />
     </div>
 
     <!-- Timeline Drawer -->
@@ -370,9 +393,11 @@ const items = [
                     <template #overview>
                         <div class="grid grid-cols-3 gap-4">
                             <UCard :ui="{ body: 'sm:p-4' }" class="shadow-sm">
-                                <div class="text-xs font-semibold text-dimmed uppercase tracking-wider mb-1">Leave Type</div>
+                                <div class="text-xs font-semibold text-dimmed uppercase tracking-wider mb-1">
+                                    {{ selectedRequest.requestType === 'overtime' ? 'Overtime Type' : 'Leave Type' }}
+                                </div>
                                 <div class="text-sm font-medium flex items-center gap-2 text-highlighted">
-                                    <UIcon :name="getLeaveTypeIcon(selectedRequest.type)" class="w-4 h-4 text-primary" />
+                                    <UIcon :name="getRequestTypeIcon(selectedRequest.type)" class="w-4 h-4 text-primary" />
                                     {{ selectedRequest.type }}
                                 </div>
                             </UCard>
@@ -399,25 +424,49 @@ const items = [
                             </UCard>
 
                             <UCard class="col-span-2 shadow-sm" :ui="{ body: 'sm:p-4' }">
-                                <div class="text-xs font-semibold text-dimmed uppercase tracking-wider mb-1">Dates</div>
+                                <div class="text-xs font-semibold text-dimmed uppercase tracking-wider mb-1">
+                                    {{ selectedRequest.requestType === 'overtime' ? 'Date' : 'Dates' }}
+                                </div>
                                 <div class="flex items-center gap-4">
-                                    <UTooltip text="Start Date">
-                                        <div class="flex items-center gap-2">
-                                            <UIcon name="i-lucide-calendar-days" class="size-4 text-primary" /> <span
-                                                class="text-sm text-highlighted">{{ selectedRequest.startDate }}</span>
-                                        </div>
-                                    </UTooltip>
-                                    <USeparator orientation="horizontal" color="primary" type="dotted" class="flex-1" />
-                                    <UTooltip text="End Date">
-                                        <div class="flex items-center gap-2">
-                                            <UIcon name="i-lucide-calendar-days" class="size-4 text-primary" /> <span
-                                                class="text-sm text-highlighted">{{ selectedRequest.endDate }}</span>
-                                        </div>
-                                    </UTooltip>
+                                    <template v-if="selectedRequest.requestType === 'overtime'">
+                                        <UTooltip text="Date">
+                                            <div class="flex items-center gap-2">
+                                                <UIcon name="i-lucide-calendar-days" class="size-4 text-primary" /> <span
+                                                    class="text-sm text-highlighted">{{ selectedRequest.date }}</span>
+                                            </div>
+                                        </UTooltip>
+
+                                        <USeparator orientation="horizontal" color="primary" type="dotted" class="flex-1 shrink-0" />
+
+                                        <UTooltip text="Time">
+                                            <div class="flex items-center gap-2">
+                                                <UIcon name="i-lucide-hourglass" class="size-4 text-primary" />
+                                                <span class="text-sm text-highlighted">{{ selectedRequest.timeStart }}</span>
+                                                -
+                                                <span class="text-sm text-highlighted">{{ selectedRequest.timeEnd }}</span>
+                                            </div>
+                                        </UTooltip>
+                                    </template>
+                                    <template v-else>
+                                        <UTooltip text="Start Date">
+                                            <div class="flex items-center gap-2">
+                                                <UIcon name="i-lucide-calendar-days" class="size-4 text-primary" /> <span
+                                                    class="text-sm text-highlighted">{{ selectedRequest.startDate }}</span>
+                                            </div>
+                                        </UTooltip>
+                                        <USeparator orientation="horizontal" color="primary" type="dotted" class="flex-1" />
+                                        <UTooltip text="End Date">
+                                            <div class="flex items-center gap-2">
+                                                <UIcon name="i-lucide-calendar-days" class="size-4 text-primary" /> <span
+                                                    class="text-sm text-highlighted">{{ selectedRequest.endDate }}</span>
+                                            </div>
+                                        </UTooltip>
+                                    </template>
                                 </div>
                             </UCard>
                             <UCard class="col-span-3 shadow-sm" :ui="{ body: 'sm:p-4' }">
-                                <div class="text-xs font-semibold text-dimmed uppercase tracking-wider mb-2">Reason for Leave
+                                <div class="text-xs font-semibold text-dimmed uppercase tracking-wider mb-2">
+                                    {{ selectedRequest.requestType === 'overtime' ? 'Reason for Overtime' : 'Reason for Leave' }}
                                 </div>
                                 <p class="text-sm text-highlighted leading-relaxed">{{ selectedRequest.reason }}</p>
                             </UCard>
@@ -462,7 +511,7 @@ const items = [
             </div>
         </template>
         <template #footer>
-            <div v-if="selectedRequest.status === 'pending'" class="flex gap-3 mt-4">
+            <div v-if="selectedRequest.status === 'PENDING'" class="flex gap-3 mt-4">
                 <UButton color="error" variant="soft" block class="flex-1" @click="openConfirmModal(selectedRequest.id, 'reject')">
                     Reject
                 </UButton>
@@ -474,20 +523,35 @@ const items = [
     </UDrawer>
 
     <!-- Confirmation Modal -->
-    <UModal v-model:open="isModalOpen" :title="`${modalAction === 'approve' ? 'Approve' : 'Reject'} Request`"
-        description="Please provide a comment for your action." close>
-        <template #body>
-            <UTextarea v-model="actionComment" placeholder="Add a comment... (optional)" :rows="4" autofocus
-                class="w-full" />
-        </template>
+    <UModal v-model:open="isModalOpen" close
+      :ui="{
+        content: 'overflow-visible group',
+        header: `relative bg-linear-to-r rounded-t-lg ${modalAction === 'approve' ? 'from-green-500/15 to-green-500/0' : 'from-red-500/15 to-red-500/0'}`
+      }">
+      <template #header>
+        <div class="absolute overflow-hidden inset-0">
+          <UIcon :name="modalAction === 'approve' ? 'i-lucide-check-square' : 'i-lucide-x-square'" 
+            class="size-24 opacity-10 absolute -bottom-7 end-4" 
+            :class="modalAction === 'approve' ? 'text-green-500' : 'text-red-500'" />
+        </div>
+        <div class="flex flex-col">
+          <h2 class="text-highlighted font-semibold capitalize">{{ modalAction }} Request</h2>
+          <p class="text-muted text-sm mt-1">Please provide a comment for your action.</p>
+        </div>
+        <UButton icon="i-lucide-x" variant="outline" color="neutral" class="absolute -top-4 -end-4 opacity-0 group-hover:opacity-100 transition-opacity" @click="isModalOpen = false" />
+      </template>
+      <template #body>
+          <UTextarea v-model="actionComment" placeholder="Add a comment... (optional)" :rows="4" autofocus
+              class="w-full" />
+      </template>
 
-        <template #footer>
-            <div class="flex justify-end gap-3 w-full">
-                <UButton color="neutral" variant="soft" @click="isModalOpen = false">Cancel</UButton>
-                <UButton :color="modalAction === 'approve' ? 'green' : 'red'" @click="confirmAction">
-                    Confirm <span class="capitalize">{{ modalAction }}</span>
-                </UButton>
-            </div>
-        </template>
+      <template #footer>
+          <div class="flex justify-end gap-3 w-full">
+              <UButton color="neutral" variant="soft" @click="isModalOpen = false">Cancel</UButton>
+              <UButton :color="modalAction === 'approve' ? 'green' : 'red'" @click="confirmAction">
+                  Confirm <span class="capitalize">{{ modalAction }}</span>
+              </UButton>
+          </div>
+      </template>
     </UModal>
 </template>

@@ -19,6 +19,10 @@ const props = withDefaults(defineProps<{
   color?: 'yellow' | 'error' | 'primary' | 'success' | 'info' | 'neutral'
   /** Loading state for the confirm button */
   loading?: boolean
+  /** Custom width class for the modal (e.g., max-w-[420px]) */
+  width?: string
+  /** Toast to show upon confirmation */
+  successToast?: { title: string; description?: string }
 }>(), {
   icon: 'i-lucide-triangle-alert',
   title: 'Confirmation',
@@ -27,6 +31,7 @@ const props = withDefaults(defineProps<{
   cancelLabel: 'Cancel',
   color: 'yellow',
   loading: false,
+  width: 'max-w-[420px]',
 })
 
 const emit = defineEmits<{
@@ -83,8 +88,18 @@ const colorMap = {
 
 const classes = computed(() => colorMap[props.color ?? 'yellow'])
 
+const toast = useToast()
+
 function onConfirm() {
   emit('confirm')
+  if (props.successToast) {
+    toast.add({
+      title: props.successToast.title,
+      description: props.successToast.description,
+      color: 'success',
+      icon: 'i-lucide-check-circle',
+    })
+  }
 }
 
 function onCancel() {
@@ -98,12 +113,14 @@ function onCancel() {
     :open="open"
     :close="false"
     :ui="{
-      content: classes.modalContent,
+      content: classes.modalContent + ' group overflow-visible',
       header: 'hidden',
     }"
     @update:open="emit('update:open', $event)"
+    :class="width"
   >
-    <template #body>
+    <template #body="{close}">
+      <UButton icon="i-lucide-x" variant="outline" color="neutral" class="absolute -top-4 -end-4 opacity-0 group-hover:opacity-100 transition-opacity" @click="close" />
       <div class="flex flex-col items-center gap-3 text-center pt-2">
         <!-- Icon -->
         <div :class="classes.iconWrapper">

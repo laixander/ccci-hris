@@ -27,9 +27,23 @@ export default defineAppConfig({
         viewport: 'scrollbar',
       },
     },
+    selectMenu: {
+      slots: {
+        base: 'scrollbar',
+      }
+    },
     table: {
       slots: {
         root: 'scrollbar',
+      }
+    },
+    modal: {
+      variants: {
+        transition: {
+          true: {
+            content: 'data-[state=open]:animate-slide-down-in data-[state=closed]:animate-slide-down-out'
+          }
+        }
       }
     }
   }

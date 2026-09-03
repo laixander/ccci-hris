@@ -23,7 +23,7 @@ const items = [
     value: 'time-adjustment'
   },
   {
-    label: 'Evaluation',
+    label: 'DTR Evaluation',
     icon: 'i-lucide-list-checks',
     value: 'evaluation'
   }
@@ -212,6 +212,19 @@ const header = useTemplateRef('header')
 const getScrollElement = () => container.value
 
 const { height: headerHeight } = useElementSize(header, undefined, { box: 'border-box' })
+
+const toast = useToast()
+const handleConfirm = async () => {
+  // e.g. await submitData()
+  isModalOpen.value = false
+  
+  toast.add({
+    title: 'Success',
+    description: 'Timesheet confirmed successfully.',
+    color: 'success',
+    icon: 'i-lucide-check-circle'
+  })
+}
 </script>
 
 <template>
@@ -224,6 +237,18 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
               <div class="flex justify-end gap-2 flex-1">
               </div>
           </UPageCard>
+      </div>
+
+      <div class="flex items-center gap-4 px-4 pb-4 w-full">
+        <div class="flex flex-wrap gap-2 w-full">
+            <UButton v-for="tab in items" :key="tab.value"
+                :variant="activeTab === tab.value ? 'solid' : 'soft'"
+                :color="activeTab === tab.value ? 'primary' : 'neutral'" class="rounded-full"
+                @click="activeTab = tab.value">
+                <UIcon :name="tab.icon" class="shrink-0 size-4" /> {{ tab.label }}
+            </UButton>
+        </div>
+        <div>
           <div v-if="activeTab === 'dtr'" class="flex gap-2">
             <USelect v-model="month" :items="months" class="w-40" />
             <USelect v-model="year" :items="years" class="w-32" />
@@ -231,15 +256,7 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
           <div v-else-if="activeTab === 'evaluation'" class="flex gap-2">
             <USelect :items="cutoffs" placeholder="Select Cut-off" class="w-72" />
           </div>
-      </div>
-
-      <div class="flex flex-wrap gap-2 w-full px-4 pb-4">
-          <UButton v-for="tab in items" :key="tab.value" 
-              :variant="activeTab === tab.value ? 'solid' : 'soft'"
-              :color="activeTab === tab.value ? 'primary' : 'neutral'" class="rounded-full"
-              @click="activeTab = tab.value">
-              <UIcon :name="tab.icon" class="shrink-0 size-4" /> {{ tab.label }}
-          </UButton>
+        </div>
       </div>
 
       <USeparator />
@@ -269,7 +286,8 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
               <div class="flex items-start justify-between">
                   <div class="flex items-start justify-between w-full gap-2">
                       <div>
-                          <div class="text-xs text-dimmed group-hover:text-primary/60 transition-colors">{{ getCutoffHalf(evaluation.cutoffPeriod) }}</div>
+                          <UBadge :label="getCutoffHalf(evaluation.cutoffPeriod)" color="neutral" variant="soft" size="sm" class="mb-1 group-hover:hidden" />
+                          <UBadge :label="getCutoffHalf(evaluation.cutoffPeriod)" color="primary" variant="soft" size="sm" class="mb-1 hidden group-hover:inline-flex" />
                           <div class="group-hover:text-primary transition-colors font-semibold text-sm">{{ evaluation.cutoffPeriod }}</div>
                       </div>
                       <!-- <UIcon name="i-lucide-panel-right-open" class="text-primary opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 size-5" /> -->
@@ -350,7 +368,7 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
     color="yellow"
     confirm-label="Confirm"
     cancel-label="Cancel"
-    description="By clicking 'Confirm', I hereby certify that the information provided in my timesheet is true, accurate, and complete to the best of my knowledge and belief. I understand that this timesheet will serve as the basis for payroll computation, and that no further corrections will be entertained after submission. I also acknowledge that any false or misleading information may be subject to disciplinary action in accordance with company policies."
-    @confirm="isModalOpen = false; isDrawerOpen = false"
+    description="By confirming, I certify this timesheet is accurate and complete. It will be used for payroll computation, and no further changes can be made once submitted. False information may lead to disciplinary action."
+    @confirm="handleConfirm"
   />
 </template>
