@@ -1,6 +1,17 @@
 <script setup lang="ts">
-import { alert } from '#build/ui';
 import type { NavigationMenuItem, SidebarProps } from '@nuxt/ui'
+
+const route = useRoute()
+
+function withActive(item: NavigationMenuItem): NavigationMenuItem {
+    if (!item.to || typeof item.to !== 'string') return item
+    return {
+        ...item,
+        active: item.to === '/' 
+            ? route.path === '/' 
+            : route.path === item.to || route.path.startsWith(item.to + '/')
+    }
+}
 
 // Ignore the props for the example
 defineProps<Pick<SidebarProps, 'variant' | 'collapsible' | 'side'>>()
@@ -18,11 +29,11 @@ const items = computed<NavigationMenuItem[][]>(() => [
             type: 'label' as const, 
             label: 'Self-Service' 
         }]),
-        {
+        withActive({
             label: 'Home',
             icon: 'i-lucide-layout-grid',
-            to: '/'
-        },
+            to: '/home'
+        }),
         {
             label: 'Approvals',
             icon: 'i-lucide-clipboard-list',
@@ -44,7 +55,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Overtime',
-            icon: 'i-lucide-clock'
+            icon: 'i-lucide-clock',
+            to: '/overtime'
         },
         {
             label: 'Expenses',
@@ -109,7 +121,6 @@ const items = computed<NavigationMenuItem[][]>(() => [
     ]
 ])
 
-const route = useRoute()
 const pageTitle = computed(() => {
     if (route.meta.title) return route.meta.title as string
     
@@ -130,6 +141,29 @@ const pageTitle = computed(() => {
 
 // add isTable to definePageMeta
 const isTable = computed(() => route.meta.isTable || false)
+
+// const breadcrumbItems = computed(() => {
+//     const home = { label: 'Home', to: '/' }
+//     if (route.path === '/') return [home]
+//     return [
+//         home,
+//         { label: pageTitle.value }
+//     ]
+// })
+
+const pageBreadcrumbItems = computed(() => {
+    const paths = route.path.split('/').filter(Boolean)
+    if (paths.length === 0) return [{ label: pageTitle.value }] // For dashboard
+
+    let currentPath = ''
+    return paths.map(path => {
+        currentPath += `/${path}`
+        return {
+            label: path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' '),
+            to: currentPath
+        }
+    })
+})
 </script>
 
 <template>
@@ -173,10 +207,10 @@ const isTable = computed(() => route.meta.isTable || false)
                 side === 'right' && 'justify-end'
             ]">
                 <UButton :icon="side === 'left' ? 'i-lucide-panel-left' : 'i-lucide-panel-right'" color="neutral"
-                    variant="ghost" aria-label="Toggle sidebar" @click="open = !open" class="lg:hidden" />
+                    variant="ghost" aria-label="Toggle sidebar" @click="open = !open" class="lg:hidden mr-1" />
 
-                <!-- page title -->
-                <h1 class="text-lg font-semibold">{{ pageTitle }}</h1>
+                <!-- page title / breadcrumbs -->
+                <UBreadcrumb :items="pageBreadcrumbItems" color="neutral" />
                 <!-- color mode -->
                 <UColorModeButton class="ml-auto" />
             </div>
@@ -197,7 +231,7 @@ const isTable = computed(() => route.meta.isTable || false)
                     color: 'error',
                     variant: 'soft'
                 }
-                ]" v-if="alertMsg && !isCollapsed">
+                ]" v-if="alertMsg">
                 <template #title>
                     <span class="relative flex size-4">
                         <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-error opacity-75"></span>

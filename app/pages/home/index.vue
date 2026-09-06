@@ -22,6 +22,9 @@ const recentActivities = [
     { text: 'Updated Profile Information', time: '1w ago', icon: 'i-lucide-user', color: 'text-primary' },
 ]
 
+const isTimedIn = ref(false)
+const isLeaveModalOpen = ref(false)
+const isOvertimeModalOpen = ref(false)
 const activeTab = ref('time-in')
 
 const tabItems = computed(() => [
@@ -95,7 +98,39 @@ const birthdayItems = computed(() => [
     }
 ])
 
+const currentTime = ref(new Date())
+let timer: ReturnType<typeof setInterval>
 
+onMounted(() => {
+  timer = setInterval(() => {
+    currentTime.value = new Date()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
+
+const formattedTime = computed(() => {
+  return currentTime.value.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }).split(' ')
+})
+
+const timePart = computed(() => formattedTime.value[0])
+const amPmPart = computed(() => formattedTime.value[1])
+
+const formattedDate = computed(() => {
+  return currentTime.value.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  })
+})
 </script>
 
 <template>
@@ -103,7 +138,7 @@ const birthdayItems = computed(() => [
         <!-- Header Section -->
         <div class="flex items-center gap-4">
             <UIcon name="i-lucide-cloud-sun" class="size-12 text-amber-500" />
-            <UPageCard title="Good Morning, Laixander Naguit!" description="Friday, August 14, 2026" variant="naked"
+            <UPageCard title="Good Morning, Laixander Naguit!" :description="formattedDate" variant="naked"
                 orientation="horizontal">
                 <div class="flex justify-end gap-2 flex-1">
                 </div>
@@ -124,12 +159,19 @@ const birthdayItems = computed(() => [
                     </div>
                 </template>
                 <div class="py-2">
-                    <h2 class="text-3xl font-bold">12:00:39 <span class="text-lg font-normal text-neutral-500">PM</span>
+                    <h2 class="text-3xl font-bold">{{ timePart }} <span class="text-lg font-normal text-neutral-500">{{ amPmPart }}</span>
                     </h2>
-                    <p class="text-sm text-neutral-500 mt-1">Friday, August 14, 2026</p>
+                    <p class="text-sm text-neutral-500 mt-1">{{ formattedDate }}</p>
                 </div>
                 <template #footer>
-                    <UButton color="error" variant="soft" block icon="i-lucide-log-out" label="Time Out" />
+                    <UButton v-if="!isTimedIn" color="primary" block @click="isTimedIn = true">
+                        <UIcon name="i-lucide-log-in" class="size-4" />
+                        Time In
+                    </UButton>
+                    <UButton v-else color="error" block @click="isTimedIn = false">
+                        <UIcon name="i-lucide-log-out" class="size-4" />
+                        Time Out
+                    </UButton>
                 </template>
             </UCard>
 
@@ -149,7 +191,10 @@ const birthdayItems = computed(() => [
                     <p class="text-sm text-neutral-500 mt-1">Total Balance</p>
                 </div>
                 <template #footer>
-                    <UButton color="primary" variant="soft" block icon="i-lucide-plus" label="Request Leave" />
+                    <UButton block @click="isLeaveModalOpen = true">
+                        <UIcon name="i-lucide-plus" class="size-4" />
+                        Request Leave
+                    </UButton>
                 </template>
             </UCard>
 
@@ -169,7 +214,10 @@ const birthdayItems = computed(() => [
                     <p class="text-sm text-neutral-500 mt-1">Total Requests</p>
                 </div>
                 <template #footer>
-                    <UButton color="primary" variant="soft" block icon="i-lucide-plus" label="Request Overtime" />
+                    <UButton block @click="isOvertimeModalOpen = true">
+                        <UIcon name="i-lucide-plus" class="size-4" />
+                        Request Overtime
+                    </UButton>
                 </template>
             </UCard>
 
@@ -195,9 +243,9 @@ const birthdayItems = computed(() => [
                     </div>
                 </div>
                 <template #footer>
-                    <UButton color="primary" variant="soft" block>
+                    <UButton block to="/approvals">
+                        <UIcon name="i-lucide-arrow-right" class="size-4" />
                         View All Tasks
-                        <UIcon name="i-lucide-arrow-right" />
                     </UButton>
                 </template>
             </UCard>
@@ -405,7 +453,7 @@ const birthdayItems = computed(() => [
                                 <h3 class="font-semibold">Recent Activities</h3>
                             </div>
                             <UButton color="primary" variant="ghost" size="xs" trailing-icon="i-lucide-arrow-right"
-                                label="View All" />
+                                label="View All" to="/home/activities" />
                         </div>
                     </template>
 
@@ -430,4 +478,7 @@ const birthdayItems = computed(() => [
 
         </div>
     </div>
+
+    <ApplyLeaveModal v-model:open="isLeaveModalOpen" />
+    <ApplyOvertimeModal v-model:open="isOvertimeModalOpen" />
 </template>
