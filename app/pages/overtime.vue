@@ -7,6 +7,7 @@ definePageMeta({
 
 const columns = [
   { accessorKey: 'dateApplied', header: 'Date Applied' },
+  { accessorKey: 'date', header: 'Overtime Date' },
   { accessorKey: 'start', header: 'Start Time' },
   { accessorKey: 'end', header: 'End Time' },
   { accessorKey: 'duration', header: 'Duration' },
@@ -17,120 +18,135 @@ const overtimeData = ref([
   {
     id: 1,
     dateApplied: 'August 17, 2026 at 09:16 AM',
-    start: 'August 17, 2026 05:00 PM',
-    end: 'August 17, 2026 07:00 PM',
+    date: 'August 17, 2026',
+    start: '05:00 PM',
+    end: '07:00 PM',
     duration: '2h',
     status: 'APPROVED',
   },
   {
     id: 2,
     dateApplied: 'August 11, 2026 at 07:24 AM',
-    start: 'August 10, 2026 06:00 PM',
-    end: 'August 10, 2026 09:00 PM',
+    date: 'August 10, 2026',
+    start: '06:00 PM',
+    end: '09:00 PM',
     duration: '3h',
     status: 'APPROVED',
   },
   {
     id: 3,
     dateApplied: 'August 04, 2026 at 08:56 AM',
-    start: 'August 03, 2026 05:00 PM',
-    end: 'August 03, 2026 06:30 PM',
+    date: 'August 03, 2026',
+    start: '05:00 PM',
+    end: '06:30 PM',
     duration: '1.5h',
     status: 'APPROVED',
   },
   {
     id: 4,
     dateApplied: 'July 27, 2026 at 09:51 AM',
-    start: 'July 26, 2026 06:00 PM',
-    end: 'July 26, 2026 08:00 PM',
+    date: 'July 26, 2026',
+    start: '06:00 PM',
+    end: '08:00 PM',
     duration: '2h',
     status: 'PENDING',
   },
   {
     id: 5,
     dateApplied: 'July 21, 2026 at 06:22 AM',
-    start: 'July 20, 2026 05:00 PM',
-    end: 'July 20, 2026 09:00 PM',
+    date: 'July 20, 2026',
+    start: '05:00 PM',
+    end: '09:00 PM',
     duration: '4h',
     status: 'APPROVED',
   },
   {
     id: 6,
     dateApplied: 'July 20, 2026 at 08:40 AM',
-    start: 'July 19, 2026 05:00 PM',
-    end: 'July 19, 2026 07:30 PM',
+    date: 'July 19, 2026',
+    start: '05:00 PM',
+    end: '07:30 PM',
     duration: '2.5h',
     status: 'REJECTED',
   },
   {
     id: 7,
     dateApplied: 'July 16, 2026 at 09:55 AM',
-    start: 'July 15, 2026 06:00 PM',
-    end: 'July 15, 2026 08:00 PM',
+    date: 'July 15, 2026',
+    start: '06:00 PM',
+    end: '08:00 PM',
     duration: '2h',
     status: 'APPROVED',
   },
   {
     id: 8,
     dateApplied: 'July 02, 2026 at 09:23 AM',
-    start: 'July 01, 2026 05:00 PM',
-    end: 'July 01, 2026 06:00 PM',
+    date: 'July 01, 2026',
+    start: '05:00 PM',
+    end: '06:00 PM',
     duration: '1h',
     status: 'APPROVED',
   },
   {
     id: 9,
     dateApplied: 'June 04, 2026 at 09:11 AM',
-    start: 'June 03, 2026 07:00 PM',
-    end: 'June 03, 2026 09:00 PM',
+    date: 'June 03, 2026',
+    start: '07:00 PM',
+    end: '09:00 PM',
     duration: '2h',
     status: 'APPROVED',
   },
   {
     id: 10,
     dateApplied: 'May 28, 2026 at 08:50 AM',
-    start: 'May 27, 2026 05:00 PM',
-    end: 'May 27, 2026 08:00 PM',
+    date: 'May 27, 2026',
+    start: '05:00 PM',
+    end: '08:00 PM',
     duration: '3h',
     status: 'APPROVED',
   },
   {
     id: 11,
     dateApplied: 'April 15, 2026 at 10:30 AM',
-    start: 'April 14, 2026 06:00 PM',
-    end: 'April 14, 2026 09:30 PM',
+    date: 'April 14, 2026',
+    start: '06:00 PM',
+    end: '09:30 PM',
     duration: '3.5h',
     status: 'APPROVED',
   },
   {
     id: 12,
     dateApplied: 'April 02, 2026 at 02:15 PM',
-    start: 'April 01, 2026 05:00 PM',
-    end: 'April 01, 2026 07:00 PM',
+    date: 'April 01, 2026',
+    start: '05:00 PM',
+    end: '07:00 PM',
     duration: '2h',
     status: 'APPROVED',
   },
   {
     id: 13,
     dateApplied: 'March 20, 2026 at 11:00 AM',
-    start: 'March 19, 2026 05:00 PM',
-    end: 'March 19, 2026 10:00 PM',
+    date: 'March 19, 2026',
+    start: '05:00 PM',
+    end: '10:00 PM',
     duration: '5h',
     status: 'PENDING',
   },
   {
     id: 14,
     dateApplied: 'February 10, 2026 at 09:45 AM',
-    start: 'February 09, 2026 06:00 PM',
-    end: 'February 09, 2026 08:00 PM',
+    date: 'February 09, 2026',
+    start: '06:00 PM',
+    end: '08:00 PM',
     duration: '2h',
     status: 'APPROVED',
   },
   {
     id: 15,
     dateApplied: 'January 05, 2026 at 08:30 AM',
-    start: 'January 04, 2026 05:00 PM',
-    end: 'January 04, 2026 06:30 PM',
+    date: 'January 04, 2026',
+    start: '05:00 PM',
+    end: '06:30 PM',
     duration: '1.5h',
     status: 'REJECTED',
   }
@@ -143,9 +159,22 @@ const getScrollElement = () => container.value
 const { height: headerHeight } = useElementSize(header, undefined, { box: 'border-box' })
 
 const isModalOpen = ref(false)
+const viewMode = ref<'grid' | 'table'>('grid')
 
 const statuses = ['All statuses', 'Pending', 'Approved', 'Rejected']
 const status = ref('All statuses')
+
+const totalHours = computed(() => overtimeData.value.reduce((acc, curr) => acc + parseFloat(curr.duration), 0))
+const approvedItems = computed(() => overtimeData.value.filter(i => i.status === 'APPROVED').length)
+const pendingItems = computed(() => overtimeData.value.filter(i => i.status === 'PENDING').length)
+const rejectedItems = computed(() => overtimeData.value.filter(i => i.status === 'REJECTED').length)
+
+const kpis = computed(() => [
+  { label: 'Total Overtime', icon: 'i-lucide-clock', color: 'text-indigo-500', bg: 'bg-indigo-500/10', value: totalHours.value.toString(), sublabel: 'HOURS' },
+  { label: 'Approved Items', icon: 'i-lucide-check-circle-2', color: 'text-emerald-500', bg: 'bg-emerald-500/10', value: approvedItems.value.toString(), sublabel: 'REQUESTS' },
+  { label: 'Pending Items', icon: 'i-lucide-hourglass', color: 'text-amber-500', bg: 'bg-amber-500/10', value: pendingItems.value.toString(), sublabel: 'REQUESTS' },
+  { label: 'Rejected Items', icon: 'i-lucide-x-circle', color: 'text-rose-500', bg: 'bg-rose-500/10', value: rejectedItems.value.toString(), sublabel: 'REQUESTS' }
+])
 </script>
 
 <template>
@@ -153,10 +182,20 @@ const status = ref('All statuses')
     <div ref="header">
       <div class="flex flex-col gap-4 p-4">
         <UPageCard title="Overtime Requests" description="Apply and track overtime"
-            variant="naked" orientation="horizontal">
+            variant="naked" orientation="horizontal" class="w-full">
+          <div class="flex items-center justify-end gap-2 flex-1">
+            <UFieldGroup>
+              <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
+              <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+            </UFieldGroup>
+            <UButton @click="isModalOpen = true">
+              <UIcon name="i-lucide-plus" class="size-4" />
+              Request Overtime
+            </UButton>  
+          </div>
         </UPageCard>
         <!-- Filters -->
-        <div class="flex items-center justify-between gap-4 w-full">
+        <!-- <div class="flex items-center justify-between gap-4 w-full">
             <div class="flex flex-wrap gap-2">
                 <UButton v-for="tab in statuses" :key="tab" :label="tab"
                     :variant="status === tab ? 'solid' : 'soft'"
@@ -174,13 +213,63 @@ const status = ref('All statuses')
                     Request Overtime
                 </UButton>
             </div>
-        </div>
+        </div> -->
       </div>
+
+      <div class="flex gap-3 px-4 pb-4">
+          <UCard v-for="(kpi, index) in kpis" :key="index" class="shadow-sm flex-1" :ui="{ body: 'sm:p-4' }">
+              <div class="flex items-center gap-3">
+                  <div class="rounded-lg p-2 shrink-0 flex" :class="kpi.bg">
+                      <UIcon :name="kpi.icon" class="size-5" :class="kpi.color" />
+                  </div>
+                  <div class="min-w-0">
+                      <div class="text-xs text-dimmed truncate">{{ kpi.label }}</div>
+                      <div class="flex items-baseline gap-1.5">
+                          <span class="text-xl font-bold leading-tight">{{ kpi.value }}</span>
+                          <span class="text-[10px] font-semibold text-dimmed/70 uppercase tracking-wider">{{ kpi.sublabel }}</span>
+                      </div>
+                  </div>
+              </div>
+          </UCard>
+      </div>
+
+      <USeparator />
     </div>
 
-    <USeparator />
+    <div v-if="viewMode === 'grid'" class="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1">
+        <UCard v-for="ot in overtimeData" :key="ot.id" class="flex flex-col shadow-sm" :ui="{ body: 'flex flex-col h-full gap-4 sm:p-4' }">
+            <div class="flex items-start justify-between gap-2">
+                <div class="space-y-0.5">
+                    <div class="font-semibold text-highlighted">Overtime Request</div>
+                    <div class="text-xs text-dimmed">{{ ot.dateApplied }}</div>
+                </div>
+                <StatusBadge :status="ot.status" />
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md mt-auto">
+                <div class="col-span-2">
+                    <div class="text-xs text-dimmed mb-0.5">Date</div>
+                    <div class="font-medium">{{ ot.date }}</div>
+                </div>
+                <USeparator class="col-span-2" />
+                <div>
+                    <div class="text-xs text-dimmed mb-0.5">Start Time</div>
+                    <div class="font-medium">{{ ot.start }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-dimmed mb-0.5">End Time</div>
+                    <div class="font-medium">{{ ot.end }}</div>
+                </div>
+                <USeparator class="col-span-2" />
+                <div class="col-span-2">
+                    <div class="text-xs text-dimmed mb-0.5">Duration</div>
+                    <div class="font-medium">{{ ot.duration }}</div>
+                </div>
+            </div>
+        </UCard>
+    </div>
 
-    <UTable :data="overtimeData" :columns="columns" sticky class="flex-1" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
+    <UTable v-else :data="overtimeData" :columns="columns" sticky class="flex-1 min-h-0" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
         <template #status-cell="{ row }">
             <StatusBadge :status="row.original.status" />
         </template>

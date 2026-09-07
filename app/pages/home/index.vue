@@ -164,7 +164,7 @@ const formattedDate = computed(() => {
                     <p class="text-sm text-neutral-500 mt-1">{{ formattedDate }}</p>
                 </div>
                 <template #footer>
-                    <UButton v-if="!isTimedIn" color="primary" block @click="isTimedIn = true">
+                    <UButton v-if="!isTimedIn" color="success" block @click="isTimedIn = true">
                         <UIcon name="i-lucide-log-in" class="size-4" />
                         Time In
                     </UButton>
@@ -243,7 +243,7 @@ const formattedDate = computed(() => {
                     </div>
                 </div>
                 <template #footer>
-                    <UButton block to="/approvals">
+                    <UButton block variant="soft" to="/approvals">
                         <UIcon name="i-lucide-arrow-right" class="size-4" />
                         View All Tasks
                     </UButton>

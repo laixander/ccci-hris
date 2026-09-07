@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, h, resolveComponent } from 'vue'
-import type { TableColumn, TableRow } from '@nuxt/ui'
+import { ref, computed, h, resolveComponent } from 'vue'
+import type { TableColumn } from '@nuxt/ui'
 
 const UButton = resolveComponent('UButton')
 const StatusBadge = resolveComponent('StatusBadge')
@@ -9,25 +9,7 @@ definePageMeta({
     isTable: true,
 })
 
-const activeTab = ref('dtr')
-
-const items = [
-  {
-    label: 'Daily Time Record',
-    icon: 'i-lucide-clock',
-    value: 'dtr'
-  },
-  {
-    label: 'Time Adjustment',
-    icon: 'i-lucide-calendar-check',
-    value: 'time-adjustment'
-  },
-  {
-    label: 'DTR Evaluation',
-    icon: 'i-lucide-list-checks',
-    value: 'evaluation'
-  }
-]
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 type TimesheetRecord = {
   day: number
@@ -45,62 +27,80 @@ type TimesheetRecord = {
 type TimeAdjustmentRecord = {
   dateApplied: string
   date: string
+  currentTimeIn: string
+  currentTimeOut: string
   timeIn: string
   timeOut: string
   duration: number
   status: string
 }
 
-type EvaluationRecord = {
-  cutoffPeriod: string
-  confirmedDate: string
-  status: 'PENDING' | 'CONFIRMED'
-}
+// ─── State ───────────────────────────────────────────────────────────────────
 
-const timeAdjustmentData = ref<TimeAdjustmentRecord[]>([])
+const isDrawerOpen = ref(false)
+const isModalOpen = ref(false)
+const selectedRecord = ref<TimesheetRecord | null>(null)
+const viewMode = ref<'calendar' | 'table'>('calendar')
 
-const data = ref<TimesheetRecord[]>([
-  { day: 31, timeIn: null, timeOut: null, duration: 0, status: 'HOLIDAY', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 30, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 29, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 28, timeIn: '07:21:00 AM', timeOut: '05:13:00 PM', duration: 9.87, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 27, timeIn: '08:08:00 AM', timeOut: '05:01:00 PM', duration: 8.88, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 26, timeIn: '08:06:00 AM', timeOut: '05:00:00 PM', duration: 8.90, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 25, timeIn: '07:37:00 AM', timeOut: '05:01:00 PM', duration: 9.40, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 24, timeIn: '08:04:00 AM', timeOut: '05:02:00 PM', duration: 8.97, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 23, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 22, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 21, timeIn: null, timeOut: null, duration: 0, status: 'HOLIDAY', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 20, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 19, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 18, timeIn: '07:31:00 AM', timeOut: '05:11:00 PM', duration: 9.67, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 17, timeIn: null, timeOut: null, duration: 0, status: 'LWOP', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 8.00 },
-  { day: 16, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 15, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 14, timeIn: '07:32:00 AM', timeOut: '05:23:00 PM', duration: 9.85, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 13, timeIn: '08:06:00 AM', timeOut: '05:01:00 PM', duration: 8.92, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 12, timeIn: '08:06:00 AM', timeOut: '05:02:00 PM', duration: 8.93, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 11, timeIn: null, timeOut: null, duration: 0, status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
-  { day: 10, timeIn: '07:30:00 AM', timeOut: '05:05:00 PM', duration: 9.58, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 9, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 8, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 7, timeIn: '07:32:00 AM', timeOut: '05:08:00 PM', duration: 9.60, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 6, timeIn: '07:55:00 AM', timeOut: '05:04:00 PM', duration: 9.15, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 5, timeIn: '08:07:00 AM', timeOut: '05:00:00 PM', duration: 8.88, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 4, timeIn: null, timeOut: null, duration: 0, status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
-  { day: 3, timeIn: '08:08:00 AM', timeOut: '05:02:00 PM', duration: 8.90, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 2, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 1, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
+const month = ref(new Date().getMonth() + 1)
+const year = ref(new Date().getFullYear())
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const timeAdjustmentData = ref<TimeAdjustmentRecord[]>([
+  { dateApplied: 'Sept 06, 2026', date: 'Sept 01, 2026', currentTimeIn: '09:32 AM', currentTimeOut: '06:45 PM', timeIn: '09:00 AM', timeOut: '06:00 PM', duration: 9, status: 'PENDING' },
+  { dateApplied: 'Aug 21, 2026', date: 'Aug 20, 2026', currentTimeIn: '08:15 AM', currentTimeOut: '05:30 PM', timeIn: '08:00 AM', timeOut: '05:00 PM', duration: 9, status: 'APPROVED' },
 ])
+
+// August 2026 — replace with API fetch keyed by month + year
+const data = ref<TimesheetRecord[]>([
+  { day: 1,  timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 2,  timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 3,  timeIn: '08:08:00 AM', timeOut: '05:02:00 PM', duration: 8.90, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 4,  timeIn: null,          timeOut: null,         duration: 0,    status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0    },
+  { day: 5,  timeIn: '08:07:00 AM', timeOut: '05:00:00 PM', duration: 8.88, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 6,  timeIn: '07:55:00 AM', timeOut: '05:04:00 PM', duration: 9.15, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 7,  timeIn: '07:32:00 AM', timeOut: '05:08:00 PM', duration: 9.60, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 8,  timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 9,  timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 10, timeIn: '07:30:00 AM', timeOut: '05:05:00 PM', duration: 9.58, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 11, timeIn: null,          timeOut: null,         duration: 0,    status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0    },
+  { day: 12, timeIn: '08:06:00 AM', timeOut: '05:02:00 PM', duration: 8.93, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 13, timeIn: '08:06:00 AM', timeOut: '05:01:00 PM', duration: 8.92, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 14, timeIn: '07:32:00 AM', timeOut: '05:23:00 PM', duration: 9.85, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 15, timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 16, timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 17, timeIn: null,          timeOut: null,         duration: 0,    status: 'LWOP',     overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 8.00 },
+  { day: 18, timeIn: '07:31:00 AM', timeOut: '05:11:00 PM', duration: 9.67, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 19, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 20, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 21, timeIn: null,          timeOut: null,         duration: 0,    status: 'HOLIDAY',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 22, timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 23, timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 24, timeIn: '08:04:00 AM', timeOut: '05:02:00 PM', duration: 8.97, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 25, timeIn: '07:37:00 AM', timeOut: '05:01:00 PM', duration: 9.40, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 26, timeIn: '08:06:00 AM', timeOut: '05:00:00 PM', duration: 8.90, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 27, timeIn: '08:08:00 AM', timeOut: '05:01:00 PM', duration: 8.88, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 28, timeIn: '07:21:00 AM', timeOut: '05:13:00 PM', duration: 9.87, status: 'PRESENT',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 29, timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 30, timeIn: null,          timeOut: null,         duration: 0,    status: 'WEEKEND',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+  { day: 31, timeIn: null,          timeOut: null,         duration: 0,    status: 'HOLIDAY',  overtime: 0, late: 0, undertime: 0, leave: 0,    lwop: 0    },
+])
+
+// Month/year the above data belongs to — update when fetching from API
+const dataMonth = ref(8)  // August
+const dataYear = ref(2026)
+
+// ─── Table Columns ────────────────────────────────────────────────────────────
 
 const columns: TableColumn<TimesheetRecord>[] = [
   { accessorKey: 'day', header: 'Day' },
   { accessorKey: 'timeIn', header: 'Time In', cell: ({ row }) => row.getValue('timeIn') || '--:--' },
   { accessorKey: 'timeOut', header: 'Time Out', cell: ({ row }) => row.getValue('timeOut') || '--:--' },
   { accessorKey: 'duration', header: 'Duration', meta: { class: { th: 'text-right', td: 'text-right font-medium text-neutral-600 dark:text-neutral-400' } }, cell: ({ row }) => Number(row.getValue('duration')).toFixed(2) },
-  { 
-    accessorKey: 'status', 
-    header: 'Status', 
+  {
+    accessorKey: 'status',
+    header: 'Status',
     cell: ({ row }) => h(StatusBadge, { status: row.getValue('status') as string })
   },
   { accessorKey: 'overtime', header: 'Overtime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('overtime')).toFixed(2) },
@@ -108,45 +108,76 @@ const columns: TableColumn<TimesheetRecord>[] = [
   { accessorKey: 'undertime', header: 'Undertime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('undertime')).toFixed(2) },
   { accessorKey: 'leave', header: 'Leave', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('leave')).toFixed(2) },
   { accessorKey: 'lwop', header: 'LWOP', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('lwop')).toFixed(2) },
+  {
+    id: 'actions',
+    header: '',
+    meta: { class: { th: 'text-right', td: 'text-right' } },
+    cell: ({ row }) => h(UButton, {
+      icon: 'i-lucide-edit-3',
+      size: 'sm',
+      variant: 'ghost',
+      color: 'neutral',
+      onClick: () => {
+        selectedRecord.value = row.original
+        isModalOpen.value = true
+      }
+    })
+  }
 ]
 
-const timeAdjustmentColumns: TableColumn<TimeAdjustmentRecord>[] = [
-  { accessorKey: 'dateApplied', header: 'Date Applied' },
-  { accessorKey: 'date', header: 'Date' },
-  { accessorKey: 'timeIn', header: 'Time In' },
-  { accessorKey: 'timeOut', header: 'Time Out' },
-  { accessorKey: 'duration', header: 'Duration' },
-  { accessorKey: 'status', header: 'Status' }
-]
+// ─── Calendar ─────────────────────────────────────────────────────────────────
 
-const evaluationData = ref<EvaluationRecord[]>([
-  { cutoffPeriod: 'August 14, 2026 – August 27, 2026', confirmedDate: 'Not yet confirmed', status: 'PENDING' },
-  { cutoffPeriod: 'July 31, 2026 – August 13, 2026', confirmedDate: 'August 14, 2026 at 11:58 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'July 15, 2026 – July 30, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'June 30, 2026 – July 14, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'June 15, 2026 – June 29, 2026', confirmedDate: 'July 03, 2026 at 07:36 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'May 29, 2026 – June 12, 2026', confirmedDate: 'June 11, 2026 at 06:30 PM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'May 15, 2026 – May 28, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'April 30, 2026 – May 14, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'April 15, 2026 – April 29, 2026', confirmedDate: 'May 11, 2026 at 09:49 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'March 31, 2026 – April 14, 2026', confirmedDate: 'April 30, 2026 at 08:26 AM', status: 'CONFIRMED' },
-])
+const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const month = ref(new Date().getMonth() + 1)
-const year = ref(new Date().getFullYear())
+type CalendarCell = {
+  day: number
+  date: Date
+  isToday: boolean
+  isWeekend: boolean
+  record: TimesheetRecord | undefined
+} | null
 
-function getCutoffHalf(cutoffPeriod: string) {
-  const parts = cutoffPeriod.split('–')
-  if (parts.length === 2) {
-    const endPart = parts[1]
-    if (!endPart) return ''
-    const endDate = new Date(endPart.trim())
-    if (!isNaN(endDate.getTime())) {
-      return endDate.getDate() <= 15 ? '1st Half' : '2nd Half'
+const calendarDays = computed<CalendarCell[]>(() => {
+  const y = year.value
+  const m = month.value // 1-based
+
+  const today = new Date()
+  const daysInMonth = new Date(y, m, 0).getDate()       // last day of month
+  const firstDayOfWeek = new Date(y, m - 1, 1).getDay() // 0=Sun … 6=Sat
+
+  const cells: CalendarCell[] = []
+
+  // Leading empty cells so day-1 lands in the correct column
+  for (let i = 0; i < firstDayOfWeek; i++) {
+    cells.push(null)
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(y, m - 1, day)
+    const dow = date.getDay()
+    cells.push({
+      day,
+      date,
+      isToday: today.getFullYear() === y && today.getMonth() + 1 === m && today.getDate() === day,
+      isWeekend: dow === 0 || dow === 6,
+      record: (month.value === dataMonth.value && year.value === dataYear.value)
+        ? data.value.find(r => r.day === day)
+        : undefined,
+    })
+  }
+
+  // Trailing empty cells so the grid always has complete rows
+  const remainder = cells.length % 7
+  if (remainder !== 0) {
+    for (let i = 0; i < 7 - remainder; i++) {
+      cells.push(null)
     }
   }
-  return ''
-}
+
+  return cells
+})
+
+// ─── Months / Years ───────────────────────────────────────────────────────────
 
 const months = [
   { label: 'January', value: 1 },
@@ -165,210 +196,223 @@ const months = [
 
 const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i)
 
-const cutoffs = [
-  { label: 'August 14, 2026 – August 27, 2026', value: 'aug-14-2026' },
-  { label: 'July 31, 2026 – August 13, 2026', value: 'jul-31-2026' },
-  { label: 'July 15, 2026 – July 30, 2026', value: 'jul-15-2026' },
-  { label: 'June 30, 2026 – July 14, 2026', value: 'jun-30-2026' },
-  { label: 'June 15, 2026 – June 29, 2026', value: 'jun-15-2026' },
-  { label: 'May 29, 2026 – June 12, 2026', value: 'may-29-2026' },
-  { label: 'May 15, 2026 – May 28, 2026', value: 'may-15-2026' },
-  { label: 'April 30, 2026 – May 14, 2026', value: 'apr-30-2026' },
-]
+// Only expose records to the table when the selected month/year matches the loaded data
+const tableData = computed(() =>
+  month.value === dataMonth.value && year.value === dataYear.value ? data.value : []
+)
 
-const isDrawerOpen = ref(false)
-const isModalOpen = ref(false)
-const selectedEvaluation = ref<EvaluationRecord | null>(null)
-
-function onSelect(e: Event, row: TableRow<EvaluationRecord>) {
-  selectedEvaluation.value = row.original
-  isDrawerOpen.value = true
-}
-
-const evaluationDetailsColumns: TableColumn<TimesheetRecord>[] = [
-  { accessorKey: 'day', header: 'Date' },
-  { accessorKey: 'timeIn', header: 'Time-in', cell: ({ row }) => row.getValue('timeIn') || '--' },
-  { accessorKey: 'timeOut', header: 'Time-out', cell: ({ row }) => row.getValue('timeOut') || '--' },
-  { 
-    accessorKey: 'status', 
-    header: 'Status', 
-    cell: ({ row }) => h(StatusBadge, { status: row.getValue('status') as string })
-  },
-  { accessorKey: 'duration', header: 'Duration', meta: { class: { th: 'text-right', td: 'text-right text-neutral-600 dark:text-neutral-400 font-medium' } }, cell: ({ row }) => Number(row.getValue('duration')).toFixed(2) },
-  { accessorKey: 'late', header: 'Late', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('late')).toFixed(2) },
-  { accessorKey: 'undertime', header: 'Undertime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('undertime')).toFixed(2) },
-  { accessorKey: 'lwop', header: 'LWOP', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('lwop')).toFixed(2) },
-  { accessorKey: 'overtime', header: 'Overtime', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('overtime')).toFixed(2) },
-  { accessorKey: 'leave', header: 'VL Deductions', meta: { class: { th: 'text-right', td: 'text-right' } }, cell: ({ row }) => Number(row.getValue('leave')).toFixed(2) },
-]
-
-const evaluationDetailsData = computed(() => {
-  const allowedDays = [14, 17, 18, 19, 20, 21, 24, 25, 26, 27]
-  return data.value.filter(d => allowedDays.includes(d.day)).sort((a, b) => a.day - b.day)
-})
+// ─── Sticky table refs ────────────────────────────────────────────────────────
 
 const container = useTemplateRef('container')
 const header = useTemplateRef('header')
 const getScrollElement = () => container.value
-
 const { height: headerHeight } = useElementSize(header, undefined, { box: 'border-box' })
-
-const toast = useToast()
-const handleConfirm = async () => {
-  // e.g. await submitData()
-  isModalOpen.value = false
-  
-  toast.add({
-    title: 'Success',
-    description: 'Timesheet confirmed successfully.',
-    color: 'success',
-    icon: 'i-lucide-check-circle'
-  })
-}
 </script>
 
 <template>
-  <div ref="container" class="flex-1 overflow-y-auto scrollbar">
-    <!-- Everything that should scroll away with the table -->
+  <div ref="container" class="flex flex-col flex-1 overflow-y-auto scrollbar">
+
+    <!-- Header ────────────────────────────────────────────────────────────── -->
     <div ref="header">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
-          <UPageCard title="Timesheet Management" description="Review and evaluate your daily time records."
-              variant="naked" orientation="horizontal">
-              <div class="flex justify-end gap-2 flex-1">
-              </div>
-          </UPageCard>
-      </div>
-
-      <div class="flex items-center gap-4 px-4 pb-4 w-full">
-        <div class="flex flex-wrap gap-2 w-full">
-            <UButton v-for="tab in items" :key="tab.value"
-                :variant="activeTab === tab.value ? 'solid' : 'soft'"
-                :color="activeTab === tab.value ? 'primary' : 'neutral'" class="rounded-full"
-                @click="activeTab = tab.value">
-                <UIcon :name="tab.icon" class="shrink-0 size-4" /> {{ tab.label }}
+        <UPageCard
+          title="Timesheet Management"
+          description="Review and evaluate your daily time records."
+          variant="naked"
+          orientation="horizontal"
+          class="w-full"
+        >
+          <div class="flex justify-end gap-2 flex-1">
+            <UFieldGroup>
+              <UButton
+                icon="i-lucide-calendar"
+                color="neutral"
+                :variant="viewMode === 'calendar' ? 'subtle' : 'outline'"
+                @click="viewMode = 'calendar'"
+              />
+              <UButton
+                icon="i-lucide-list"
+                color="neutral"
+                :variant="viewMode === 'table' ? 'subtle' : 'outline'"
+                @click="viewMode = 'table'"
+              />
+            </UFieldGroup>
+            <div class="flex gap-2">
+              <USelect v-model="month" :items="months" class="w-40" />
+              <USelect v-model="year" :items="years" class="w-32" />
+            </div>
+            <UButton variant="soft" color="neutral" @click="isDrawerOpen = true">
+              <UIcon name="i-lucide-clipboard-list" class="size-4" />
+              Adjustments List
             </UButton>
-        </div>
-        <div>
-          <div v-if="activeTab === 'dtr'" class="flex gap-2">
-            <USelect v-model="month" :items="months" class="w-40" />
-            <USelect v-model="year" :items="years" class="w-32" />
           </div>
-          <div v-else-if="activeTab === 'evaluation'" class="flex gap-2">
-            <USelect :items="cutoffs" placeholder="Select Cut-off" class="w-72" />
-          </div>
-        </div>
+        </UPageCard>
       </div>
-
       <USeparator />
     </div>
 
-  <!-- tab: dtr -->
-  <UTable v-if="activeTab === 'dtr'" :data="data" :columns="columns" sticky class="flex-1" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
-      <template #empty>
-          <UEmpty icon="i-lucide-clock" title="No time records" description="There are no daily time records available for this period." variant="naked" />
-      </template>
-  </UTable>
-
-  <!-- tab: time adjustment -->
-  <UTable v-else-if="activeTab === 'time-adjustment'" :data="timeAdjustmentData" :columns="timeAdjustmentColumns" sticky class="flex-1" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
-      <template #empty>
-          <UEmpty icon="i-lucide-calendar-check" title="No time adjustments" description="You haven't applied for any time adjustments yet." variant="naked" />
-      </template>
-  </UTable>
-
-  <!-- tab: evaluation -->
-  <div v-else-if="activeTab === 'evaluation'" class="flex-1 flex flex-col p-4">
-      <div v-if="evaluationData.length === 0" class="flex-1 flex items-center justify-center">
-          <UEmpty icon="i-lucide-calendar-check" title="No evaluations" description="There are no evaluations available for this period." variant="naked" />
-      </div>
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <UCard v-for="evaluation in evaluationData" :key="evaluation.cutoffPeriod" class="shadow-sm cursor-pointer group hover:ring-1 hover:ring-primary/40 transition-all" :ui="{ body: 'group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out' }" @click="selectedEvaluation = evaluation; isDrawerOpen = true">
-              <div class="flex items-start justify-between">
-                  <div class="flex items-start justify-between w-full gap-2">
-                      <div>
-                          <UBadge :label="getCutoffHalf(evaluation.cutoffPeriod)" color="neutral" variant="soft" size="sm" class="mb-1 group-hover:hidden" />
-                          <UBadge :label="getCutoffHalf(evaluation.cutoffPeriod)" color="primary" variant="soft" size="sm" class="mb-1 hidden group-hover:inline-flex" />
-                          <div class="group-hover:text-primary transition-colors font-semibold text-sm">{{ evaluation.cutoffPeriod }}</div>
-                      </div>
-                      <!-- <UIcon name="i-lucide-panel-right-open" class="text-primary opacity-0 translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 size-5" /> -->
-                  </div>
-              </div>
-              <div class="relative mt-4 sm:mt-6">
-                <!-- Default: status + date -->
-                <div class="flex items-center justify-between transition-all duration-200 group-hover:opacity-0 group-hover:-translate-y-1">
-                  <StatusBadge :status="evaluation.status" />
-                  <div class="text-xs text-dimmed">{{ evaluation.confirmedDate }}</div>
-                </div>
-                <!-- Hover: review button -->
-                <div class="absolute inset-0 flex items-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
-                  <UButton block label="Review" variant="soft" :color="evaluation.status === 'CONFIRMED' ? 'success' : 'warning'" @click.stop="selectedEvaluation = evaluation; isDrawerOpen = true" />
-                </div>
-              </div>
-          </UCard>
-      </div>
-  </div>
-
-  </div>
-
-  <UDrawer v-model:open="isDrawerOpen" direction="right" title="Review Timesheet" inset close class="w-full max-w-[1200px]" :ui="{container: 'pr-0', header: 'pr-4', footer: 'pr-4', body: 'min-h-0 pr-4 pl-[1px] py-[1px] overflow-y-auto scrollbar'}">
-    <template #body>
-      <div v-if="selectedEvaluation" class="space-y-6">
-        <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-          <UCard :ui="{ body: 'flex flex-col items-center justify-center sm:p-4' }" class="shadow-sm">
-            <UIcon name="i-lucide-clock" class="size-6 text-primary mb-2" />
-            <div class="text-xs text-dimmed mb-1">Duration</div>
-            <div class="text-2xl font-bold">73.77</div>
-          </UCard>
-          <UCard :ui="{ body: 'flex flex-col items-center justify-center sm:p-4' }" class="shadow-sm">
-            <UIcon name="i-lucide-alarm-clock" class="size-6 text-warning-500 mb-2" />
-            <div class="text-xs text-dimmed mb-1">Late</div>
-            <div class="text-2xl font-bold">0.00</div>
-          </UCard>
-          <UCard :ui="{ body: 'flex flex-col items-center justify-center sm:p-4' }" class="shadow-sm">
-            <UIcon name="i-lucide-history" class="size-6 text-orange-500 mb-2" />
-            <div class="text-xs text-dimmed mb-1">Undertime</div>
-            <div class="text-2xl font-bold">0.00</div>
-          </UCard>
-          <UCard :ui="{ body: 'flex flex-col items-center justify-center sm:p-4' }" class="shadow-sm">
-            <UIcon name="i-lucide-user-x" class="size-6 text-error-500 mb-2" />
-            <div class="text-xs text-dimmed mb-1">LWOP</div>
-            <div class="text-2xl font-bold">8.00</div>
-          </UCard>
-          <UCard :ui="{ body: 'flex flex-col items-center justify-center sm:p-4' }" class="shadow-sm">
-            <UIcon name="i-lucide-timer" class="size-6 text-success-500 mb-2" />
-            <div class="text-xs text-dimmed mb-1">Overtime</div>
-            <div class="text-2xl font-bold">0.00</div>
-          </UCard>
-          <UCard :ui="{ body: 'flex flex-col items-center justify-center sm:p-4' }" class="shadow-sm">
-            <UIcon name="i-lucide-calendar-minus" class="size-6 text-purple-500 mb-2" />
-            <div class="text-xs text-dimmed mb-1">VL Deductions</div>
-            <div class="text-2xl font-bold">0.00</div>
-          </UCard>
+    <!-- Calendar view ─────────────────────────────────────────────────────── -->
+    <template v-if="viewMode === 'calendar'">
+      <!-- Day-of-week header -->
+      <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] shrink-0 border-b border-[var(--ui-border)]">
+        <div
+          v-for="wd in WEEK_DAYS"
+          :key="wd"
+          class="bg-[var(--ui-bg)] py-2 text-center text-xs font-medium"
+          :class="wd === 'Sun' || wd === 'Sat' ? 'text-dimmed' : 'text-toned'"
+        >
+          {{ wd }}
         </div>
+      </div>
 
-        <UCard :ui="{ body: 'p-0 sm:p-0' }" class="shadow-sm">
-          <UTable :data="evaluationDetailsData" :columns="evaluationDetailsColumns" />
-        </UCard>
+      <!-- Calendar grid -->
+      <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] flex-1 auto-rows-fr">
+        <div
+          v-for="(cell, idx) in calendarDays"
+          :key="idx"
+          class="p-2 flex flex-col transition-colors group relative"
+          :class="[
+            !cell
+              ? 'bg-[var(--ui-bg)]'
+              : cell.isWeekend
+                ? 'bg-[var(--ui-bg)] cursor-default'
+                : 'bg-[var(--ui-bg)] hover:bg-primary/5 cursor-pointer',
+          ]"
+          @click="if (cell && !cell.isWeekend && cell.record) { selectedRecord = cell.record; isModalOpen = true }"
+        >
+          <template v-if="cell">
+            <!-- Day number -->
+            <div class="flex items-center justify-between mb-1">
+              <span
+                class="text-sm font-medium leading-none w-6 h-6 flex items-center justify-center rounded-full"
+                :class="[
+                  cell.isToday
+                    ? 'bg-primary text-white font-bold'
+                    : cell.isWeekend
+                      ? 'text-dimmed'
+                      : 'text-highlighted',
+                ]"
+              >
+                {{ cell.day }}
+              </span>
+            </div>
 
-
+            <!-- Record content -->
+            <template v-if="cell.record">
+              <div class="flex flex-col gap-0.5 mt-1">
+                <div class="text-[10px] flex items-center gap-1 text-dimmed">
+                  <UIcon name="i-lucide-log-in" class="size-3 shrink-0" />
+                  {{ cell.record.timeIn || '--:--' }}
+                </div>
+                <div class="text-[10px] flex items-center gap-1 text-dimmed">
+                  <UIcon name="i-lucide-log-out" class="size-3 shrink-0" />
+                  {{ cell.record.timeOut || '--:--' }}
+                </div>
+              </div>
+              <div class="mt-auto pt-1 flex items-center justify-between">
+                <StatusBadge :status="cell.record.status" />
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <UButton
+                    icon="i-lucide-edit-3"
+                    size="xs"
+                    color="primary"
+                    variant="ghost"
+                    @click.stop="selectedRecord = cell.record!; isModalOpen = true"
+                  />
+                </div>
+              </div>
+            </template>
+          </template>
+        </div>
       </div>
     </template>
-    <template #footer>
-      <div class="flex justify-end gap-2">
-        <UButton label="Cancel" variant="ghost" color="neutral" @click="isDrawerOpen = false" />
-        <UButton label="Confirm" variant="subtle" color="warning" @click="isModalOpen = true" />
+
+    <!-- Table view ────────────────────────────────────────────────────────── -->
+    <UTable
+      v-else
+      :data="tableData"
+      :columns="columns"
+      sticky
+      class="flex-1"
+      :virtualize="{ scrollMargin: headerHeight, getScrollElement }"
+    >
+      <template #empty>
+        <UEmpty
+          icon="i-lucide-clock"
+          title="No time records"
+          description="There are no daily time records available for this period."
+          variant="naked"
+        />
+      </template>
+    </UTable>
+
+  </div>
+
+  <!-- Drawer: Time Adjustments ──────────────────────────────────────────────── -->
+  <UDrawer
+    v-model:open="isDrawerOpen"
+    direction="right"
+    title="Time Adjustments"
+    inset
+    close
+    class="w-full max-w-[572px]"
+    :ui="{ container: 'pr-0', header: 'pr-4', footer: 'pr-4', body: 'pr-4 overflow-y-auto scrollbar' }"
+  >
+    <template #body>
+      <div class="flex-1 min-h-0 overflow-y-auto p-[1px] scrollbar">
+        <UCard class="shadow-sm" :ui="{ body: 'p-0 sm:p-0' }">
+          <div class="divide-y divide-[var(--ui-border)]">
+            <div v-for="(entry, index) in timeAdjustmentData" :key="index" class="p-4 space-y-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <div class="text-sm font-semibold text-highlighted">Adjustment for {{ entry.date }}</div>
+                  <div class="text-xs text-dimmed">Applied on {{ entry.dateApplied }}</div>
+                </div>
+                <StatusBadge :status="entry.status" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <div class="text-xs text-dimmed mb-2 font-medium">Current (Recorded)</div>
+                  <div class="flex items-center gap-2 text-sm">
+                    <div class="flex items-center gap-1.5 bg-muted px-2 py-1 rounded-md text-toned">
+                      <UIcon name="i-lucide-clock" class="size-3.5 text-warning" />
+                      <span>{{ entry.currentTimeIn }}</span>
+                    </div>
+                    <span class="text-dimmed">&mdash;</span>
+                    <div class="flex items-center gap-1.5 bg-muted px-2 py-1 rounded-md text-toned">
+                      <UIcon name="i-lucide-clock" class="size-3.5 text-warning" />
+                      <span>{{ entry.currentTimeOut }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div class="text-xs text-dimmed mb-2 font-medium">Adjusted (Requested)</div>
+                  <div class="flex items-center gap-2 text-sm">
+                    <div class="flex items-center gap-1.5 bg-primary/10 px-2 py-1 rounded-md text-primary">
+                      <UIcon name="i-lucide-clock" class="size-3.5" />
+                      <span>{{ entry.timeIn }}</span>
+                    </div>
+                    <span class="text-dimmed">&mdash;</span>
+                    <div class="flex items-center gap-1.5 bg-primary/10 px-2 py-1 rounded-md text-primary">
+                      <UIcon name="i-lucide-clock" class="size-3.5" />
+                      <span>{{ entry.timeOut }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
       </div>
     </template>
   </UDrawer>
-  <!-- confirmation modal -->
-  <ConfirmModal
+
+  <!-- Modal: Time Adjustment ────────────────────────────────────────────────── -->
+  <ApplyTimeAdjustmentModal
     v-model:open="isModalOpen"
-    title="Confirmation"
-    icon="i-lucide-triangle-alert"
-    color="yellow"
-    confirm-label="Confirm"
-    cancel-label="Cancel"
-    description="By confirming, I certify this timesheet is accurate and complete. It will be used for payroll computation, and no further changes can be made once submitted. False information may lead to disciplinary action."
-    @confirm="handleConfirm"
+    :record="selectedRecord"
+    :month-label="months.find(m => m.value === month)?.label"
+    :year="year"
   />
 </template>

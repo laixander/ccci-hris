@@ -44,10 +44,11 @@ const items = computed<NavigationMenuItem[][]>(() => [
             icon: 'i-lucide-timer',
             to: '/timesheet'
         },
-        // {
-        //     label: 'DTR Evaluation',
-        //     icon: 'i-lucide-clipboard-check'
-        // },
+        {
+            label: 'DTR Evaluation',
+            icon: 'i-lucide-clipboard-check',
+            to: '/evaluations'
+        },
         {
             label: 'Leaves',
             icon: 'i-lucide-calendar',
@@ -60,7 +61,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Expenses',
-            icon: 'i-lucide-piggy-bank'
+            icon: 'i-lucide-piggy-bank',
+            to: '/reimbursements'
         },
         {
             label: 'Payslip',

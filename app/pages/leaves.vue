@@ -110,8 +110,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -125,8 +124,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -140,8 +138,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -155,8 +152,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -170,8 +166,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -185,8 +180,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -200,8 +194,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -215,8 +208,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -230,8 +222,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -245,8 +236,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -259,7 +249,8 @@ const leaves = [
     status: 'APPROVED',
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -271,6 +262,8 @@ const leaves = [
     duration: '2 day/s',
     status: 'APPROVED',
     approvers: [
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
@@ -285,8 +278,7 @@ const leaves = [
     approvers: [
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -298,8 +290,9 @@ const leaves = [
     duration: '7 day/s',
     status: 'APPROVED',
     approvers: [
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
       { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Doe' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   },
   {
@@ -311,7 +304,9 @@ const leaves = [
     duration: '3 day/s',
     status: 'REJECTED',
     approvers: [
-      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' }
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Felix' },
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=Aneka' },
+      { src: 'https://api.dicebear.com/9.x/thumbs/svg?seed=John' }
     ]
   }
 ]
@@ -324,6 +319,7 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 
 const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
+const viewMode = ref<'grid' | 'table'>('grid')
 
 </script>
 
@@ -332,20 +328,22 @@ const isModalOpen = ref(false)
     <div ref="header">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
         <UPageCard title="Leave Management" description="Request and manage your leaves"
-            variant="naked" orientation="horizontal">
+            variant="naked" orientation="horizontal" class="w-full">
             <div class="flex justify-end gap-2 flex-1">
+              <UFieldGroup>
+                <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
+                <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+              </UFieldGroup>
+              <UButton variant="soft" color="neutral" @click="isDrawerOpen = true">
+                <UIcon name="i-lucide-clipboard-list" class="size-4" />
+                Open Ledger
+              </UButton>
+              <UButton @click="isModalOpen = true">
+                <UIcon name="i-lucide-edit" class="size-4" />
+                Request Leave
+              </UButton>
             </div>
         </UPageCard>
-        <div class="flex justify-end gap-2">
-          <UButton variant="soft" color="neutral" @click="isDrawerOpen = true">
-            <UIcon name="i-lucide-clipboard-list" class="size-4" />
-            Open Ledger
-          </UButton>
-        <UButton @click="isModalOpen = true">
-            <UIcon name="i-lucide-edit" class="size-4" />
-            Request Leave
-        </UButton>
-        </div>
       </div>
 
       <div class="flex gap-3 px-4 pb-4">
@@ -368,7 +366,44 @@ const isModalOpen = ref(false)
       <USeparator />
     </div>
 
-    <UTable :data="leaves" :columns="columns" sticky class="flex-1" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
+    <div v-if="viewMode === 'grid'" class="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1">
+        <UCard v-for="leave in leaves" :key="leave.id" class="flex flex-col shadow-sm" :ui="{ body: 'flex flex-col h-full gap-4 sm:p-4' }">
+            <div class="flex items-start justify-between gap-2">
+                <div class="space-y-0.5">
+                    <div class="font-semibold text-highlighted">{{ leave.type }}</div>
+                    <div class="text-xs text-dimmed">{{ leave.dateApplied }}</div>
+                </div>
+                <StatusBadge :status="leave.status" />
+            </div>
+            
+            <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md">
+                <div>
+                    <div class="text-xs text-dimmed mb-0.5">Start</div>
+                    <div class="font-medium">{{ leave.start }}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-dimmed mb-0.5">End</div>
+                    <div class="font-medium">{{ leave.end }}</div>
+                </div>
+                <USeparator class="col-span-2" />
+                <div class="col-span-2">
+                    <div class="text-xs text-dimmed mb-0.5">Duration</div>
+                    <div class="font-medium">{{ leave.duration }}</div>
+                </div>
+            </div>
+
+            <USeparator />
+            
+            <div class="mt-auto flex items-center justify-between">
+                <span class="text-xs text-dimmed font-medium uppercase tracking-wider">Approvers</span>
+                <UAvatarGroup :max="4" size="sm">
+                    <UAvatar v-for="(approver, index) in leave.approvers" :key="index" :src="approver.src" :chip="{ inset: true, color: 'success', position: 'bottom-right', size: 'md' }" />
+                </UAvatarGroup>
+            </div>
+        </UCard>
+    </div>
+
+    <UTable v-else :data="leaves" :columns="columns" sticky class="flex-1 min-h-0" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
         <template #status-cell="{ row }">
             <StatusBadge :status="row.original.status" />
         </template>
