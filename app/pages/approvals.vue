@@ -144,6 +144,33 @@ const approvalRequests = ref([
 
 const filterStatus = ref('PENDING')
 const search = ref('')
+const selectedType = ref('All Categories')
+const period = ref('Monthly')
+const month = ref(new Date().getMonth() + 1)
+const year = ref(new Date().getFullYear())
+const quarter = ref(Math.ceil((new Date().getMonth() + 1) / 3))
+
+const months = Array.from({ length: 12 }, (_, i) => ({
+    label: new Date(0, i, 1).toLocaleString('default', { month: 'short' }),
+    value: i + 1
+}))
+
+const years = Array.from({ length: 10 }, (_, i) => ({
+    label: (new Date().getFullYear() - 5 + i).toString(),
+    value: new Date().getFullYear() - 5 + i
+}))
+
+const quarters = [
+    { label: 'Q1', value: 1 },
+    { label: 'Q2', value: 2 },
+    { label: 'Q3', value: 3 },
+    { label: 'Q4', value: 4 }
+]
+
+const requestTypes = computed(() => [
+    'All Categories',
+    ...new Set(approvalRequests.value.map(s => s.type))
+])
 const tabs = [
     { label: 'Pending', value: 'PENDING' },
     { label: 'Approved', value: 'APPROVED' },
@@ -166,6 +193,28 @@ const filteredRequests = computed(() => {
             req.reason.toLowerCase().includes(searchTerm)
         )
     }
+
+    if (selectedType.value !== 'All Categories') {
+        result = result.filter(req => req.type === selectedType.value)
+    }
+
+    result = result.filter(req => {
+        const itemDate = new Date(req.dateApplied)
+        const itemMonth = itemDate.getMonth() + 1
+        const itemYear = itemDate.getFullYear()
+        const itemQuarter = Math.ceil(itemMonth / 3)
+        
+        let matchesPeriod = false
+        if (period.value === 'Yearly') {
+            matchesPeriod = itemYear === year.value
+        } else if (period.value === 'Quarterly') {
+            matchesPeriod = itemYear === year.value && itemQuarter === quarter.value
+        } else if (period.value === 'Monthly') {
+            matchesPeriod = itemYear === year.value && itemMonth === month.value
+        }
+        
+        return matchesPeriod
+    })
 
     return result
 })
@@ -279,11 +328,10 @@ const items = [
 
 <template>
     <div class="flex-1 overflow-y-auto scrollbar flex flex-col">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
+        <div class="flex flex-col gap-4 p-4">
             <UPageCard title="Approval Board" description="Manage and review requests from your team."
                 variant="naked" orientation="horizontal" class="w-full">
                 <div class="flex justify-end gap-4 flex-1">
-                    <UInput v-model="search" placeholder="Search requests" icon="i-lucide-search" class="flex-1 sm:max-w-64" />
                     <div class="flex flex-wrap gap-2">
                         <UButton v-for="tab in tabs" :key="tab.value" :label="tab.label"
                             :variant="filterStatus === tab.value ? 'solid' : 'soft'"
@@ -292,6 +340,20 @@ const items = [
                     </div>
                 </div>
             </UPageCard>
+
+            <div class="flex items-center gap-3">
+                <UInput
+                    v-model="search"
+                    placeholder="Search by name, type, or reason..."
+                    icon="i-lucide-search"
+                    class="flex-1"
+                />
+                <USelect v-model="selectedType" :items="requestTypes" class="w-48" />
+                <USelect v-model="period" :items="['Monthly', 'Quarterly', 'Yearly']" class="w-32" />
+                <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-24" />
+                <USelect v-if="period === 'Quarterly'" v-model="quarter" :items="quarters" class="w-24" />
+                <USelect v-model="year" :items="years" class="w-24" />
+            </div>
         </div>
 
         <USeparator />

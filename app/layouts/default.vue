@@ -66,11 +66,13 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Payslip',
-            icon: 'i-lucide-file-text'
+            icon: 'i-lucide-file-text',
+            to: '/payslip'
         },
         {
             label: 'Service Request',
-            icon: 'i-lucide-user'
+            icon: 'i-lucide-user',
+            to: '/services'
         },
         {
             label: 'Calendar',
@@ -78,7 +80,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Directory',
-            icon: 'i-lucide-book-open'
+            icon: 'i-lucide-book-open',
+            to: '/directory'
         },
         {
             label: 'My Performance',

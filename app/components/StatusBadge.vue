@@ -3,10 +3,13 @@
  * StatusBadge — Reusable badge for uppercase enum status values.
  *
  * Covers:
- *   Approval:   PENDING | APPROVED | REJECTED
- *   Timesheet:  PRESENT | HOLIDAY | WEEKEND | LWOP | ON LEAVE
- *   Evaluation: PENDING | CONFIRMED
- *   Leaves:     PENDING | APPROVED | REJECTED
+ *   Approval:        PENDING | APPROVED | REJECTED
+ *   Timesheet:       PRESENT | HOLIDAY | WEEKEND | LWOP | ON LEAVE
+ *   Evaluation:      PENDING | CONFIRMED
+ *   Leaves:          PENDING | APPROVED | REJECTED
+ *   Reimbursements:  PENDING | APPROVED | DECLINED
+ *   Payslip:         PROCESSING | GENERATED | RELEASED | APPROVED
+ *   Directory:       ACTIVE | INACTIVE
  */
 
 const props = withDefaults(defineProps<{
@@ -28,10 +31,16 @@ type StatusConfig = {
 
 const STATUS_MAP: Record<string, StatusConfig> = {
     // Approval / Leave statuses
-    APPROVED:   { color: 'success', icon: 'i-lucide-check-circle' },
-    CONFIRMED:  { color: 'success', icon: 'i-lucide-check-circle' },
-    PENDING:    { color: 'warning', icon: 'i-lucide-clock' },
-    REJECTED:   { color: 'error',   icon: 'i-lucide-x-circle' },
+    APPROVED:    { color: 'success', icon: 'i-lucide-check-circle' },
+    CONFIRMED:   { color: 'success', icon: 'i-lucide-check-circle' },
+    PENDING:     { color: 'warning', icon: 'i-lucide-clock' },
+    REJECTED:    { color: 'error',   icon: 'i-lucide-x-circle' },
+    DECLINED:    { color: 'error',   icon: 'i-lucide-ban' },
+
+    // Payslip statuses
+    PROCESSING:  { color: 'info',    icon: 'i-lucide-loader-circle' },
+    GENERATED:   { color: 'neutral', icon: 'i-lucide-file-check' },
+    RELEASED:    { color: 'primary', icon: 'i-lucide-send' },
 
     // Timesheet attendance statuses
     PRESENT:    { color: 'success', icon: 'i-lucide-circle-check' },
@@ -39,6 +48,10 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     WEEKEND:    { color: 'neutral', icon: 'i-lucide-calendar-off' },
     LWOP:       { color: 'error',   icon: 'i-lucide-circle-minus' },
     'ON LEAVE': { color: 'warning', icon: 'i-lucide-plane' },
+
+    // Directory statuses
+    ACTIVE:     { color: 'success', icon: 'i-lucide-user-check' },
+    INACTIVE:   { color: 'neutral', icon: 'i-lucide-user-minus' },
 }
 
 const config = computed<StatusConfig>(() => {

@@ -100,6 +100,64 @@ function getCutoffHalf(cutoffPeriod: string) {
   return ''
 }
 
+const search = ref('')
+const status = ref('All Status')
+const period = ref('Monthly')
+const month = ref(new Date().getMonth() + 1)
+const year = ref(new Date().getFullYear())
+const quarter = ref(Math.ceil((new Date().getMonth() + 1) / 3))
+
+const months = Array.from({ length: 12 }, (_, i) => ({
+    label: new Date(0, i, 1).toLocaleString('default', { month: 'short' }),
+    value: i + 1
+}))
+
+const years = Array.from({ length: 10 }, (_, i) => ({
+    label: (new Date().getFullYear() - 5 + i).toString(),
+    value: new Date().getFullYear() - 5 + i
+}))
+
+const quarters = [
+    { label: 'Q1', value: 1 },
+    { label: 'Q2', value: 2 },
+    { label: 'Q3', value: 3 },
+    { label: 'Q4', value: 4 }
+]
+
+const filteredEvaluations = computed(() => {
+    return evaluationData.value.filter(s => {
+        // Search
+        const matchesSearch = s.cutoffPeriod.toLowerCase().includes(search.value.toLowerCase()) ||
+                              s.status.toLowerCase().includes(search.value.toLowerCase()) ||
+                              s.confirmedDate.toLowerCase().includes(search.value.toLowerCase())
+                              
+        // Status
+        const matchesStatus = status.value === 'All Status' || s.status.toUpperCase() === status.value.toUpperCase()
+        
+        // Period
+        const parts = s.cutoffPeriod.split('–')
+        let itemDate = new Date()
+        if (parts.length === 2 && parts[1]) {
+            itemDate = new Date(parts[1].trim())
+        }
+        
+        const itemMonth = itemDate.getMonth() + 1
+        const itemYear = itemDate.getFullYear()
+        const itemQuarter = Math.ceil(itemMonth / 3)
+        
+        let matchesPeriod = false
+        if (period.value === 'Yearly') {
+            matchesPeriod = itemYear === year.value
+        } else if (period.value === 'Quarterly') {
+            matchesPeriod = itemYear === year.value && itemQuarter === quarter.value
+        } else if (period.value === 'Monthly') {
+            matchesPeriod = itemYear === year.value && itemMonth === month.value
+        }
+        
+        return matchesSearch && matchesStatus && matchesPeriod
+    })
+})
+
 const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
 const selectedEvaluation = ref<EvaluationRecord | null>(null)
@@ -186,7 +244,7 @@ const handleConfirm = async () => {
 
 <template>
   <div class="flex-1 overflow-y-auto scrollbar flex flex-col">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
+    <div class="flex flex-col gap-4 p-4">
         <UPageCard title="Evaluations" description="Review and evaluate your daily time records."
             variant="naked" orientation="horizontal" class="w-full">
             <div class="flex justify-end gap-2 flex-1">
@@ -194,19 +252,33 @@ const handleConfirm = async () => {
                 <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                 <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
               </UFieldGroup>
-              <USelect :items="cutoffs" placeholder="Select Cut-off" class="w-72" />
             </div>
         </UPageCard>
+
+        <!-- Search & filter -->
+        <div class="flex items-center gap-3">
+            <UInput
+                v-model="search"
+                placeholder="Search by cutoff or status..."
+                icon="i-lucide-search"
+                class="flex-1"
+            />
+            <USelect v-model="status" :items="['All Status', 'Pending', 'Confirmed']" class="w-32" />
+            <USelect v-model="period" :items="['Monthly', 'Quarterly', 'Yearly']" class="w-32" />
+            <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-24" />
+            <USelect v-if="period === 'Quarterly'" v-model="quarter" :items="quarters" class="w-24" />
+            <USelect v-model="year" :items="years" class="w-24" />
+        </div>
     </div>
     
     <USeparator />
 
     <div v-if="viewMode === 'grid'" class="flex-1 flex flex-col p-4">
-        <div v-if="evaluationData.length === 0" class="flex-1 flex items-center justify-center">
+        <div v-if="filteredEvaluations.length === 0" class="flex-1 flex items-center justify-center">
             <UEmpty icon="i-lucide-calendar-check" title="No evaluations" description="There are no evaluations available for this period." variant="naked" />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <UCard v-for="evaluation in evaluationData" :key="evaluation.cutoffPeriod" class="shadow-sm cursor-pointer group hover:ring-1 hover:ring-primary/40 transition-all" :ui="{ body: 'sm:p-4 space-y-4 group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out' }" @click="selectedEvaluation = evaluation; isDrawerOpen = true">
+            <UCard v-for="evaluation in filteredEvaluations" :key="evaluation.cutoffPeriod" class="shadow-sm cursor-pointer group hover:ring-1 hover:ring-primary/40 transition-all" :ui="{ body: 'sm:p-4 space-y-4 group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out' }" @click="selectedEvaluation = evaluation; isDrawerOpen = true">
                 <div class="flex items-start justify-between">
                     <div class="flex items-start justify-between w-full gap-2">
                         <div>
@@ -232,7 +304,16 @@ const handleConfirm = async () => {
         </div>
     </div>
 
-    <UTable v-else :data="evaluationData" :columns="evaluationColumns" class="flex-1" />
+    <UTable v-else :data="filteredEvaluations" :columns="evaluationColumns" class="flex-1">
+        <template #empty>
+            <UEmpty
+                icon="i-lucide-clipboard-x"
+                title="No evaluations"
+                description="No timesheet evaluations found for the selected period."
+                variant="naked"
+            />
+        </template>
+    </UTable>
 
     <UDrawer v-model:open="isDrawerOpen" direction="right" title="Review Timesheet" inset close class="w-full max-w-[1200px]" :ui="{container: 'pr-0', header: 'pr-4', footer: 'pr-4', body: 'min-h-0 pr-4 pl-[1px] py-[1px] overflow-y-auto scrollbar'}">
       <template #body>
@@ -271,7 +352,16 @@ const handleConfirm = async () => {
           </div>
 
           <UCard :ui="{ body: 'p-0 sm:p-0' }" class="shadow-sm">
-            <UTable :data="evaluationDetailsData" :columns="evaluationDetailsColumns" />
+            <UTable :data="evaluationDetailsData" :columns="evaluationDetailsColumns">
+                <template #empty>
+                    <UEmpty
+                        icon="i-lucide-calendar-search"
+                        title="No daily records"
+                        description="No daily time records found for this evaluation period."
+                        variant="naked"
+                    />
+                </template>
+            </UTable>
           </UCard>
         </div>
       </template>

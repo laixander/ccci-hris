@@ -321,6 +321,67 @@ const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
 const viewMode = ref<'grid' | 'table'>('grid')
 
+const search = ref('')
+const selectedType = ref('All Categories')
+const status = ref('All Status')
+const period = ref('Monthly')
+const month = ref(new Date().getMonth() + 1)
+const year = ref(new Date().getFullYear())
+const quarter = ref(Math.ceil((new Date().getMonth() + 1) / 3))
+
+const months = Array.from({ length: 12 }, (_, i) => ({
+    label: new Date(0, i, 1).toLocaleString('default', { month: 'short' }),
+    value: i + 1
+}))
+
+const years = Array.from({ length: 10 }, (_, i) => ({
+    label: (new Date().getFullYear() - 5 + i).toString(),
+    value: new Date().getFullYear() - 5 + i
+}))
+
+const quarters = [
+    { label: 'Q1', value: 1 },
+    { label: 'Q2', value: 2 },
+    { label: 'Q3', value: 3 },
+    { label: 'Q4', value: 4 }
+]
+
+const requestTypes = computed(() => [
+    'All Categories',
+    ...new Set(leaves.map(s => s.type))
+])
+
+const filteredLeaves = computed(() => {
+    return leaves.filter(s => {
+        // Search
+        const matchesSearch = s.type.toLowerCase().includes(search.value.toLowerCase()) ||
+                              s.status.toLowerCase().includes(search.value.toLowerCase())
+                              
+        // Category
+        const matchesType = selectedType.value === 'All Categories' || s.type === selectedType.value
+        
+        // Status
+        const matchesStatus = status.value === 'All Status' || s.status.toUpperCase() === status.value.toUpperCase()
+        
+        // Period
+        const itemDate = new Date(s.start)
+        const itemMonth = itemDate.getMonth() + 1
+        const itemYear = itemDate.getFullYear()
+        const itemQuarter = Math.ceil(itemMonth / 3)
+        
+        let matchesPeriod = false
+        if (period.value === 'Yearly') {
+            matchesPeriod = itemYear === year.value
+        } else if (period.value === 'Quarterly') {
+            matchesPeriod = itemYear === year.value && itemQuarter === quarter.value
+        } else if (period.value === 'Monthly') {
+            matchesPeriod = itemYear === year.value && itemMonth === month.value
+        }
+        
+        return matchesSearch && matchesType && matchesStatus && matchesPeriod
+    })
+})
+
 </script>
 
 <template>
@@ -346,6 +407,22 @@ const viewMode = ref<'grid' | 'table'>('grid')
         </UPageCard>
       </div>
 
+      <!-- Search & filter -->
+      <div class="flex items-center gap-3 px-4 pb-4">
+          <UInput
+              v-model="search"
+              placeholder="Search by type or status..."
+              icon="i-lucide-search"
+              class="flex-1"
+          />
+          <USelect v-model="selectedType" :items="requestTypes" class="w-48" />
+          <USelect v-model="status" :items="['All Status', 'Pending', 'Approved', 'Rejected']" class="w-32" />
+          <USelect v-model="period" :items="['Monthly', 'Quarterly', 'Yearly']" class="w-32" />
+          <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-24" />
+          <USelect v-if="period === 'Quarterly'" v-model="quarter" :items="quarters" class="w-24" />
+          <USelect v-model="year" :items="years" class="w-24" />
+      </div>
+
       <div class="flex gap-3 px-4 pb-4">
           <UCard v-for="(kpi, index) in kpis" :key="index" class="shadow-sm flex-1" :ui="{ body: 'sm:p-4' }">
               <div class="flex items-center gap-3">
@@ -366,44 +443,54 @@ const viewMode = ref<'grid' | 'table'>('grid')
       <USeparator />
     </div>
 
-    <div v-if="viewMode === 'grid'" class="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1">
-        <UCard v-for="leave in leaves" :key="leave.id" class="flex flex-col shadow-sm" :ui="{ body: 'flex flex-col h-full gap-4 sm:p-4' }">
-            <div class="flex items-start justify-between gap-2">
-                <div class="space-y-0.5">
-                    <div class="font-semibold text-highlighted">{{ leave.type }}</div>
-                    <div class="text-xs text-dimmed">{{ leave.dateApplied }}</div>
+    <div v-if="viewMode === 'grid'" class="flex-1 flex flex-col p-4">
+        <div v-if="filteredLeaves.length === 0" class="flex-1 flex items-center justify-center">
+            <UEmpty
+                icon="i-lucide-calendar-x"
+                title="No leave requests"
+                description="No leave records found for the selected period."
+                variant="naked"
+            />
+        </div>
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+            <UCard v-for="leave in filteredLeaves" :key="leave.id" class="flex flex-col shadow-sm" :ui="{ body: 'flex flex-col h-full gap-4 sm:p-4' }">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="space-y-0.5">
+                        <div class="font-semibold text-highlighted">{{ leave.type }}</div>
+                        <div class="text-xs text-dimmed">{{ leave.dateApplied }}</div>
+                    </div>
+                    <StatusBadge :status="leave.status" />
                 </div>
-                <StatusBadge :status="leave.status" />
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md">
-                <div>
-                    <div class="text-xs text-dimmed mb-0.5">Start</div>
-                    <div class="font-medium">{{ leave.start }}</div>
+                
+                <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md">
+                    <div>
+                        <div class="text-xs text-dimmed mb-0.5">Start</div>
+                        <div class="font-medium">{{ leave.start }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-dimmed mb-0.5">End</div>
+                        <div class="font-medium">{{ leave.end }}</div>
+                    </div>
+                    <USeparator class="col-span-2" />
+                    <div class="col-span-2">
+                        <div class="text-xs text-dimmed mb-0.5">Duration</div>
+                        <div class="font-medium">{{ leave.duration }}</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="text-xs text-dimmed mb-0.5">End</div>
-                    <div class="font-medium">{{ leave.end }}</div>
-                </div>
-                <USeparator class="col-span-2" />
-                <div class="col-span-2">
-                    <div class="text-xs text-dimmed mb-0.5">Duration</div>
-                    <div class="font-medium">{{ leave.duration }}</div>
-                </div>
-            </div>
 
-            <USeparator />
-            
-            <div class="mt-auto flex items-center justify-between">
-                <span class="text-xs text-dimmed font-medium uppercase tracking-wider">Approvers</span>
-                <UAvatarGroup :max="4" size="sm">
-                    <UAvatar v-for="(approver, index) in leave.approvers" :key="index" :src="approver.src" :chip="{ inset: true, color: 'success', position: 'bottom-right', size: 'md' }" />
-                </UAvatarGroup>
-            </div>
-        </UCard>
+                <USeparator />
+                
+                <div class="mt-auto flex items-center justify-between">
+                    <span class="text-xs text-dimmed font-medium uppercase tracking-wider">Approvers</span>
+                    <UAvatarGroup :max="4" size="sm">
+                        <UAvatar v-for="(approver, index) in leave.approvers" :key="index" :src="approver.src" :chip="{ inset: true, color: 'success', position: 'bottom-right', size: 'md' }" />
+                    </UAvatarGroup>
+                </div>
+            </UCard>
+        </div>
     </div>
 
-    <UTable v-else :data="leaves" :columns="columns" sticky class="flex-1 min-h-0" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
+    <UTable v-else :data="filteredLeaves" :columns="columns" sticky class="flex-1 min-h-0" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
         <template #status-cell="{ row }">
             <StatusBadge :status="row.original.status" />
         </template>
@@ -411,6 +498,14 @@ const viewMode = ref<'grid' | 'table'>('grid')
             <UAvatarGroup :max="4" size="sm">
                 <UAvatar v-for="(approver, index) in row.original.approvers" :key="index" :src="approver.src" :chip="{ inset: true, color: 'success', position: 'bottom-right', size: 'md' }" />
             </UAvatarGroup>
+        </template>
+        <template #empty>
+            <UEmpty
+                icon="i-lucide-calendar-x"
+                title="No leave requests"
+                description="No leave records found for the selected period."
+                variant="naked"
+            />
         </template>
     </UTable>
   </div>

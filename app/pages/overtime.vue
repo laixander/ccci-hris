@@ -161,13 +161,64 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 const isModalOpen = ref(false)
 const viewMode = ref<'grid' | 'table'>('grid')
 
-const statuses = ['All statuses', 'Pending', 'Approved', 'Rejected']
-const status = ref('All statuses')
+const statuses = ['All Status', 'Pending', 'Approved', 'Rejected']
+const status = ref('All Status')
 
-const totalHours = computed(() => overtimeData.value.reduce((acc, curr) => acc + parseFloat(curr.duration), 0))
-const approvedItems = computed(() => overtimeData.value.filter(i => i.status === 'APPROVED').length)
-const pendingItems = computed(() => overtimeData.value.filter(i => i.status === 'PENDING').length)
-const rejectedItems = computed(() => overtimeData.value.filter(i => i.status === 'REJECTED').length)
+const search = ref('')
+const period = ref('Monthly')
+const month = ref(new Date().getMonth() + 1)
+const year = ref(new Date().getFullYear())
+const quarter = ref(Math.ceil((new Date().getMonth() + 1) / 3))
+
+const months = Array.from({ length: 12 }, (_, i) => ({
+    label: new Date(0, i, 1).toLocaleString('default', { month: 'short' }),
+    value: i + 1
+}))
+
+const years = Array.from({ length: 10 }, (_, i) => ({
+    label: (new Date().getFullYear() - 5 + i).toString(),
+    value: new Date().getFullYear() - 5 + i
+}))
+
+const quarters = [
+    { label: 'Q1', value: 1 },
+    { label: 'Q2', value: 2 },
+    { label: 'Q3', value: 3 },
+    { label: 'Q4', value: 4 }
+]
+
+const filteredOvertime = computed(() => {
+    return overtimeData.value.filter(s => {
+        // Search
+        const matchesSearch = s.status.toLowerCase().includes(search.value.toLowerCase()) ||
+                              s.date.toLowerCase().includes(search.value.toLowerCase())
+                              
+        // Status
+        const matchesStatus = status.value === 'All Status' || s.status.toUpperCase() === status.value.toUpperCase()
+        
+        // Period
+        const itemDate = new Date(s.date)
+        const itemMonth = itemDate.getMonth() + 1
+        const itemYear = itemDate.getFullYear()
+        const itemQuarter = Math.ceil(itemMonth / 3)
+        
+        let matchesPeriod = false
+        if (period.value === 'Yearly') {
+            matchesPeriod = itemYear === year.value
+        } else if (period.value === 'Quarterly') {
+            matchesPeriod = itemYear === year.value && itemQuarter === quarter.value
+        } else if (period.value === 'Monthly') {
+            matchesPeriod = itemYear === year.value && itemMonth === month.value
+        }
+        
+        return matchesSearch && matchesStatus && matchesPeriod
+    })
+})
+
+const totalHours = computed(() => filteredOvertime.value.reduce((acc, curr) => acc + parseFloat(curr.duration), 0))
+const approvedItems = computed(() => filteredOvertime.value.filter(i => i.status === 'APPROVED').length)
+const pendingItems = computed(() => filteredOvertime.value.filter(i => i.status === 'PENDING').length)
+const rejectedItems = computed(() => filteredOvertime.value.filter(i => i.status === 'REJECTED').length)
 
 const kpis = computed(() => [
   { label: 'Total Overtime', icon: 'i-lucide-clock', color: 'text-indigo-500', bg: 'bg-indigo-500/10', value: totalHours.value.toString(), sublabel: 'HOURS' },
@@ -194,26 +245,21 @@ const kpis = computed(() => [
             </UButton>  
           </div>
         </UPageCard>
-        <!-- Filters -->
-        <!-- <div class="flex items-center justify-between gap-4 w-full">
-            <div class="flex flex-wrap gap-2">
-                <UButton v-for="tab in statuses" :key="tab" :label="tab"
-                    :variant="status === tab ? 'solid' : 'soft'"
-                    :color="status === tab ? 'primary' : 'neutral'" class="rounded-full"
-                    @click="status = tab" />
-            </div>
-            <div class="flex items-center gap-2">
-                <UInput
-                    icon="i-lucide-search"
-                    placeholder="Search"
-                    class="w-64"
-                />
-                <UButton @click="isModalOpen = true">
-                    <UIcon name="i-lucide-plus" class="size-4" />
-                    Request Overtime
-                </UButton>
-            </div>
-        </div> -->
+      </div>
+
+      <!-- Search & filter -->
+      <div class="flex items-center gap-3 px-4 pb-4">
+          <UInput
+              v-model="search"
+              placeholder="Search by date or status..."
+              icon="i-lucide-search"
+              class="flex-1"
+          />
+          <USelect v-model="status" :items="statuses" class="w-32" />
+          <USelect v-model="period" :items="['Monthly', 'Quarterly', 'Yearly']" class="w-32" />
+          <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-24" />
+          <USelect v-if="period === 'Quarterly'" v-model="quarter" :items="quarters" class="w-24" />
+          <USelect v-model="year" :items="years" class="w-24" />
       </div>
 
       <div class="flex gap-3 px-4 pb-4">
@@ -236,47 +282,60 @@ const kpis = computed(() => [
       <USeparator />
     </div>
 
-    <div v-if="viewMode === 'grid'" class="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1">
-        <UCard v-for="ot in overtimeData" :key="ot.id" class="flex flex-col shadow-sm" :ui="{ body: 'flex flex-col h-full gap-4 sm:p-4' }">
-            <div class="flex items-start justify-between gap-2">
-                <div class="space-y-0.5">
-                    <div class="font-semibold text-highlighted">Overtime Request</div>
-                    <div class="text-xs text-dimmed">{{ ot.dateApplied }}</div>
+    <div v-if="viewMode === 'grid'" class="flex-1 flex flex-col p-4">
+        <div v-if="filteredOvertime.length === 0" class="flex-1 flex items-center justify-center">
+            <UEmpty
+                icon="i-lucide-clock-4"
+                title="No overtime requests"
+                description="No overtime records found for the selected period."
+                variant="naked"
+            />
+        </div>
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+            <UCard v-for="ot in filteredOvertime" :key="ot.id" class="flex flex-col shadow-sm" :ui="{ body: 'flex flex-col h-full gap-4 sm:p-4' }">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="space-y-0.5">
+                        <div class="font-semibold text-highlighted">Overtime Request</div>
+                        <div class="text-xs text-dimmed">{{ ot.dateApplied }}</div>
+                    </div>
+                    <StatusBadge :status="ot.status" />
                 </div>
-                <StatusBadge :status="ot.status" />
-            </div>
-            
-            <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md mt-auto">
-                <div class="col-span-2">
-                    <div class="text-xs text-dimmed mb-0.5">Date</div>
-                    <div class="font-medium">{{ ot.date }}</div>
+                
+                <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md mt-auto">
+                    <div class="col-span-2">
+                        <div class="text-xs text-dimmed mb-0.5">Date</div>
+                        <div class="font-medium">{{ ot.date }}</div>
+                    </div>
+                    <USeparator class="col-span-2" />
+                    <div>
+                        <div class="text-xs text-dimmed mb-0.5">Start Time</div>
+                        <div class="font-medium">{{ ot.start }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-dimmed mb-0.5">End Time</div>
+                        <div class="font-medium">{{ ot.end }}</div>
+                    </div>
+                    <USeparator class="col-span-2" />
+                    <div class="col-span-2">
+                        <div class="text-xs text-dimmed mb-0.5">Duration</div>
+                        <div class="font-medium">{{ ot.duration }}</div>
+                    </div>
                 </div>
-                <USeparator class="col-span-2" />
-                <div>
-                    <div class="text-xs text-dimmed mb-0.5">Start Time</div>
-                    <div class="font-medium">{{ ot.start }}</div>
-                </div>
-                <div>
-                    <div class="text-xs text-dimmed mb-0.5">End Time</div>
-                    <div class="font-medium">{{ ot.end }}</div>
-                </div>
-                <USeparator class="col-span-2" />
-                <div class="col-span-2">
-                    <div class="text-xs text-dimmed mb-0.5">Duration</div>
-                    <div class="font-medium">{{ ot.duration }}</div>
-                </div>
-            </div>
-        </UCard>
+            </UCard>
+        </div>
     </div>
 
-    <UTable v-else :data="overtimeData" :columns="columns" sticky class="flex-1 min-h-0" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
+    <UTable v-else :data="filteredOvertime" :columns="columns" sticky class="flex-1 min-h-0" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
         <template #status-cell="{ row }">
             <StatusBadge :status="row.original.status" />
         </template>
         <template #empty>
-            <div class="flex items-center justify-center py-6 text-sm text-dimmed">
-                No data
-            </div>
+            <UEmpty
+                icon="i-lucide-clock-4"
+                title="No overtime requests"
+                description="No overtime records found for the selected period."
+                variant="naked"
+            />
         </template>
     </UTable>
   </div>
