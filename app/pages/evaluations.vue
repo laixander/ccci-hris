@@ -162,6 +162,7 @@ const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
 const selectedEvaluation = ref<EvaluationRecord | null>(null)
 const viewMode = ref<'grid' | 'table'>('grid')
+const detailsViewMode = ref<'grid' | 'table'>('grid')
 
 const evaluationColumns: TableColumn<EvaluationRecord>[] = [
   { 
@@ -229,6 +230,10 @@ const evaluationDetailsData = computed(() => {
   return data.value.filter(d => allowedDays.includes(d.day)).sort((a, b) => a.day - b.day)
 })
 
+const getTotalDeduction = (record: TimesheetRecord) => {
+  return record.late + record.undertime + record.lwop + record.leave
+}
+
 const toast = useToast()
 const handleConfirm = async () => {
   isModalOpen.value = false
@@ -246,7 +251,9 @@ const handleConfirm = async () => {
   <div class="flex-1 overflow-y-auto scrollbar flex flex-col">
     <div class="flex flex-col gap-4 p-4">
         <UPageCard title="Evaluations" description="Review and evaluate your daily time records."
-            variant="naked" orientation="horizontal" class="w-full">
+            variant="naked" orientation="horizontal" class="w-full" :ui="{
+              title: 'text-2xl font-bold'
+            }" >
             <div class="flex justify-end gap-2 flex-1">
               <UFieldGroup>
                 <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
@@ -351,7 +358,64 @@ const handleConfirm = async () => {
             </UCard>
           </div>
 
-          <UCard :ui="{ body: 'p-0 sm:p-0' }" class="shadow-sm">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center justify-center size-10 rounded-lg bg-primary/10 text-primary">
+                <UIcon name="i-lucide-calendar" class="size-5" />
+              </div>
+              <div>
+                  <UBadge :label="getCutoffHalf(selectedEvaluation.cutoffPeriod).toUpperCase()" color="neutral" variant="soft" size="sm" class="mb-1" />
+                  <div class="font-semibold text-sm">{{ selectedEvaluation.cutoffPeriod }}</div>
+              </div>
+            </div>
+            <UFieldGroup>
+              <UButton icon="i-lucide-layout-grid" color="neutral" :variant="detailsViewMode === 'grid' ? 'subtle' : 'outline'" @click="detailsViewMode = 'grid'" />
+              <UButton icon="i-lucide-list" color="neutral" :variant="detailsViewMode === 'table' ? 'subtle' : 'outline'" @click="detailsViewMode = 'table'" />
+            </UFieldGroup>
+          </div>
+
+          <div v-if="detailsViewMode === 'grid'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <UCard v-for="record in evaluationDetailsData" :key="record.day" :class="['shadow-sm', getTotalDeduction(record) > 0 ? 'ring-1 ring-error-500/20 bg-linear-to-tl from-error-500/10 to-transparent' : '']" :ui="{ body: 'sm:p-4 space-y-3' }">
+                  <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <UIcon name="i-lucide-calendar-days" class="size-5 text-dimmed" />
+                        <div class="font-semibold text-sm">Day {{ record.day }}</div>
+                      </div>
+                      <StatusBadge :status="record.status" />
+                  </div>
+                  <USeparator
+                    :ui="{ border: getTotalDeduction(record) > 0 ? 'border-error-500/10' : '' }"
+                  />
+                  <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+                      <div class="flex flex-col">
+                          <span class="text-dimmed text-xs">Time-in</span>
+                          <span class="font-medium">{{ record.timeIn || '--' }}</span>
+                      </div>
+                      <div class="flex flex-col">
+                          <span class="text-dimmed text-xs">Time-out</span>
+                          <span class="font-medium">{{ record.timeOut || '--' }}</span>
+                      </div>
+                      <div class="flex flex-col">
+                          <span class="text-dimmed text-xs">Duration</span>
+                          <span class="font-medium">{{ Number(record.duration).toFixed(2) }}</span>
+                      </div>
+                      <div class="flex flex-col">
+                          <span class="text-dimmed text-xs">Total Deduction</span>
+                          <span :class="getTotalDeduction(record) > 0 ? 'font-bold text-error-500' : 'font-medium'">{{ getTotalDeduction(record).toFixed(2) }}</span>
+                      </div>
+                  </div>
+              </UCard>
+              <div v-if="evaluationDetailsData.length === 0" class="col-span-full flex items-center justify-center p-8">
+                  <UEmpty
+                      icon="i-lucide-calendar-search"
+                      title="No daily records"
+                      description="No daily time records found for this evaluation period."
+                      variant="naked"
+                  />
+              </div>
+          </div>
+
+          <UCard v-else :ui="{ body: 'p-0 sm:p-0' }" class="shadow-sm">
             <UTable :data="evaluationDetailsData" :columns="evaluationDetailsColumns">
                 <template #empty>
                     <UEmpty
@@ -366,7 +430,7 @@ const handleConfirm = async () => {
         </div>
       </template>
       <template #footer>
-        <div class="flex justify-end gap-2">
+        <div class="flex items-center gap-2">
           <UButton :label="selectedEvaluation?.status === 'PENDING' ? 'Cancel' : 'Close'" variant="ghost" color="neutral" @click="isDrawerOpen = false" />
           <UButton v-if="selectedEvaluation?.status === 'PENDING'" label="Confirm" color="warning" @click="isModalOpen = true" />
         </div>

@@ -208,6 +208,9 @@ function openDetail(row: (typeof payslipData.value)[0]) {
                     description="Download and view your payslips"
                     variant="naked"
                     class="flex-1"
+                    :ui="{
+                        title: 'text-2xl font-bold'
+                    }"
                 />
                 <div class="flex items-center gap-2">
                     <UFieldGroup>

@@ -330,7 +330,11 @@ const items = [
     <div class="flex-1 overflow-y-auto scrollbar flex flex-col">
         <div class="flex flex-col gap-4 p-4">
             <UPageCard title="Approval Board" description="Manage and review requests from your team."
-                variant="naked" orientation="horizontal" class="w-full">
+                variant="naked" orientation="horizontal" class="w-full"
+                :ui="{
+                    title: 'text-2xl font-bold'
+                }"
+            >
                 <div class="flex justify-end gap-4 flex-1">
                     <div class="flex flex-wrap gap-2">
                         <UButton v-for="tab in tabs" :key="tab.value" :label="tab.label"
@@ -759,10 +763,10 @@ const items = [
         </template>
         <template #footer>
             <div v-if="selectedRequest.status === 'PENDING'" class="flex gap-3">
-                <UButton color="error" block class="flex-1" @click="openConfirmModal(selectedRequest.id, 'reject')">
+                <UButton color="error" variant="soft" block class="flex-1" @click="openConfirmModal(selectedRequest.id, 'reject')">
                     Reject
                 </UButton>
-                <UButton color="success" block class="flex-1" @click="openConfirmModal(selectedRequest.id, 'approve')">
+                <UButton color="success" variant="soft" block class="flex-1" @click="openConfirmModal(selectedRequest.id, 'approve')">
                     Approve
                 </UButton>
             </div>

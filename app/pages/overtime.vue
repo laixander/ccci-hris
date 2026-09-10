@@ -233,7 +233,9 @@ const kpis = computed(() => [
     <div ref="header">
       <div class="flex flex-col gap-4 p-4">
         <UPageCard title="Overtime Requests" description="Apply and track overtime"
-            variant="naked" orientation="horizontal" class="w-full">
+            variant="naked" orientation="horizontal" class="w-full" :ui="{
+                    title: 'text-2xl font-bold'
+                }">
           <div class="flex items-center justify-end gap-2 flex-1">
             <UFieldGroup>
               <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />

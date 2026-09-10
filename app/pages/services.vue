@@ -180,6 +180,9 @@ const openDetails = (request: ServiceRequest) => {
                     description="Submit and track IT, HR, or administrative concerns"
                     variant="naked"
                     class="flex-1"
+                    :ui="{
+                        title: 'text-2xl font-bold'
+                    }"
                 />
                 <div class="flex items-center gap-2">
                     <UFieldGroup>

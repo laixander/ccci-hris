@@ -421,6 +421,9 @@ const floatingRoles = [
                     description="Browse and search the company employee directory"
                     variant="naked"
                     class="flex-1"
+                    :ui="{
+                        title: 'text-2xl font-bold'
+                    }"
                 />
                 <div class="flex items-center gap-2">
                     <UFieldGroup>
@@ -609,19 +612,22 @@ const floatingRoles = [
         </template>
     </UModal>
 
-    <UModal fullscreen v-model:open="isOrgChartOpen" :ui="{ content: 'flex flex-col', body: 'flex-1 min-h-0 p-0 overflow-hidden' }">
+    <UModal fullscreen v-model:open="isOrgChartOpen" :ui="{ content: 'flex flex-col', header: 'relative bg-linear-to-r from-primary-500/15 to-primary-500/0 group', body: 'flex-1 min-h-0 p-0 sm:p-0 overflow-hidden' }">
         <template #header>
-            <div class="flex items-center justify-between px-2">
-                <div class="flex items-center gap-3">
-                    <div class="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <UIcon name="i-lucide-git-fork" class="size-4 text-primary rotate-180" />
+            <div class="absolute overflow-hidden inset-0 pointer-events-none">
+                <UIcon name="i-lucide-git-fork" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2 rotate-180" />
+            </div>
+            <div class="flex items-center justify-between relative z-10 w-full">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <UIcon name="i-lucide-git-fork" class="size-5 text-primary rotate-180" />
                     </div>
                     <div>
-                        <div class="text-base font-semibold">Organization Chart</div>
-                        <div class="text-xs text-dimmed">CCCI Company Structure</div>
+                        <h2 class="text-primary font-semibold leading-tight">Organization Chart</h2>
+                        <p class="text-primary/60 text-sm">CCCI Company Structure</p>
                     </div>
                 </div>
-                <UButton color="neutral" variant="ghost" icon="i-lucide-x" @click="isOrgChartOpen = false" />
+                <UButton color="neutral" variant="ghost" icon="i-lucide-x" class="hover:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" @click="isOrgChartOpen = false" />
             </div>
         </template>
         <template #body>
@@ -630,33 +636,9 @@ const floatingRoles = [
                 <div class="absolute inset-0 opacity-30"
                     style="background-image: radial-gradient(circle, var(--ui-border) 1px, transparent 1px); background-size: 28px 28px;" />
 
-                <!-- Floating roles (top right) -->
-                <div class="absolute top-6 right-6 flex flex-col gap-3 z-10">
-                    <div class="text-[9px] font-semibold text-dimmed uppercase tracking-widest text-right mb-1">Floating Roles</div>
-                    <div v-for="role in floatingRoles" :key="role.title"
-                        class="w-36 bg-default/80 backdrop-blur-sm border border-[var(--ui-border)] rounded-xl p-3 shadow-lg hover:border-primary/50 hover:shadow-primary/10 hover:shadow-xl transition-all">
-                        <div class="flex justify-center mb-2">
-                            <div class="size-7 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <UIcon :name="role.icon" class="size-3.5 text-primary" />
-                            </div>
-                        </div>
-                        <div class="text-[10px] font-semibold text-center mb-2 leading-tight px-1">
-                            {{ role.title }}
-                        </div>
-                        <div class="flex justify-center mb-2">
-                            <UAvatar :src="dicebearUrl(role.avatars[0] || '')" :alt="role.avatars[0]" size="xs" class="ring-2 ring-background" />
-                        </div>
-                        <div class="flex justify-center">
-                            <div class="text-[9px] bg-muted px-2 py-0.5 rounded-full text-dimmed font-medium">
-                                {{ role.employees }} employee
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Main Org Chart — fills full area -->
+                <!-- Main Org Chart — fills full area, floating roles rendered inside component -->
                 <ClientOnly>
-                    <OrgChart :data="orgData" />
+                    <OrgChart :data="orgData" :floating-roles="floatingRoles" />
                 </ClientOnly>
             </div>
         </template>

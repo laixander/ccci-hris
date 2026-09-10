@@ -221,6 +221,9 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
           variant="naked"
           orientation="horizontal"
           class="w-full"
+          :ui="{
+            title: 'text-2xl font-bold'
+          }"
         >
           <div class="flex justify-end gap-2 flex-1">
             <UFieldGroup>

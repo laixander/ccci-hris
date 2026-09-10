@@ -20,6 +20,8 @@ const collapsible = ref<SidebarProps['collapsible']>('icon')
 
 const open = ref(true)
 const { alertMsg, clearAlert } = useAlert()
+const { currentUser } = useDemoAuth()
+const firstName = computed(() => currentUser.value.name.split(' ')[0])
 
 const isCollapsed = computed(() => collapsible.value === 'icon' && !open.value)
 
@@ -32,7 +34,7 @@ const items = computed<NavigationMenuItem[][]>(() => [
         withActive({
             label: 'Home',
             icon: 'i-lucide-layout-grid',
-            to: '/home'
+            to: '/'
         }),
         {
             label: 'Approvals',
@@ -169,6 +171,50 @@ const pageBreadcrumbItems = computed(() => {
         }
     })
 })
+
+const timeGreeting = computed(() => {
+    const hour = new Date().getHours()
+    if (hour >= 5 && hour < 12) {
+        return {
+            text: 'Good Morning',
+            icon: 'i-lucide-sun',
+            colorClass: 'text-yellow-600 dark:text-yellow-500',
+            bgClass: 'bg-linear-to-r from-yellow-500/20 via-yellow-500/5 to-transparent',
+            borderColorClass: 'bg-yellow-500/20'
+        }
+    } else if (hour >= 12 && hour < 17) {
+        return {
+            text: 'Good Afternoon',
+            icon: 'i-lucide-sun-dim',
+            colorClass: 'text-orange-600 dark:text-orange-500',
+            bgClass: 'bg-linear-to-r from-orange-500/20 via-orange-500/5 to-transparent',
+            borderColorClass: 'bg-orange-500/20'
+        }
+    } else {
+        return {
+            text: 'Good Evening',
+            icon: 'i-lucide-moon-star',
+            colorClass: 'text-indigo-600 dark:text-indigo-500',
+            bgClass: 'bg-linear-to-r from-indigo-500/20 via-indigo-500/5 to-transparent',
+            borderColorClass: 'bg-indigo-500/20'
+        }
+    }
+})
+
+const formattedDate = computed(() => {
+    return new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    })
+})
+
+const headerTextureStyle = {
+    maskImage: 'linear-gradient(to right, black 10%, transparent 80%)',
+    WebkitMaskImage: 'linear-gradient(to right, black 10%, transparent 80%)',
+    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")`
+}
 </script>
 
 <template>
@@ -200,24 +246,48 @@ const pageBreadcrumbItems = computed(() => {
                 separator: 'my-2.5',
             }" />
 
-            <template #footer>
+            <!-- <template #footer>
                 <UserMenu :collapsed="isCollapsed" />
-            </template>
+            </template> -->
         </USidebar>
 
         <div
             class="flex-1 flex flex-col overflow-hidden lg:peer-data-[variant=floating]:my-4 peer-data-[variant=inset]:m-4 lg:peer-data-[variant=inset]:not-peer-data-[collapsible=offcanvas]:ms-0 peer-data-[variant=inset]:rounded-xl peer-data-[variant=inset]:shadow-sm peer-data-[variant=inset]:ring peer-data-[variant=inset]:ring-default bg-default">
-            <div class="h-(--ui-header-height) shrink-0 flex items-center px-4" :class="[
+            <div class="h-(--ui-header-height) shrink-0 flex items-center px-4 relative overflow-hidden" :class="[
                 variant !== 'floating' && 'border-b border-default',
                 side === 'right' && 'justify-end'
             ]">
+                <!-- Texture BG -->
+                <div class="absolute inset-0 w-2/3 md:w-1/2 pointer-events-none transition-colors duration-1000" :class="timeGreeting.bgClass">
+                    <div class="absolute inset-0" :style="headerTextureStyle"></div>
+                </div>
+                
                 <UButton :icon="side === 'left' ? 'i-lucide-panel-left' : 'i-lucide-panel-right'" color="neutral"
-                    variant="ghost" aria-label="Toggle sidebar" @click="open = !open" class="lg:hidden mr-1" />
+                    variant="ghost" aria-label="Toggle sidebar" @click="open = !open" class="lg:hidden mr-1 z-10" />
+
+                <div class="flex items-center gap-3 z-10">
+                    <div class="flex items-center gap-2">
+                        <UIcon :name="timeGreeting.icon" :class="['size-5', timeGreeting.colorClass]" />
+                        <span class="hidden sm:block font-semibold" :class="timeGreeting.colorClass">{{ timeGreeting.text }}, {{ firstName }}!</span>
+                    </div>
+                    <div class="h-4 w-px" :class="timeGreeting.borderColorClass"></div>
+                    <span class="hidden sm:block text-xs opacity-60" :class="timeGreeting.colorClass">{{ formattedDate }}</span>
+                </div>
 
                 <!-- page title / breadcrumbs -->
-                <UBreadcrumb :items="pageBreadcrumbItems" color="neutral" />
+                <!-- <UBreadcrumb :items="pageBreadcrumbItems" color="neutral" class="z-10" /> -->
                 <!-- color mode -->
-                <UColorModeButton class="ml-auto" />
+                <div class="ml-auto z-10 flex items-center gap-2">
+                    <!-- notification button -->
+                    <UColorModeButton />
+                    <UButton 
+                        icon="i-lucide-bell"
+                        variant="ghost"
+                        color="neutral"
+                        aria-label="Notifications"
+                        to="/notifications" />
+                    <UserMenu :collapsed="isCollapsed" />
+                </div>
             </div>
             
             <UAlert 
@@ -252,4 +322,7 @@ const pageBreadcrumbItems = computed(() => {
             </div>
         </div>
     </div>
+
+    <!-- Global AI FAB + Chat Drawer -->
+    <AIChatDrawer />
 </template>

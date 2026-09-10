@@ -180,7 +180,9 @@ const kpis = computed(() => [
         <div ref="header">
             <div class="flex items-center gap-4 p-4">
                 <UPageCard title="Reimbursements" description="Submit and track expense reimbursements"
-                    variant="naked">
+                    variant="naked" :ui="{
+                    title: 'text-2xl font-bold'
+                }">
                 </UPageCard>
                 <div class="flex items-center justify-end gap-2 flex-1">
                     <UFieldGroup>

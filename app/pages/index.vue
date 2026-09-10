@@ -131,123 +131,177 @@ const formattedDate = computed(() => {
     year: 'numeric'
   })
 })
+
+// AI chat - use global composable
+const { aiInput, quickPrompts, sendMessage } = useAIChat()
 </script>
 
 <template>
     <div class="space-y-6">
         <!-- Header Section -->
-        <div class="flex items-center gap-4">
+        <!-- <div class="flex items-center gap-4">
             <UIcon name="i-lucide-cloud-sun" class="size-12 text-amber-500" />
             <UPageCard title="Good Morning, Laixander Naguit!" :description="formattedDate" variant="naked"
                 orientation="horizontal">
                 <div class="flex justify-end gap-2 flex-1">
                 </div>
             </UPageCard>
-        </div>
+        </div> -->
+
+        <!-- AI Assistance -->
+        <UCard :ui="{ root: 'bg-primary-50 dark:bg-primary-950/20 ring-primary-100 dark:ring-primary-900/50 overflow-hidden relative' }">
+            <!-- Decorative grid background (far right, fades to top-left) -->
+            <div class="pointer-events-none absolute inset-y-0 right-0 w-2/3 overflow-hidden" aria-hidden="true"
+                style="mask-image: linear-gradient(to top left, rgba(0,0,0,0.18) 0%, transparent 70%); -webkit-mask-image: linear-gradient(to top left, rgba(0,0,0,0.18) 0%, transparent 70%);">
+                <svg class="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <pattern id="ai-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" class="stroke-primary-500 dark:stroke-primary-400" stroke-width="0.5" />
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#ai-grid)" />
+                </svg>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="relative flex items-center justify-center size-11 rounded-xl bg-primary-500/10 text-primary-600 dark:text-primary-400 shrink-0">
+                        <UIcon name="i-lucide-sparkles" class="size-6" />
+                        <!-- Pulse ring -->
+                        <span class="absolute -top-[4px] -right-[4px] flex size-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full size-3 bg-primary-300"></span>
+                        </span>
+                    </div>
+                    <div class="flex flex-col">
+                        <h3 class="font-bold text-primary-900 dark:text-primary-100">AI Assistant</h3>
+                        <p class="text-sm text-primary-600 dark:text-primary-400">Ask me anything about your benefits, leaves, or company policies.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center gap-2">
+                <UInput
+                    v-model="aiInput"
+                    placeholder="E.g. How many vacation leaves do I have left?"
+                    class="flex-1"
+                    size="md"
+                    variant="subtle"
+                    color="primary"
+                    :ui="{
+                        base: 'bg-primary-500/10 ring-primary-300 dark:ring-primary-800 placeholder:text-primary-400 dark:placeholder:text-primary-600',
+                        leadingIcon: 'text-primary-500'
+                    }"
+                    @keydown.enter="sendMessage()"
+                />
+                <UButton icon="i-lucide-arrow-right" color="primary" size="md" @click="sendMessage()" />
+            </div>
+            
+            <div class="mt-6 flex flex-wrap gap-2">
+                <span class="text-xs text-primary-600 dark:text-primary-400 mr-1 flex items-center">Try asking:</span>
+                <UButton
+                    v-for="p in quickPrompts"
+                    :key="p.label"
+                    :label="p.label"
+                    :icon="p.icon"
+                    color="primary"
+                    variant="soft"
+                    size="xs"
+                    @click="sendMessage(p.label)"
+                />
+            </div>
+        </UCard>
 
         <!-- Top Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Time Card -->
             <UCard 
-                :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
-                <template #header>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center justify-center p-2 rounded-lg bg-blue-500/10 text-blue-500">
-                            <UIcon name="i-lucide-clock" class="size-5" />
-                        </div>
-                        <span class="text-xs font-semibold text-neutral-500 uppercase">Time</span>
+                :ui="{ root: 'flex flex-col shadow-sm bg-blue-50 dark:bg-blue-950/20 ring-blue-100 dark:ring-blue-900/50 relative', body: 'flex-1 flex flex-col space-y-4' }">
+                <UIcon name="i-lucide-timer" class="size-52 absolute -bottom-16 -right-12 text-blue-500 opacity-5 pointer-events-none" />
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center p-2 rounded-lg bg-blue-500/10 text-blue-500">
+                        <UIcon name="i-lucide-timer" class="size-5" />
                     </div>
-                </template>
-                <div class="py-2">
-                    <h2 class="text-3xl font-bold">{{ timePart }} <span class="text-lg font-normal text-neutral-500">{{ amPmPart }}</span>
-                    </h2>
-                    <p class="text-sm text-neutral-500 mt-1">{{ formattedDate }}</p>
+                    <span class="font-bold text-blue-900 dark:text-blue-100">Time</span>
                 </div>
-                <template #footer>
-                    <UButton v-if="!isTimedIn" color="success" block @click="isTimedIn = true">
-                        <UIcon name="i-lucide-log-in" class="size-4" />
-                        Time In
-                    </UButton>
-                    <UButton v-else color="error" block @click="isTimedIn = false">
-                        <UIcon name="i-lucide-log-out" class="size-4" />
-                        Time Out
-                    </UButton>
-                </template>
+                <div class="py-2">
+                    <h2 class="text-3xl font-bold">{{ timePart }} <span class="text-lg font-normal">{{ amPmPart }}</span>
+                    </h2>
+                    <p class="text-sm text-blue-600 dark:text-blue-400 mt-1">{{ formattedDate }}</p>
+                </div>
+                <UButton v-if="!isTimedIn" color="blue" block @click="isTimedIn = true">
+                    <UIcon name="i-lucide-log-in" class="size-4" />
+                    Time In
+                </UButton>
+                <UButton v-else color="error" block @click="isTimedIn = false">
+                    <UIcon name="i-lucide-log-out" class="size-4" />
+                    Time Out
+                </UButton>
             </UCard>
 
             <!-- Leaves Card -->
             <UCard 
-                :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
-                <template #header>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center justify-center p-2 rounded-lg bg-green-500/10 text-green-500">
-                            <UIcon name="i-lucide-calendar-off" class="size-5" />
-                        </div>
-                        <span class="text-xs font-semibold text-neutral-500 uppercase">Leaves</span>
+                :ui="{ root: 'flex flex-col shadow-sm bg-green-50 dark:bg-green-950/20 ring-green-100 dark:ring-green-900/50 relative', body: 'flex-1 flex flex-col space-y-4' }">
+                <UIcon name="i-lucide-calendar" class="size-52 absolute -bottom-16 -right-12 text-green-500 opacity-5 pointer-events-none" />
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center p-2 rounded-lg bg-green-500/10 text-green-500">
+                        <UIcon name="i-lucide-calendar" class="size-5" />
                     </div>
-                </template>
+                    <span class="font-bold text-green-900 dark:text-green-100">Leaves</span>
+                </div>
                 <div class="py-2">
                     <h2 class="text-3xl font-bold">0.00</h2>
-                    <p class="text-sm text-neutral-500 mt-1">Total Balance</p>
+                    <p class="text-sm text-green-600 dark:text-green-400 mt-1">Total Balance</p>
                 </div>
-                <template #footer>
-                    <UButton block @click="isLeaveModalOpen = true">
-                        <UIcon name="i-lucide-plus" class="size-4" />
-                        Request Leave
-                    </UButton>
-                </template>
+                <UButton block color="green" @click="isLeaveModalOpen = true">
+                    <UIcon name="i-lucide-plus" class="size-4" />
+                    Request Leave
+                </UButton>
             </UCard>
 
             <!-- Overtime Card -->
             <UCard 
-                :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
-                <template #header>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center justify-center p-2 rounded-lg bg-orange-500/10 text-orange-500">
-                            <UIcon name="i-lucide-clock-4" class="size-5" />
-                        </div>
-                        <span class="text-xs font-semibold text-neutral-500 uppercase">Overtime</span>
+                :ui="{ root: 'flex flex-col shadow-sm bg-orange-50 dark:bg-orange-950/20 ring-orange-100 dark:ring-orange-900/50 relative', body: 'flex-1 flex flex-col space-y-4' }">
+                <UIcon name="i-lucide-clock-4" class="size-52 absolute -bottom-16 -right-12 text-orange-500 opacity-5 pointer-events-none" />
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center p-2 rounded-lg bg-orange-500/10 text-orange-500">
+                        <UIcon name="i-lucide-clock-4" class="size-5" />
                     </div>
-                </template>
+                    <span class="font-bold text-orange-900 dark:text-orange-100">Overtime</span>
+                </div>
                 <div class="py-2">
                     <h2 class="text-3xl font-bold">0</h2>
-                    <p class="text-sm text-neutral-500 mt-1">Total Requests</p>
+                    <p class="text-sm text-orange-600 dark:text-orange-400 mt-1">Total Requests</p>
                 </div>
-                <template #footer>
-                    <UButton block @click="isOvertimeModalOpen = true">
-                        <UIcon name="i-lucide-plus" class="size-4" />
-                        Request Overtime
-                    </UButton>
-                </template>
+                <UButton block color="orange" @click="isOvertimeModalOpen = true">
+                    <UIcon name="i-lucide-plus" class="size-4" />
+                    Request Overtime
+                </UButton>
             </UCard>
 
             <!-- Tasks for Approval Card -->
             <UCard 
-                :ui="{ root: 'flex flex-col shadow-sm', body: 'flex-1 flex flex-col', footer: 'mt-auto' }">
-                <template #header>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center justify-center p-2 rounded-lg bg-purple-500/10 text-purple-500">
-                            <UIcon name="i-lucide-clipboard-check" class="size-5" />
-                        </div>
-                        <span class="text-xs font-semibold text-neutral-500 uppercase">Tasks for Approval</span>
+                :ui="{ root: 'flex flex-col shadow-sm bg-purple-50 dark:bg-purple-950/20 ring-purple-100 dark:ring-purple-900/50 relative', body: 'flex-1 flex flex-col space-y-4' }">
+                <UIcon name="i-lucide-clipboard-check" class="size-52 absolute -bottom-16 -right-12 text-purple-500 opacity-5 pointer-events-none" />
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center justify-center p-2 rounded-lg bg-purple-500/10 text-purple-500">
+                        <UIcon name="i-lucide-clipboard-check" class="size-5" />
                     </div>
-                </template>
+                    <span class="font-bold text-purple-900 dark:text-purple-100">Tasks for Approval</span>
+                </div>
                 <div class="py-2 flex gap-8">
                     <div>
                         <h2 class="text-3xl font-bold">1</h2>
-                        <p class="text-sm text-neutral-500 mt-1">Backlog</p>
+                        <p class="text-sm text-purple-600 dark:text-purple-400 mt-1">Backlog</p>
                     </div>
                     <div>
                         <h2 class="text-3xl font-bold">0</h2>
-                        <p class="text-sm text-neutral-500 mt-1">In-Progress</p>
+                        <p class="text-sm text-purple-600 dark:text-purple-400 mt-1">In-Progress</p>
                     </div>
                 </div>
-                <template #footer>
-                    <UButton block variant="soft" to="/approvals">
-                        <UIcon name="i-lucide-arrow-right" class="size-4" />
-                        View All Tasks
-                    </UButton>
-                </template>
+                <UButton block color="purple" to="/approvals">
+                    <UIcon name="i-lucide-arrow-right" class="size-4" />
+                    View All Tasks
+                </UButton>
             </UCard>
         </div>
 
@@ -453,7 +507,7 @@ const formattedDate = computed(() => {
                                 <h3 class="font-semibold">Recent Activities</h3>
                             </div>
                             <UButton color="primary" variant="ghost" size="xs" trailing-icon="i-lucide-arrow-right"
-                                label="View All" to="/home/activities" />
+                                label="View All" to="/activities" />
                         </div>
                     </template>
 

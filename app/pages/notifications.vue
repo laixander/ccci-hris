@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ title: 'Activities' })
+definePageMeta({ title: 'notifications' })
 
 type ActivityCategory = 'all' | 'time' | 'leave' | 'login' | 'overtime' | 'profile' | 'system' | 'approval'
 
@@ -28,7 +28,7 @@ const categories: { key: ActivityCategory, label: string, icon: string }[] = [
 
 const activeCategory = ref<ActivityCategory>('all')
 
-const activities = ref<Activity[]>([
+const notifications = ref<Activity[]>([
     {
         id: 1,
         category: 'time',
@@ -143,24 +143,24 @@ const activities = ref<Activity[]>([
 
 const filtered = computed(() =>
     activeCategory.value === 'all'
-        ? activities.value
-        : activities.value.filter(a => a.category === activeCategory.value)
+        ? notifications.value
+        : notifications.value.filter(a => a.category === activeCategory.value)
 )
 
-const unreadCount = computed(() => activities.value.filter(a => a.unread).length)
+const unreadCount = computed(() => notifications.value.filter(a => a.unread).length)
 
 function markAllRead() {
-    activities.value.forEach(a => { a.unread = false })
+    notifications.value.forEach(a => { a.unread = false })
 }
 
 function markRead(id: number) {
-    const a = activities.value.find(a => a.id === id)
+    const a = notifications.value.find(a => a.id === id)
     if (a) a.unread = false
 }
 
 function dismiss(id: number) {
-    const idx = activities.value.findIndex(a => a.id === id)
-    if (idx !== -1) activities.value.splice(idx, 1)
+    const idx = notifications.value.findIndex(a => a.id === id)
+    if (idx !== -1) notifications.value.splice(idx, 1)
 }
 </script>
 
@@ -169,7 +169,7 @@ function dismiss(id: number) {
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-highlighted">Activities</h1>
+                <h1 class="text-2xl font-bold text-highlighted">Notifications</h1>
                 <p class="text-muted text-sm mt-1">
                     A full log of your recent account activity
                     <UBadge v-if="unreadCount > 0" :label="`${unreadCount} unread`" variant="soft" class="ml-2" />
@@ -233,8 +233,8 @@ function dismiss(id: number) {
         <div v-else class="py-20">
             <UEmpty
                 icon="i-lucide-activity"
-                title="No activities"
-                description="There are no activities to show for this category."
+                title="No notifications"
+                description="There are no notifications to show for this category."
             />
         </div>
     </div>
