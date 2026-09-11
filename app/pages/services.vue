@@ -298,6 +298,6 @@ const openDetails = (request: ServiceRequest) => {
     <!-- New Request Modal -->
     <ServiceRequestModal v-model:open="isRequestModalOpen" />
 
-    <!-- View Details Modal -->
-    <ServiceRequestDetailModal v-model:open="isDetailModalOpen" :request="selectedRequest" />
+    <!-- View Details Drawer -->
+    <ServiceRequestDetailDrawer v-model:open="isDetailModalOpen" :request="selectedRequest" />
 </template>

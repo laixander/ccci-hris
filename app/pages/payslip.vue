@@ -14,6 +14,9 @@ const viewMode = ref<'grid' | 'table'>('table')
 const isDetailOpen = ref(false)
 const selectedPayslip = ref<(typeof payslipData.value)[0] | null>(null)
 
+const { register } = useOverlayVisibility()
+register(isDetailOpen)
+
 // ─── Filters ──────────────────────────────────────────────────────────────────
 const period = ref('Monthly')
 const month = ref(new Date().getMonth() + 1)
@@ -348,6 +351,6 @@ function openDetail(row: (typeof payslipData.value)[0]) {
         </UTable>
     </div>
 
-    <!-- ── Payslip Detail Modal ──────────────────────────────────────── -->
-    <PayslipDetailModal v-model:open="isDetailOpen" :payslip="selectedPayslip" />
+    <!-- ── Payslip Detail Drawer ──────────────────────────────────────── -->
+    <PayslipDetailDrawer v-model:open="isDetailOpen" :payslip="selectedPayslip" />
 </template>

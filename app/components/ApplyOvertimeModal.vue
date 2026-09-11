@@ -14,6 +14,9 @@ const overtimeTimeRange = shallowRef<{ start: Time | undefined, end: Time | unde
 })
 
 const inputDate = useTemplateRef('inputDate')
+
+const { register } = useOverlayVisibility()
+register(open)
 </script>
 
 <template>

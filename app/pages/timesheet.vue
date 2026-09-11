@@ -42,6 +42,10 @@ const isModalOpen = ref(false)
 const selectedRecord = ref<TimesheetRecord | null>(null)
 const viewMode = ref<'calendar' | 'table'>('calendar')
 
+const { register } = useOverlayVisibility()
+register(isDrawerOpen)
+register(isModalOpen)
+
 const month = ref(new Date().getMonth() + 1)
 const year = ref(new Date().getFullYear())
 
@@ -256,6 +260,16 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 
     <!-- Calendar view ─────────────────────────────────────────────────────── -->
     <template v-if="viewMode === 'calendar'">
+      <div class="flex items-center justify-between p-4">
+        <UButton square color="neutral" variant="ghost" @click="month--">
+          <UIcon name="i-lucide-chevron-left" class="size-4" />
+        </UButton>
+        <p class="text-lg font-semibold text-toned">{{ months.find(m => m.value === month)?.label }} {{ year }}</p>
+        <UButton square color="neutral" variant="ghost" @click="month++">
+          <UIcon name="i-lucide-chevron-right" class="size-4" />
+        </UButton>
+      </div>
+      <USeparator />
       <!-- Day-of-week header -->
       <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] shrink-0 border-b border-[var(--ui-border)]">
         <div

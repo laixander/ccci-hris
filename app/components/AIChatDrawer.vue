@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { isAIChatOpen, aiInput, chatMessages, chatEndRef, quickPrompts, sendMessage } = useAIChat()
+const { isAnyOverlayOpen } = useOverlayVisibility()
 </script>
 
 <template>
@@ -13,7 +14,7 @@ const { isAIChatOpen, aiInput, chatMessages, chatEndRef, quickPrompts, sendMessa
             leave-from-class="opacity-100 scale-100"
             leave-to-class="opacity-0 scale-75"
         >
-        <div v-show="!isAIChatOpen" class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+        <div v-show="!isAIChatOpen && !isAnyOverlayOpen" class="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
             <!-- Tooltip bubble -->
             <Transition
                 enter-active-class="transition-all duration-300 ease-out"
@@ -24,7 +25,7 @@ const { isAIChatOpen, aiInput, chatMessages, chatEndRef, quickPrompts, sendMessa
                 leave-to-class="opacity-0 translate-y-2 scale-95"
             >
                 <div
-                    v-if="!isAIChatOpen && chatMessages.length === 0"
+                    v-if="!isAIChatOpen && !isAnyOverlayOpen && chatMessages.length === 0"
                     class="bg-white dark:bg-neutral-800 rounded-md shadow-xl ring-1 ring-neutral-200 dark:ring-neutral-700 p-2.5 text-sm font-medium text-neutral-700 dark:text-neutral-200 max-w-[200px]"
                 >
                     👋 Hi! Ask me anything.

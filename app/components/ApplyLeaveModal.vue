@@ -21,6 +21,9 @@ const leaveDateRange = shallowRef<{ start: CalendarDate | undefined, end: Calend
     start: undefined,
     end: undefined
 })
+
+const { register } = useOverlayVisibility()
+register(open)
 </script>
 
 <template>

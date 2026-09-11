@@ -321,6 +321,10 @@ const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
 const viewMode = ref<'grid' | 'table'>('grid')
 
+const { register } = useOverlayVisibility()
+register(isDrawerOpen)
+register(isModalOpen)
+
 const search = ref('')
 const selectedType = ref('All Categories')
 const status = ref('All Status')

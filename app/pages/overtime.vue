@@ -161,6 +161,9 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 const isModalOpen = ref(false)
 const viewMode = ref<'grid' | 'table'>('grid')
 
+const { register } = useOverlayVisibility()
+register(isModalOpen)
+
 const statuses = ['All Status', 'Pending', 'Approved', 'Rejected']
 const status = ref('All Status')
 

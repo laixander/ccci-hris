@@ -10,6 +10,9 @@ defineProps<{
   monthLabel: string | undefined
   year: number
 }>()
+
+const { register } = useOverlayVisibility()
+register(open)
 </script>
 
 <template>

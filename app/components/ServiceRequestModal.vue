@@ -23,6 +23,9 @@ const handleReset = () => {
     formState.remarks = ''
     files.value = []
 }
+
+const { register } = useOverlayVisibility()
+register(open)
 </script>
 
 <template>

@@ -312,6 +312,10 @@ const openDrawer = (req: any) => {
     isDrawerOpen.value = true
 }
 
+const { register } = useOverlayVisibility()
+register(isModalOpen)
+register(isDrawerOpen)
+
 const items = [
   {
     label: 'Overview',

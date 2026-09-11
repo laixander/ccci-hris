@@ -40,6 +40,9 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
+const { register } = useOverlayVisibility()
+register(computed(() => props.open))
+
 // Full static class maps so Tailwind JIT can detect all used classes at scan time.
 const colorMap = {
   yellow: {

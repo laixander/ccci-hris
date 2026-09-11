@@ -18,6 +18,9 @@ const formState = shallowReactive({
 })
 
 const inputDate = useTemplateRef('inputDate')
+
+const { register } = useOverlayVisibility()
+register(open)
 </script>
 
 <template>

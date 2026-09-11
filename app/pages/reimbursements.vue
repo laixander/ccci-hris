@@ -95,6 +95,10 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 
 const viewMode = ref('table')
 const isModalOpen = ref(false)
+
+const { register } = useOverlayVisibility()
+register(isModalOpen)
+
 const status = ref('All Status')
 const period = ref('Monthly')
 const month = ref(new Date().getMonth() + 1)

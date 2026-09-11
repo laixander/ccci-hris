@@ -242,6 +242,7 @@ const openDetails = (employee: Employee) => {
 
 const isOrgChartOpen = ref(false)
 
+
 const orgData = [
   {
     id: 'ceo',
@@ -540,107 +541,9 @@ const floatingRoles = [
         </UTable>
     </div>
 
-    <!-- Detail Modal -->
-    <UModal v-model:open="isDetailOpen" class="w-full max-w-[480px]" :ui="{
-        content: 'overflow-visible group',
-        header: 'relative bg-linear-to-r from-primary-500/15 to-primary-500/0 rounded-t-lg',
-    }">
-        <template #header>
-            <div class="absolute overflow-hidden inset-0">
-                <UIcon name="i-lucide-user" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2" />
-            </div>
-            <div v-if="selectedEmployee" class="flex items-center gap-3">
-                <UAvatar
-                    :src="dicebearUrl(selectedEmployee.name.split(' ')[0] || selectedEmployee.name)"
-                    :alt="selectedEmployee.name"
-                    size="md"
-                    :chip="{ color: selectedEmployee.status === 'ACTIVE' ? 'success' : 'neutral', inset: true }"
-                />
-                <div>
-                    <h2 class="text-primary font-semibold leading-tight">{{ selectedEmployee.name }}</h2>
-                    <p class="text-primary/60 text-sm">{{ selectedEmployee.designation }}</p>
-                </div>
-            </div>
-            <UButton icon="i-lucide-x" variant="outline" color="neutral"
-                class="absolute -top-4 -end-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                @click="isDetailOpen = false" />
-        </template>
+    <!-- Employee Detail Drawer -->
+    <EmployeeDetailDrawer v-model:open="isDetailOpen" :employee="selectedEmployee" />
 
-        <template #body>
-            <div v-if="selectedEmployee" class="space-y-3">
-                <p class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Employment Details</p>
-                <div class="grid grid-cols-2 gap-3 text-sm bg-muted dark:bg-muted/30 p-4 rounded-lg">
-                    <div>
-                        <div class="text-xs text-dimmed mb-0.5">Department</div>
-                        <div class="font-medium">{{ selectedEmployee.department }}</div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-dimmed mb-0.5">Designation</div>
-                        <div class="font-medium">{{ selectedEmployee.designation }}</div>
-                    </div>
-                    <USeparator class="col-span-2" />
-                    <div>
-                        <div class="text-xs text-dimmed mb-0.5">Employee No.</div>
-                        <div class="font-medium tabular-nums">{{ selectedEmployee.employeeNo }}</div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-dimmed mb-0.5">Date Hired</div>
-                        <div class="font-medium">{{ selectedEmployee.dateHired }}</div>
-                    </div>
-                    <USeparator class="col-span-2" />
-                    <div>
-                        <div class="text-xs text-dimmed mb-0.5">Employment Type</div>
-                        <div class="font-semibold text-xs tracking-wider">{{ selectedEmployee.employmentType }}</div>
-                    </div>
-                    <div>
-                        <div class="text-xs text-dimmed mb-1">Status</div>
-                        <StatusBadge :status="selectedEmployee.status" />
-                    </div>
-                    <USeparator class="col-span-2" />
-                    <div class="col-span-2">
-                        <div class="text-xs text-dimmed mb-0.5">Email</div>
-                        <div class="font-medium">{{ selectedEmployee.email }}</div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <template #footer>
-            <div class="flex justify-end">
-                <UButton label="Close" variant="ghost" color="neutral" @click="isDetailOpen = false" />
-            </div>
-        </template>
-    </UModal>
-
-    <UModal fullscreen v-model:open="isOrgChartOpen" :ui="{ content: 'flex flex-col', header: 'relative bg-linear-to-r from-primary-500/15 to-primary-500/0 group', body: 'flex-1 min-h-0 p-0 sm:p-0 overflow-hidden' }">
-        <template #header>
-            <div class="absolute overflow-hidden inset-0 pointer-events-none">
-                <UIcon name="i-lucide-git-fork" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2 rotate-180" />
-            </div>
-            <div class="flex items-center justify-between relative z-10 w-full">
-                <div class="flex items-center gap-3 flex-1">
-                    <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <UIcon name="i-lucide-git-fork" class="size-5 text-primary rotate-180" />
-                    </div>
-                    <div>
-                        <h2 class="text-primary font-semibold leading-tight">Organization Chart</h2>
-                        <p class="text-primary/60 text-sm">CCCI Company Structure</p>
-                    </div>
-                </div>
-                <UButton color="neutral" variant="ghost" icon="i-lucide-x" class="hover:bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" @click="isOrgChartOpen = false" />
-            </div>
-        </template>
-        <template #body>
-            <div class="relative w-full h-full overflow-auto bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent">
-                <!-- Subtle grid background -->
-                <div class="absolute inset-0 opacity-30"
-                    style="background-image: radial-gradient(circle, var(--ui-border) 1px, transparent 1px); background-size: 28px 28px;" />
-
-                <!-- Main Org Chart — fills full area, floating roles rendered inside component -->
-                <ClientOnly>
-                    <OrgChart :data="orgData" :floating-roles="floatingRoles" />
-                </ClientOnly>
-            </div>
-        </template>
-    </UModal>
+    <!-- Org Chart Modal -->
+    <OrgChartModal v-model:open="isOrgChartOpen" :data="orgData" :floating-roles="floatingRoles" />
 </template>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TabsItem } from '@nuxt/ui'
+
 const timeInList = [
     { name: 'PAOR, SAGE RYAN ARGAMOSA', role: 'Team Lead Developer', time: '08:28:23 AM', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Sage' },
     { name: 'SURRIGA, JOSEPH EBRON', role: 'Team Lead Developer', time: '08:15:23 AM', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Joseph' },
@@ -25,24 +27,7 @@ const recentActivities = [
 const isTimedIn = ref(false)
 const isLeaveModalOpen = ref(false)
 const isOvertimeModalOpen = ref(false)
-const activeTab = ref('time-in')
 
-const tabItems = computed(() => [
-    {
-        label: 'Time-In',
-        value: 'time-in',
-        slot: 'time-in',
-        chipColor: 'success' as const, // green dot
-        badge: { label: timeInList.length, variant: 'soft' as const }
-    },
-    {
-        label: 'Time-Out',
-        value: 'time-out',
-        slot: 'time-out',
-        chipColor: 'neutral' as const, // gray dot
-        badge: { label: timeOutList.length, variant: 'soft' as const }
-    }
-])
 
 const onLeaveTodayList = [
     { name: 'DELA CRUZ, JUAN', role: 'Software Engineer', leaveType: 'Sick Leave', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Juan' },
@@ -131,6 +116,44 @@ const formattedDate = computed(() => {
     year: 'numeric'
   })
 })
+
+const items = ref<TabsItem[]>([
+  {
+    label: 'Employee Attendance',
+    icon: 'i-lucide-users',
+    slot: 'attendance' as const,
+    ui: { leadingIcon: 'data-[state=active]:text-blue-500' }
+  },
+  {
+    label: 'Leave Schedule',
+    icon: 'i-lucide-calendar',
+    slot: 'leave' as const,
+    ui: { leadingIcon: 'data-[state=active]:text-amber-500' }
+  },
+  {
+    label: 'Birthdays',
+    icon: 'i-lucide-cake',
+    slot: 'birthdays' as const,
+    ui: { leadingIcon: 'data-[state=active]:text-pink-500' }
+  }
+])
+
+const active = ref('0')
+
+const colorMap: Record<string, string> = {
+  '0': 'bg-blue-500',
+  '1': 'bg-amber-500',
+  '2': 'bg-pink-500'
+}
+
+const textColorMap: Record<string, string> = {
+  '0': 'data-[state=active]:text-blue-500',
+  '1': 'data-[state=active]:text-amber-500',
+  '2': 'data-[state=active]:text-pink-500'
+}
+
+const indicatorClass = computed(() => `${colorMap[active.value]} h-0.5`)
+const triggerClass = computed(() => textColorMap[active.value])
 
 // AI chat - use global composable
 const { aiInput, quickPrompts, sendMessage } = useAIChat()
@@ -228,11 +251,11 @@ const { aiInput, quickPrompts, sendMessage } = useAIChat()
                     </h2>
                     <p class="text-sm text-blue-600 dark:text-blue-400 mt-1">{{ formattedDate }}</p>
                 </div>
-                <UButton v-if="!isTimedIn" color="blue" block @click="isTimedIn = true">
+                <UButton v-if="!isTimedIn" variant="soft" color="blue" block @click="isTimedIn = true">
                     <UIcon name="i-lucide-log-in" class="size-4" />
                     Time In
                 </UButton>
-                <UButton v-else color="error" block @click="isTimedIn = false">
+                <UButton v-else variant="soft" color="error" block @click="isTimedIn = false">
                     <UIcon name="i-lucide-log-out" class="size-4" />
                     Time Out
                 </UButton>
@@ -252,7 +275,7 @@ const { aiInput, quickPrompts, sendMessage } = useAIChat()
                     <h2 class="text-3xl font-bold">0.00</h2>
                     <p class="text-sm text-green-600 dark:text-green-400 mt-1">Total Balance</p>
                 </div>
-                <UButton block color="green" @click="isLeaveModalOpen = true">
+                <UButton block variant="soft" color="green" @click="isLeaveModalOpen = true">
                     <UIcon name="i-lucide-plus" class="size-4" />
                     Request Leave
                 </UButton>
@@ -272,7 +295,7 @@ const { aiInput, quickPrompts, sendMessage } = useAIChat()
                     <h2 class="text-3xl font-bold">0</h2>
                     <p class="text-sm text-orange-600 dark:text-orange-400 mt-1">Total Requests</p>
                 </div>
-                <UButton block color="orange" @click="isOvertimeModalOpen = true">
+                <UButton block variant="soft" color="orange" @click="isOvertimeModalOpen = true">
                     <UIcon name="i-lucide-plus" class="size-4" />
                     Request Overtime
                 </UButton>
@@ -298,7 +321,7 @@ const { aiInput, quickPrompts, sendMessage } = useAIChat()
                         <p class="text-sm text-purple-600 dark:text-purple-400 mt-1">In-Progress</p>
                     </div>
                 </div>
-                <UButton block color="purple" to="/approvals">
+                <UButton block variant="soft" color="purple" to="/approvals">
                     <UIcon name="i-lucide-arrow-right" class="size-4" />
                     View All Tasks
                 </UButton>
@@ -310,190 +333,200 @@ const { aiInput, quickPrompts, sendMessage } = useAIChat()
 
             <!-- Left Column -->
             <div class="xl:col-span-2 space-y-6">
-                <!-- Employee Attendance -->
-                <UCard  :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
-                    <template #header>
-                        <div class="flex items-center gap-2">
-                            <UIcon name="i-lucide-users" class="text-primary size-5" />
-                            <h3 class="font-semibold">Employee Attendance</h3>
-                        </div>
+                <UTabs v-model="active" :items="items" variant="link" :ui="{ root: 'flex-1 flex flex-col h-full', content: 'flex-1', indicator: indicatorClass, trigger: triggerClass }">
+
+                    <template #attendance>
+                        <!-- Employee Attendance -->
+                        <UCard :ui="{ root: 'shadow-sm h-full flex flex-col', body: 'p-0 sm:p-0 flex-1 flex flex-col' }">
+                            <div class="flex divide-x divide-default w-full flex-1">
+                                <!-- TIME-IN Column -->
+                                <div class="w-full h-full flex flex-col">
+                                    <div class="flex items-center justify-between p-4 sm:px-6 border-b border-default">
+                                        <div class="flex items-center gap-2">
+                                            <UChip color="success" standalone inset size="sm" />
+                                            <span class="text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Time-In</span>
+                                        </div>
+                                        <UBadge color="neutral" variant="soft" size="sm">{{ timeInList.length }}</UBadge>
+                                    </div>
+                                    <div v-if="timeInList.length === 0" class="flex-1 flex items-center justify-center">
+                                        <UEmpty variant="naked" icon="i-lucide-users" title="No time in yet" description="No one has timed in yet." />
+                                    </div>
+                                    <div v-else class="space-y-4 p-4 sm:p-6">
+                                        <div v-for="(user, i) in timeInList" :key="i" class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <UAvatar :src="user.avatar" size="md" />
+                                                <div>
+                                                    <p class="font-medium text-sm">{{ user.name }}</p>
+                                                    <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                                                {{ user.time }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- TIME-OUT Column -->
+                                <div class="w-full h-full flex flex-col">
+                                    <div class="flex items-center justify-between p-4 sm:px-6 border-b border-default">
+                                        <div class="flex items-center gap-2">
+                                            <UChip color="neutral" standalone inset size="sm" />
+                                            <span class="text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Time-Out</span>
+                                        </div>
+                                        <UBadge color="neutral" variant="soft" size="sm">{{ timeOutList.length }}</UBadge>
+                                    </div>
+
+                                    <div v-if="timeOutList.length === 0" class="flex-1 flex items-center justify-center">
+                                        <UEmpty variant="naked" icon="i-lucide-users" title="No time out yet" description="No one has timed out yet." />
+                                    </div>
+                                    <div v-else class="space-y-4 p-4 sm:p-6">
+                                        <div v-for="(user, i) in timeOutList" :key="i"
+                                            class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <UAvatar :src="user.avatar" size="md" />
+                                                <div>
+                                                    <p class="font-medium text-sm">{{ user.name }}</p>
+                                                    <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                                                {{ user.time }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </UCard>
                     </template>
 
-                    <UTabs v-model="activeTab" :items="tabItems" variant="link" class="w-full"
-                        :ui="{ list: 'px-4 sm:px-6', content: 'p-4 sm:p-6' }">
-                        <!-- Custom label with chip + counter -->
-                        <template #default="{ item }">
-                            <span class="flex items-center gap-2">
-                                <UChip :color="item.chipColor" standalone inset size="sm" />
-                                <span class="text-xs font-bold uppercase tracking-wider">{{ item.label }}</span>
-                                <!-- <UBadge color="neutral" size="sm" v-bind="item.badge" /> -->
-                            </span>
-                        </template>
-
-                        <!-- TIME-IN Panel -->
-                        <template #time-in>
-                            <UEmpty variant="naked" v-if="timeInList.length === 0" icon="i-lucide-users" title="No time in yet" description="No one has timed in yet." />
-                            <div v-else class="space-y-4">
-                                <div v-for="(user, i) in timeInList" :key="i" class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <UAvatar :src="user.avatar" size="md" />
-                                        <div>
-                                            <p class="font-medium text-sm">{{ user.name }}</p>
-                                            <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                    <template #leave>
+                        <!-- Leave Schedule -->
+                        <UCard :ui="{ root: 'shadow-sm h-full flex flex-col', body: 'p-0 sm:p-0 flex-1 flex flex-col' }">
+                            <div class="flex divide-x divide-default w-full flex-1">
+                                <!-- On Leave Today Column -->
+                                <div class="w-full h-full flex flex-col">
+                                    <div class="flex items-center justify-between p-4 sm:px-6 border-b border-default">
+                                        <div class="flex items-center gap-2">
+                                            <UChip color="orange" standalone inset size="sm" />
+                                            <span class="text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">On Leave Today</span>
+                                        </div>
+                                        <UBadge color="neutral" variant="soft" size="sm">{{ onLeaveTodayList.length }}</UBadge>
+                                    </div>
+                                    <div v-if="onLeaveTodayList.length === 0" class="flex-1 flex items-center justify-center">
+                                        <UEmpty variant="naked" icon="i-lucide-calendar-off" title="No one on leave" description="No one is on leave today." />
+                                    </div>
+                                    <div v-else class="space-y-4 p-4 sm:p-6">
+                                        <div v-for="(user, i) in onLeaveTodayList" :key="i" class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <UAvatar :src="user.avatar" size="md" />
+                                                <div>
+                                                    <p class="font-medium text-sm">{{ user.name }}</p>
+                                                    <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                                                {{ user.leaveType }}
+                                            </span>
                                         </div>
                                     </div>
-                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                                        {{ user.time }}
-                                    </span>
                                 </div>
-                            </div>
-                        </template>
 
-                        <!-- TIME-OUT Panel -->
-                        <template #time-out>
-                            <UEmpty variant="naked" v-if="timeOutList.length === 0" icon="i-lucide-users" title="No time out yet" description="No one has timed out yet." />
-                            <div v-else class="space-y-4">
-                                <div v-for="(user, i) in timeOutList" :key="i"
-                                    class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <UAvatar :src="user.avatar" size="md" />
-                                        <div>
-                                            <p class="font-medium text-sm">{{ user.name }}</p>
-                                            <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                <!-- Upcoming This Week Column -->
+                                <div class="w-full h-full flex flex-col">
+                                    <div class="flex items-center justify-between p-4 sm:px-6 border-b border-default">
+                                        <div class="flex items-center gap-2">
+                                            <UChip color="blue" standalone inset size="sm" />
+                                            <span class="text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Upcoming This Week</span>
+                                        </div>
+                                        <UBadge color="neutral" variant="soft" size="sm">{{ upcomingLeaveList.length }}</UBadge>
+                                    </div>
+                                    <div v-if="upcomingLeaveList.length === 0" class="flex-1 flex items-center justify-center">
+                                        <UEmpty variant="naked" icon="i-lucide-calendar" title="No upcoming leaves" description="No one is scheduled for leave this week." />
+                                    </div>
+                                    <div v-else class="space-y-4 p-4 sm:p-6">
+                                        <div v-for="(user, i) in upcomingLeaveList" :key="i" class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <UAvatar :src="user.avatar" size="md" />
+                                                <div>
+                                                    <p class="font-medium text-sm">{{ user.name }}</p>
+                                                    <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                                                {{ user.leaveType }}
+                                            </span>
                                         </div>
                                     </div>
-                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                                        {{ user.time }}
-                                    </span>
                                 </div>
                             </div>
-                        </template>
-                    </UTabs>
-                </UCard>
-
-                <!-- Leave Schedule -->
-                <UCard  :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
-                    <template #header>
-                        <div class="flex items-center gap-2">
-                            <UIcon name="i-lucide-calendar" class="text-orange-500 size-5" />
-                            <h3 class="font-semibold">Leave Schedule</h3>
-                        </div>
+                        </UCard>
                     </template>
 
-                    <UTabs v-model="activeLeaveTab" :items="leaveItems" variant="link" class="w-full"
-                        :ui="{ list: 'px-4 sm:px-6', content: 'p-4 sm:p-6' }">
-                        <!-- Custom label with chip + counter -->
-                        <template #default="{ item }">
-                            <span class="flex items-center gap-2">
-                                <UChip :color="item.chipColor" standalone inset size="sm" />
-                                <span class="text-xs font-bold uppercase tracking-wider">{{ item.label }}</span>
-                                <!-- <UBadge color="neutral" size="sm" v-bind="item.badge" /> -->
-                            </span>
-                        </template>
-
-                        <!-- On Leave Today content -->
-                        <template #on-leave>
-                            <UEmpty variant="naked" v-if="onLeaveTodayList.length === 0" icon="i-lucide-calendar-off" title="No one on leave" description="No one is on leave today." />
-                            <div v-else class="space-y-4">
-                                <div v-for="(user, i) in onLeaveTodayList" :key="i"
-                                    class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <UAvatar :src="user.avatar" size="md" />
-                                        <div>
-                                            <p class="font-medium text-sm">{{ user.name }}</p>
-                                            <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                    <template #birthdays>
+                        <!-- Birthdays -->
+                        <UCard :ui="{ root: 'shadow-sm h-full flex flex-col', body: 'p-0 sm:p-0 flex-1 flex flex-col' }">
+                            <div class="flex divide-x divide-default w-full flex-1">
+                                <!-- Today Column -->
+                                <div class="w-full h-full flex flex-col">
+                                    <div class="flex items-center justify-between p-4 sm:px-6 border-b border-default">
+                                        <div class="flex items-center gap-2">
+                                            <UChip color="pink" standalone inset size="sm" />
+                                            <span class="text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Today</span>
+                                        </div>
+                                        <UBadge color="neutral" variant="soft" size="sm">{{ birthdaysTodayList.length }}</UBadge>
+                                    </div>
+                                    <div v-if="birthdaysTodayList.length === 0" class="flex-1 flex items-center justify-center">
+                                        <UEmpty variant="naked" icon="i-lucide-cake" title="No birthdays today" description="There are no birthdays today." />
+                                    </div>
+                                    <div v-else class="space-y-4 p-4 sm:p-6">
+                                        <div v-for="(user, i) in birthdaysTodayList" :key="i" class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <UAvatar :src="user.avatar" size="md" />
+                                                <div>
+                                                    <p class="font-medium text-sm">{{ user.name }}</p>
+                                                    <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                                                {{ user.date }}
+                                            </span>
                                         </div>
                                     </div>
-                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                                        {{ user.leaveType }}
-                                    </span>
                                 </div>
-                            </div>
-                        </template>
 
-                        <!-- Upcoming This Week content -->
-                        <template #upcoming>
-                            <UEmpty variant="naked" v-if="upcomingLeaveList.length === 0" icon="i-lucide-calendar" title="No upcoming leaves" description="No one is scheduled for leave this week." />
-                            <div v-else class="space-y-4">
-                                <div v-for="(user, i) in upcomingLeaveList" :key="i"
-                                    class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <UAvatar :src="user.avatar" size="md" />
-                                        <div>
-                                            <p class="font-medium text-sm">{{ user.name }}</p>
-                                            <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                <!-- Upcoming This Month Column -->
+                                <div class="w-full h-full flex flex-col">
+                                    <div class="flex items-center justify-between p-4 sm:px-6 border-b border-default">
+                                        <div class="flex items-center gap-2">
+                                            <UChip color="purple" standalone inset size="sm" />
+                                            <span class="text-xs font-bold uppercase tracking-wider text-neutral-700 dark:text-neutral-300">Upcoming This Month</span>
+                                        </div>
+                                        <UBadge color="neutral" variant="soft" size="sm">{{ upcomingBirthdaysList.length }}</UBadge>
+                                    </div>
+                                    <div v-if="upcomingBirthdaysList.length === 0" class="flex-1 flex items-center justify-center">
+                                        <UEmpty variant="naked" icon="i-lucide-cake" title="No upcoming birthdays" description="There are no upcoming birthdays this month." />
+                                    </div>
+                                    <div v-else class="space-y-4 p-4 sm:p-6">
+                                        <div v-for="(user, i) in upcomingBirthdaysList" :key="i" class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <UAvatar :src="user.avatar" size="md" />
+                                                <div>
+                                                    <p class="font-medium text-sm">{{ user.name }}</p>
+                                                    <p class="text-xs text-neutral-500">{{ user.role }}</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                                                {{ user.date }}
+                                            </span>
                                         </div>
                                     </div>
-                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                                        {{ user.leaveType }}
-                                    </span>
                                 </div>
                             </div>
-                        </template>
-                    </UTabs>
-                </UCard>
-
-                <!-- Birthdays -->
-                <UCard  :ui="{ root: 'shadow-sm', body: 'p-0 sm:p-0' }">
-                    <template #header>
-                        <div class="flex items-center gap-2">
-                            <UIcon name="i-lucide-cake" class="text-pink-500 size-5" />
-                            <h3 class="font-semibold">Birthdays</h3>
-                        </div>
+                        </UCard>
                     </template>
 
-                    <UTabs v-model="activeBirthdayTab" :items="birthdayItems" variant="link" class="w-full"
-                        :ui="{ list: 'px-4 sm:px-6', content: 'p-4 sm:p-6' }">
-                        <!-- Custom label with chip + counter -->
-                        <template #default="{ item }">
-                            <span class="flex items-center gap-2">
-                                <UChip :color="item.chipColor" standalone inset size="sm" />
-                                <span class="text-xs font-bold uppercase tracking-wider">{{ item.label }}</span>
-                                <!-- <UBadge color="neutral" size="sm" v-bind="item.badge" /> -->
-                            </span>
-                        </template>
-
-                        <!-- Today content -->
-                        <template #today>
-                            <UEmpty variant="naked" v-if="birthdaysTodayList.length === 0" icon="i-lucide-cake" title="No birthdays today" description="There are no birthdays today." />
-                            <div v-else class="space-y-4">
-                                <div v-for="(user, i) in birthdaysTodayList" :key="i"
-                                    class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <UAvatar :src="user.avatar" size="md" />
-                                        <div>
-                                            <p class="font-medium text-sm">{{ user.name }}</p>
-                                            <p class="text-xs text-neutral-500">{{ user.role }}</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                                        {{ user.date }}
-                                    </span>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Upcoming This Month content -->
-                        <template #upcoming>
-                            <UEmpty variant="naked" v-if="upcomingBirthdaysList.length === 0" icon="i-lucide-cake" title="No upcoming birthdays" description="There are no upcoming birthdays this month." />
-                            <div v-else class="space-y-4">
-                                <div v-for="(user, i) in upcomingBirthdaysList" :key="i"
-                                    class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <UAvatar :src="user.avatar" size="md" />
-                                        <div>
-                                            <p class="font-medium text-sm">{{ user.name }}</p>
-                                            <p class="text-xs text-neutral-500">{{ user.role }}</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-                                        {{ user.date }}
-                                    </span>
-                                </div>
-                            </div>
-                        </template>
-                    </UTabs>
-                </UCard>
+                </UTabs>
             </div>
 
             <!-- Right Column -->

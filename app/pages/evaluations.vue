@@ -164,6 +164,10 @@ const selectedEvaluation = ref<EvaluationRecord | null>(null)
 const viewMode = ref<'grid' | 'table'>('grid')
 const detailsViewMode = ref<'grid' | 'table'>('grid')
 
+const { register } = useOverlayVisibility()
+register(isDrawerOpen)
+register(isModalOpen)
+
 const evaluationColumns: TableColumn<EvaluationRecord>[] = [
   { 
     accessorKey: 'cutoffPeriod', 
