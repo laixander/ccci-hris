@@ -151,10 +151,11 @@ const columns: TableColumn<ServiceRequest>[] = [
         header: '',
         meta: { class: { th: 'w-32', td: 'text-right' } },
         cell: ({ row }) => h(UButton, {
-            label: 'View Details',
-            variant: 'soft',
-            color: 'primary',
-            size: 'xs',
+            icon: 'i-lucide-eye',
+            color: 'neutral',
+            variant: 'ghost',
+            size: 'sm',
+            'aria-label': 'View details',
             onClick: (e: Event) => {
                 e.stopPropagation()
                 selectedRequest.value = row.original

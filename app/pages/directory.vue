@@ -230,6 +230,19 @@ const columns: TableColumn<Employee>[] = [
         header: 'Status',
         cell: ({ row }) => h(StatusBadge, { status: row.getValue('status') as string })
     },
+    {
+        accessorKey: 'actions',
+        header: '',
+        meta: { class: { th: 'w-32', td: 'text-right' } },
+        cell: ({ row }) => h(resolveComponent('UButton'), {
+            icon: 'i-lucide-eye',
+            color: 'neutral',
+            variant: 'ghost',
+            size: 'sm',
+            'aria-label': 'View details',
+            onClick: () => openDetails(row.original)
+        })
+    }
 ]
 
 const isDetailOpen = ref(false)
@@ -433,7 +446,7 @@ const floatingRoles = [
                     </UFieldGroup>
 
                     <UButton variant="soft" @click="isOrgChartOpen = true">
-                        <UIcon name="i-lucide-git-fork" class="size-5 rotate-180" /> Open Org Chart
+                        <UIcon name="i-lucide-building" class="size-5" /> Open Org Chart
                     </UButton>
                 </div>
             </div>

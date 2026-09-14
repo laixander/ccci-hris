@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, h, resolveComponent } from 'vue'
+import { ref, computed, h, resolveComponent, watch, nextTick } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 
 const UButton = resolveComponent('UButton')
@@ -40,7 +40,8 @@ type TimeAdjustmentRecord = {
 const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
 const selectedRecord = ref<TimesheetRecord | null>(null)
-const viewMode = ref<'calendar' | 'table'>('calendar')
+const viewMode = ref<'calendar' | 'week' | 'table'>('calendar')
+const selectedWeekIndex = ref(0)
 
 const { register } = useOverlayVisibility()
 register(isDrawerOpen)
@@ -181,6 +182,18 @@ const calendarDays = computed<CalendarCell[]>(() => {
   return cells
 })
 
+const calendarWeeks = computed(() => {
+  const weeks = []
+  for (let i = 0; i < calendarDays.value.length; i += 7) {
+    weeks.push(calendarDays.value.slice(i, i + 7))
+  }
+  return weeks
+})
+
+watch([month, year], () => {
+  selectedWeekIndex.value = 0
+})
+
 // ─── Months / Years ───────────────────────────────────────────────────────────
 
 const months = [
@@ -211,6 +224,44 @@ const container = useTemplateRef('container')
 const header = useTemplateRef('header')
 const getScrollElement = () => container.value
 const { height: headerHeight } = useElementSize(header, undefined, { box: 'border-box' })
+
+function prevMonth() {
+  if (month.value === 1) {
+    month.value = 12
+    year.value--
+  } else {
+    month.value--
+  }
+}
+
+function nextMonth() {
+  if (month.value === 12) {
+    month.value = 1
+    year.value++
+  } else {
+    month.value++
+  }
+}
+
+function prevWeek() {
+  if (selectedWeekIndex.value > 0) {
+    selectedWeekIndex.value--
+  } else {
+    prevMonth()
+    nextTick(() => {
+      selectedWeekIndex.value = calendarWeeks.value.length - 1
+    })
+  }
+}
+
+function nextWeek() {
+  if (selectedWeekIndex.value < calendarWeeks.value.length - 1) {
+    selectedWeekIndex.value++
+  } else {
+    nextMonth()
+    selectedWeekIndex.value = 0
+  }
+}
 </script>
 
 <template>
@@ -238,6 +289,12 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
                 @click="viewMode = 'calendar'"
               />
               <UButton
+                icon="i-lucide-columns-3"
+                color="neutral"
+                :variant="viewMode === 'week' ? 'subtle' : 'outline'"
+                @click="viewMode = 'week'"
+              />
+              <UButton
                 icon="i-lucide-list"
                 color="neutral"
                 :variant="viewMode === 'table' ? 'subtle' : 'outline'"
@@ -245,8 +302,8 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
               />
             </UFieldGroup>
             <div class="flex gap-2">
-              <USelect v-model="month" :items="months" class="w-40" />
-              <USelect v-model="year" :items="years" class="w-32" />
+              <USelect v-model="month" :items="months" class="w-32" />
+              <USelect v-model="year" :items="years" class="w-24" />
             </div>
             <UButton variant="soft" color="neutral" @click="isDrawerOpen = true">
               <UIcon name="i-lucide-clipboard-list" class="size-4" />
@@ -261,16 +318,18 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
     <!-- Calendar view ─────────────────────────────────────────────────────── -->
     <template v-if="viewMode === 'calendar'">
       <div class="flex items-center justify-between p-4">
-        <UButton square color="neutral" variant="ghost" @click="month--">
+        <UButton square color="neutral" variant="ghost" @click="prevMonth">
           <UIcon name="i-lucide-chevron-left" class="size-4" />
         </UButton>
         <p class="text-lg font-semibold text-toned">{{ months.find(m => m.value === month)?.label }} {{ year }}</p>
-        <UButton square color="neutral" variant="ghost" @click="month++">
+        <UButton square color="neutral" variant="ghost" @click="nextMonth">
           <UIcon name="i-lucide-chevron-right" class="size-4" />
         </UButton>
       </div>
       <USeparator />
-      <!-- Day-of-week header -->
+      <div class="flex-1 flex flex-col overflow-x-auto scrollbar">
+        <div class="flex flex-col flex-1 min-w-[800px]">
+          <!-- Day-of-week header -->
       <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] shrink-0 border-b border-[var(--ui-border)]">
         <div
           v-for="wd in WEEK_DAYS"
@@ -317,11 +376,11 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
             <!-- Record content -->
             <template v-if="cell.record">
               <div class="flex flex-col gap-0.5 mt-1">
-                <div class="text-[10px] flex items-center gap-1 text-dimmed">
+                <div class="text-[10px] flex items-center gap-1 text-dimmed whitespace-nowrap">
                   <UIcon name="i-lucide-log-in" class="size-3 shrink-0" />
                   {{ cell.record.timeIn || '--:--' }}
                 </div>
-                <div class="text-[10px] flex items-center gap-1 text-dimmed">
+                <div class="text-[10px] flex items-center gap-1 text-dimmed whitespace-nowrap">
                   <UIcon name="i-lucide-log-out" class="size-3 shrink-0" />
                   {{ cell.record.timeOut || '--:--' }}
                 </div>
@@ -340,6 +399,114 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
               </div>
             </template>
           </template>
+        </div>
+      </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- Week view ─────────────────────────────────────────────────────────── -->
+    <template v-else-if="viewMode === 'week'">
+      <div class="flex items-center justify-between p-4">
+        <UButton square color="neutral" variant="ghost" @click="prevWeek">
+          <UIcon name="i-lucide-chevron-left" class="size-4" />
+        </UButton>
+        <p class="text-lg font-semibold text-toned">
+          Week {{ selectedWeekIndex + 1 }} of {{ months.find(m => m.value === month)?.label }} {{ year }}
+        </p>
+        <UButton square color="neutral" variant="ghost" @click="nextWeek">
+          <UIcon name="i-lucide-chevron-right" class="size-4" />
+        </UButton>
+      </div>
+      <USeparator />
+      <div class="flex-1 flex flex-col overflow-x-auto scrollbar">
+        <div class="flex flex-col flex-1 min-w-[1200px]">
+          <!-- Day-of-week header -->
+      <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] shrink-0 border-b border-[var(--ui-border)]">
+        <div
+          v-for="wd in WEEK_DAYS"
+          :key="wd"
+          class="bg-[var(--ui-bg)] py-2 text-center text-xs font-medium"
+          :class="wd === 'Sun' || wd === 'Sat' ? 'text-dimmed' : 'text-toned'"
+        >
+          {{ wd }}
+        </div>
+      </div>
+
+      <!-- Week grid -->
+      <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] flex-1">
+        <div
+          v-for="(cell, idx) in (calendarWeeks[selectedWeekIndex] || [])"
+          :key="idx"
+          class="p-4 flex flex-col transition-colors group relative h-full"
+          :class="[
+            !cell
+              ? 'bg-[var(--ui-bg)]'
+              : cell.isWeekend
+                ? 'bg-[var(--ui-bg)] cursor-default'
+                : 'bg-[var(--ui-bg)] hover:bg-primary/5 cursor-pointer',
+          ]"
+          @click="if (cell && !cell.isWeekend && cell.record) { selectedRecord = cell.record; isModalOpen = true }"
+        >
+          <template v-if="cell">
+            <!-- Day number -->
+            <div class="flex items-center justify-between mb-4">
+              <span
+                class="text-sm font-medium leading-none w-8 h-8 flex items-center justify-center rounded-full"
+                :class="[
+                  cell.isToday
+                    ? 'bg-primary text-white font-bold'
+                    : cell.isWeekend
+                      ? 'text-dimmed'
+                      : 'text-highlighted',
+                ]"
+              >
+                {{ cell.day }}
+              </span>
+            </div>
+
+            <!-- Record content -->
+            <template v-if="cell.record">
+              <div class="flex flex-col gap-2">
+                <div class="text-sm flex items-center gap-2 text-toned whitespace-nowrap">
+                  <UIcon name="i-lucide-log-in" class="size-4 shrink-0 text-dimmed" />
+                  {{ cell.record.timeIn || '--:--' }}
+                </div>
+                <div class="text-sm flex items-center gap-2 text-toned whitespace-nowrap">
+                  <UIcon name="i-lucide-log-out" class="size-4 shrink-0 text-dimmed" />
+                  {{ cell.record.timeOut || '--:--' }}
+                </div>
+              </div>
+              
+              <USeparator class="my-4" />
+              
+              <div class="flex flex-col gap-2">
+                 <div class="flex justify-between items-center text-sm">
+                   <span class="text-dimmed">Duration</span>
+                   <span class="font-medium text-toned">{{ cell.record.duration > 0 ? cell.record.duration.toFixed(2) + 'h' : '-' }}</span>
+                 </div>
+                 <div class="flex justify-between items-center text-sm" v-if="cell.record.overtime > 0">
+                   <span class="text-dimmed">Overtime</span>
+                   <span class="font-medium text-warning">{{ cell.record.overtime.toFixed(2) + 'h' }}</span>
+                 </div>
+              </div>
+              
+              <div class="mt-auto pt-4 flex items-center justify-between">
+                <StatusBadge :status="cell.record.status" />
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <UButton
+                    icon="i-lucide-edit-3"
+                    size="sm"
+                    color="primary"
+                    variant="ghost"
+                    @click.stop="selectedRecord = cell.record!; isModalOpen = true"
+                  />
+                </div>
+              </div>
+            </template>
+          </template>
+        </div>
+      </div>
         </div>
       </div>
     </template>

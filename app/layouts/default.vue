@@ -78,7 +78,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Calendar',
-            icon: 'i-lucide-calendar-days'
+            icon: 'i-lucide-calendar-days',
+            to: '/calendar'
         },
         {
             label: 'Directory',
@@ -87,7 +88,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'My Performance',
-            icon: 'i-lucide-trending-up'
+            icon: 'i-lucide-trending-up',
+            to: '/performance'
         }
     ],
     [
@@ -98,6 +100,22 @@ const items = computed<NavigationMenuItem[][]>(() => [
         {
             label: 'Expenses',
             icon: 'i-lucide-receipt-text'
+        }
+    ],
+    [
+        ...(isCollapsed.value ? [] : [{ 
+            type: 'label' as const, 
+            label: 'Employee Lifecycle' 
+        }]),
+        {
+            label: 'Onboarding Templates',
+            icon: 'i-lucide-clipboard-list',
+            to: '/onboarding/templates'
+        },
+        {
+            label: 'Employee Onboarding',
+            icon: 'i-lucide-user-plus',
+            to: '/onboarding'
         }
     ],
     [

@@ -182,14 +182,14 @@ const evaluationColumns: TableColumn<EvaluationRecord>[] = [
     }
   },
   { 
-    accessorKey: 'status', 
-    header: 'Status', 
-    cell: ({ row }) => h(StatusBadge, { status: row.getValue('status') as string })
-  },
-  { 
     accessorKey: 'confirmedDate', 
     header: 'Date Confirmed',
     cell: ({ row }) => h('span', { class: 'text-neutral-500 dark:text-neutral-400' }, row.getValue('confirmedDate') as string)
+  },
+  { 
+    accessorKey: 'status', 
+    header: 'Status', 
+    cell: ({ row }) => h(StatusBadge, { status: row.getValue('status') as string })
   },
   { 
     id: 'actions', 
@@ -198,10 +198,12 @@ const evaluationColumns: TableColumn<EvaluationRecord>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string
       return h(UButton, {
-        label: status === 'CONFIRMED' ? 'View Details' : 'Review',
-        variant: 'soft',
-        color: status === 'CONFIRMED' ? 'primary' : 'warning',
-        size: 'xs',
+        label: status === 'CONFIRMED' ? undefined : 'Review',
+        icon: status === 'CONFIRMED' ? 'i-lucide-eye' : undefined,
+        'aria-label': status === 'CONFIRMED' ? 'View details' : undefined,
+        variant: status === 'CONFIRMED' ? 'ghost' : 'soft',
+        color: status === 'CONFIRMED' ? 'neutral' : 'warning',
+        size: status === 'CONFIRMED' ? 'sm' : 'xs',
         onClick: (e: Event) => {
           e.stopPropagation()
           selectedEvaluation.value = row.original

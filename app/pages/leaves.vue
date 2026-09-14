@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, resolveComponent } from 'vue'
+import { h, resolveComponent, computed } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
 
 const UAvatar = resolveComponent('UAvatar')
@@ -319,7 +319,7 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 
 const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
-const viewMode = ref<'grid' | 'table'>('grid')
+const viewMode = ref<'grid' | 'table' | 'month'>('grid')
 
 const { register } = useOverlayVisibility()
 register(isDrawerOpen)
@@ -334,7 +334,7 @@ const year = ref(new Date().getFullYear())
 const quarter = ref(Math.ceil((new Date().getMonth() + 1) / 3))
 
 const months = Array.from({ length: 12 }, (_, i) => ({
-    label: new Date(0, i, 1).toLocaleString('default', { month: 'short' }),
+    label: new Date(0, i, 1).toLocaleString('default', { month: 'long' }),
     value: i + 1
 }))
 
@@ -386,10 +386,78 @@ const filteredLeaves = computed(() => {
     })
 })
 
+// ─── Calendar ────────────────────────────────────────────────────────────
+
+const WEEK_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+const calendarDays = computed(() => {
+  const y = year.value
+  const m = month.value
+  const today = new Date()
+  const daysInMonth = new Date(y, m, 0).getDate()
+  const firstDayOfWeek = new Date(y, m - 1, 1).getDay()
+
+  const cells = []
+
+  for (let i = 0; i < firstDayOfWeek; i++) cells.push(null)
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(y, m - 1, day)
+    const dow = date.getDay()
+    // Find leaves that cover this day
+    const dayLeaves = leaves.filter(l => {
+      const start = new Date(l.start)
+      const end = new Date(l.end)
+      start.setHours(0, 0, 0, 0)
+      end.setHours(23, 59, 59, 999)
+      const d = new Date(y, m - 1, day)
+      return d >= start && d <= end
+    })
+    cells.push({
+      day,
+      date,
+      isToday: today.getFullYear() === y && today.getMonth() + 1 === m && today.getDate() === day,
+      isWeekend: dow === 0 || dow === 6,
+      leaves: dayLeaves,
+    })
+  }
+
+  const remainder = cells.length % 7
+  if (remainder !== 0) {
+    for (let i = 0; i < 7 - remainder; i++) cells.push(null)
+  }
+
+  return cells
+})
+
+const leaveTypeColor: Record<string, string> = {
+  'Sick Leave':         'bg-rose-500/15 text-rose-600 dark:text-rose-400',
+  'Vacation Leave':     'bg-sky-500/15 text-sky-600 dark:text-sky-400',
+  'Birthday Leave':     'bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-400',
+  'Emergency Leave':    'bg-orange-500/15 text-orange-600 dark:text-orange-400',
+  'Maternity Leave':    'bg-pink-500/15 text-pink-600 dark:text-pink-400',
+  'Paternity Leave':    'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+  'Bereavement Leave':  'bg-stone-500/15 text-stone-600 dark:text-stone-400',
+}
+
+function getLeaveColor(type: string) {
+  return leaveTypeColor[type] ?? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+}
+
+function prevMonth() {
+  if (month.value === 1) { month.value = 12; year.value-- }
+  else { month.value-- }
+}
+
+function nextMonth() {
+  if (month.value === 12) { month.value = 1; year.value++ }
+  else { month.value++ }
+}
+
 </script>
 
 <template>
-  <div ref="container" class="flex-1 overflow-y-auto scrollbar">
+  <div ref="container" class="flex flex-col flex-1 overflow-y-auto scrollbar">
     <div ref="header">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
         <UPageCard title="Leave Management" description="Request and manage your leaves"
@@ -400,6 +468,7 @@ const filteredLeaves = computed(() => {
               <UFieldGroup>
                 <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                 <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                <UButton icon="i-lucide-calendar-days" color="neutral" :variant="viewMode === 'month' ? 'subtle' : 'outline'" @click="viewMode = 'month'" />
               </UFieldGroup>
               <UButton variant="soft" @click="isDrawerOpen = true">
                 <UIcon name="i-lucide-clipboard-list" class="size-4" />
@@ -414,7 +483,7 @@ const filteredLeaves = computed(() => {
       </div>
 
       <!-- Search & filter -->
-      <div class="flex items-center gap-3 px-4 pb-4">
+      <div v-if="viewMode !== 'month'" class="flex items-center gap-3 px-4 pb-4">
           <UInput
               v-model="search"
               placeholder="Search by type or status..."
@@ -424,12 +493,12 @@ const filteredLeaves = computed(() => {
           <USelect v-model="selectedType" :items="requestTypes" class="w-48" />
           <USelect v-model="status" :items="['All Status', 'Pending', 'Approved', 'Rejected']" class="w-32" />
           <USelect v-model="period" :items="['Monthly', 'Quarterly', 'Yearly']" class="w-32" />
-          <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-24" />
+          <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-32" />
           <USelect v-if="period === 'Quarterly'" v-model="quarter" :items="quarters" class="w-24" />
           <USelect v-model="year" :items="years" class="w-24" />
       </div>
 
-      <div class="flex gap-3 px-4 pb-4">
+      <div v-if="viewMode !== 'month'" class="flex gap-3 px-4 pb-4">
           <UCard v-for="(kpi, index) in kpis" :key="index" class="shadow-sm flex-1" :ui="{ body: 'sm:p-4' }">
               <div class="flex items-center gap-3">
                   <div class="rounded-lg p-2 shrink-0 flex" :class="kpi.bg">
@@ -495,6 +564,111 @@ const filteredLeaves = computed(() => {
             </UCard>
         </div>
     </div>
+
+    <!-- Month calendar view -->
+    <template v-else-if="viewMode === 'month'">
+      <div class="flex items-center justify-between p-4">
+        <UButton square color="neutral" variant="ghost" @click="prevMonth">
+          <UIcon name="i-lucide-chevron-left" class="size-4" />
+        </UButton>
+        <p class="text-lg font-semibold text-toned">
+          {{ months.find(m => m.value === month)?.label }} {{ year }}
+        </p>
+        <UButton square color="neutral" variant="ghost" @click="nextMonth">
+          <UIcon name="i-lucide-chevron-right" class="size-4" />
+        </UButton>
+      </div>
+      <USeparator />
+      <div class="flex-1 flex flex-col overflow-x-auto scrollbar">
+        <div class="flex flex-col flex-1 min-w-[800px]">
+          <!-- Day-of-week header -->
+          <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] shrink-0 border-b border-[var(--ui-border)]">
+            <div
+              v-for="wd in WEEK_DAYS"
+              :key="wd"
+              class="bg-[var(--ui-bg)] py-2 text-center text-xs font-medium"
+              :class="wd === 'Sun' || wd === 'Sat' ? 'text-dimmed' : 'text-toned'"
+            >
+              {{ wd }}
+            </div>
+          </div>
+          <!-- Calendar grid -->
+          <div class="grid grid-cols-7 gap-px bg-[var(--ui-border)] flex-1 auto-rows-fr">
+            <div
+              v-for="(cell, idx) in calendarDays"
+              :key="idx"
+              class="p-2 flex flex-col bg-[var(--ui-bg)]"
+            >
+              <template v-if="cell">
+                <div class="flex items-center justify-between mb-1">
+                  <span
+                    class="text-sm font-medium leading-none w-6 h-6 flex items-center justify-center rounded-full"
+                    :class="[
+                      cell.isToday
+                        ? 'bg-primary text-white font-bold'
+                        : cell.isWeekend
+                          ? 'text-dimmed'
+                          : 'text-highlighted',
+                    ]"
+                  >
+                    {{ cell.day }}
+                  </span>
+                </div>
+                <!-- Leave badges with popover -->
+                <div class="flex flex-col gap-0.5 mt-0.5">
+                  <UPopover
+                    v-for="(leave, li) in cell.leaves.slice(0, 2)"
+                    :key="li"
+                    mode="click"
+                    :content="{ align: 'start', side: 'right' }"
+                  >
+                    <UBadge
+                      :label="leave.type"
+                      variant="soft"
+                      size="sm"
+                      class="w-full truncate cursor-pointer text-[10px]"
+                      :class="getLeaveColor(leave.type)"
+                      :ui="{ base: 'justify-start' }"
+                    />
+                    <template #content>
+                      <div class="p-3 w-auto space-y-2.5">
+                        <div class="flex items-start justify-between gap-4">
+                          <div class="space-y-0.5">
+                            <div class="text-sm font-semibold text-highlighted">{{ leave.type }}</div>
+                            <div class="text-xs text-dimmed whitespace-nowrap">{{ leave.dateApplied }}</div>
+                          </div>
+                          <StatusBadge :status="leave.status" />
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs bg-muted/50 rounded-md p-2">
+                          <div>
+                            <div class="text-dimmed mb-0.5">Start</div>
+                            <div class="font-medium text-toned whitespace-nowrap">{{ leave.start }}</div>
+                          </div>
+                          <div>
+                            <div class="text-dimmed mb-0.5">End</div>
+                            <div class="font-medium text-toned whitespace-nowrap">{{ leave.end }}</div>
+                          </div>
+                          <div class="col-span-2 pt-1 border-t border-[var(--ui-border)]">
+                            <div class="text-dimmed mb-0.5">Duration</div>
+                            <div class="font-medium text-toned">{{ leave.duration }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </UPopover>
+                  <div
+                    v-if="cell.leaves.length > 2"
+                    class="text-[10px] text-dimmed px-1 font-medium"
+                  >
+                    +{{ cell.leaves.length - 2 }} more
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
 
     <UTable v-else :data="filteredLeaves" :columns="columns" sticky class="flex-1 min-h-0" :virtualize="{ scrollMargin: headerHeight, getScrollElement }">
         <template #status-cell="{ row }">

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { h, resolveComponent } from 'vue'
+
 definePageMeta({
     isTable: true
 })
@@ -142,11 +144,39 @@ const payslipData = ref([
 const columns = [
     { accessorKey: 'date', header: 'Date' },
     { accessorKey: 'cutoffPeriod', header: 'Cut-off Period' },
-    { accessorKey: 'grossPay', header: 'Gross Pay' },
-    { accessorKey: 'deductions', header: 'Deductions' },
-    { accessorKey: 'netPay', header: 'Net Pay' },
-    { accessorKey: 'status', header: 'Status' },
-    { accessorKey: 'actions', header: '' },
+    {
+        accessorKey: 'grossPay',
+        header: 'Gross Pay',
+        cell: ({ row }: any) => h('span', { class: 'tabular-nums' }, formatPHP(row.original.grossPay))
+    },
+    {
+        accessorKey: 'deductions',
+        header: 'Deductions',
+        cell: ({ row }: any) => h('span', { class: 'tabular-nums text-rose-500' }, formatPHP(row.original.deductions))
+    },
+    {
+        accessorKey: 'netPay',
+        header: 'Net Pay',
+        cell: ({ row }: any) => h('span', { class: 'tabular-nums font-semibold text-primary' }, formatPHP(row.original.netPay))
+    },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }: any) => h(resolveComponent('StatusBadge'), { status: row.original.status })
+    },
+    {
+        accessorKey: 'actions',
+        header: '',
+        meta: { class: { th: 'w-32', td: 'text-right' } },
+        cell: ({ row }: any) => h(resolveComponent('UButton'), {
+            icon: 'i-lucide-eye',
+            color: 'neutral',
+            variant: 'ghost',
+            size: 'sm',
+            'aria-label': 'View payslip',
+            onClick: () => openDetail(row.original)
+        })
+    }
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -318,28 +348,6 @@ function openDetail(row: (typeof payslipData.value)[0]) {
             class="flex-1 min-h-0"
             :virtualize="{ scrollMargin: headerHeight, getScrollElement }"
         >
-            <template #grossPay-cell="{ row }">
-                <span class="tabular-nums">{{ formatPHP(row.original.grossPay) }}</span>
-            </template>
-            <template #deductions-cell="{ row }">
-                <span class="tabular-nums text-rose-500">{{ formatPHP(row.original.deductions) }}</span>
-            </template>
-            <template #netPay-cell="{ row }">
-                <span class="tabular-nums font-semibold text-primary">{{ formatPHP(row.original.netPay) }}</span>
-            </template>
-            <template #status-cell="{ row }">
-                <StatusBadge :status="row.original.status" />
-            </template>
-            <template #actions-cell="{ row }">
-                <UButton
-                    icon="i-lucide-eye"
-                    color="neutral"
-                    variant="ghost"
-                    size="sm"
-                    aria-label="View payslip"
-                    @click="openDetail(row.original)"
-                />
-            </template>
             <template #empty>
                 <UEmpty
                     icon="i-lucide-file-x"

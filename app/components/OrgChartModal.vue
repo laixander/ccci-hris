@@ -41,12 +41,12 @@ register(open)
     >
         <template #header>
             <div class="absolute overflow-hidden inset-0 pointer-events-none">
-                <UIcon name="i-lucide-git-fork" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2 rotate-180" />
+                <UIcon name="i-lucide-building-2" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2" />
             </div>
             <div class="flex items-center justify-between relative z-10 w-full">
                 <div class="flex items-center gap-3 flex-1">
                     <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <UIcon name="i-lucide-git-fork" class="size-5 text-primary rotate-180" />
+                        <UIcon name="i-lucide-building" class="size-5 text-primary" />
                     </div>
                     <div>
                         <h2 class="text-primary font-semibold leading-tight">Organization Chart</h2>
