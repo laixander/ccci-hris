@@ -107,11 +107,11 @@ const items = computed<NavigationMenuItem[][]>(() => [
             type: 'label' as const, 
             label: 'Employee Lifecycle' 
         }]),
-        {
+        withActive({
             label: 'Onboarding Templates',
             icon: 'i-lucide-clipboard-list',
             to: '/onboarding/templates'
-        },
+        }),
         {
             label: 'Employee Onboarding',
             icon: 'i-lucide-user-plus',

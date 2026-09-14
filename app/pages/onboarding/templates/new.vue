@@ -78,11 +78,21 @@ function moveTaskDown(index: number) {
                         title="New Template"
                         description="Define the checklist tasks for a new-hire onboarding template"
                         variant="naked"
+                        orientation="horizontal"
                         class="flex-1"
                         :ui="{
                             title: 'text-2xl font-bold'
                         }"
-                    />
+                    >
+                        <div class="flex justify-end gap-2 flex-1">
+                            <UButton color="neutral" variant="outline" icon="i-lucide-save">
+                                Save as Draft
+                            </UButton>
+                            <UButton color="primary" icon="i-lucide-send-horizontal">
+                                Publish
+                            </UButton>
+                        </div>
+                    </UPageCard>
                 </div>
 
                 <!-- Template Details -->
@@ -213,7 +223,7 @@ function moveTaskDown(index: number) {
         </div>
 
         <!-- Sticky Footer -->
-        <div class="sticky bottom-0 bg-default/95 backdrop-blur border-t border-default p-4 z-10">
+        <!-- <div class="sticky bottom-0 bg-default/95 backdrop-blur border-t border-default p-4 z-10">
             <div class="flex items-center justify-between">
                 <p class="text-sm text-dimmed hidden sm:block">
                     <UIcon name="i-lucide-info" class="size-3.5 inline-block mr-1" />
@@ -231,6 +241,6 @@ function moveTaskDown(index: number) {
                     </UButton>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
