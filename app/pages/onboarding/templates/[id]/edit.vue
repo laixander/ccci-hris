@@ -5,50 +5,61 @@ definePageMeta({
     isTable: true
 })
 
-const { addTemplate } = useTemplates()
+const route = useRoute()
+const id = Number(route.params.id)
+
+const { getTemplate, updateTemplate } = useTemplates()
 const toast = useToast()
 
+const existing = getTemplate(id)
+
+if (!existing) {
+    await navigateTo('/onboarding/templates')
+}
+
 const template = reactive({
-    name: '',
-    description: '',
-    status: 'Draft' as 'Draft' | 'Published',
+    name: existing?.name ?? '',
+    description: existing?.description ?? '',
+    status: (existing?.status ?? 'Draft') as 'Draft' | 'Published',
 })
 
 const categories = ['Documentation', 'Hardware', 'Software', 'Training', 'Introduction']
 const assignees = ['HR', 'IT', 'Manager', 'Buddy']
 const statuses = ['Draft', 'Published']
 
-const tasks = ref<OnboardingTask[]>([
-    { id: 1, name: '', description: '', category: 'Documentation', assignee: 'HR', dueDays: 1, required: true }
-])
+const tasks = ref<OnboardingTask[]>(
+    existing?.tasks?.length
+        ? existing.tasks.map(t => ({ ...t }))
+        : [{ id: 1, name: '', description: '', category: 'Documentation', assignee: 'HR', dueDays: 1, required: true }]
+)
 
-const expandedTasks = ref<Set<number>>(new Set([1]))
+const expandedTasks = ref<Set<number>>(new Set(tasks.value.map(t => t.id)))
 
 function addTask() {
-    const id = Date.now()
+    const tid = Date.now()
     tasks.value.push({
-        id,
+        id: tid,
         name: '',
         description: '',
         category: 'Documentation',
         assignee: 'HR',
         dueDays: 1,
-        required: true
+        required: true,
     })
-    expandedTasks.value.add(id)
+    expandedTasks.value.add(tid)
 }
 
 function removeTask(index: number) {
-    const id = tasks.value[index]?.id
-    if (id) expandedTasks.value.delete(id)
+    const tid = tasks.value[index]?.id
+    if (tid) expandedTasks.value.delete(tid)
     tasks.value.splice(index, 1)
 }
 
-function toggleExpand(id: number) {
-    if (expandedTasks.value.has(id)) {
-        expandedTasks.value.delete(id)
+function toggleExpand(tid: number) {
+    if (expandedTasks.value.has(tid)) {
+        expandedTasks.value.delete(tid)
     } else {
-        expandedTasks.value.add(id)
+        expandedTasks.value.add(tid)
     }
 }
 
@@ -73,7 +84,7 @@ function saveTemplate(status: 'Draft' | 'Published') {
         toast.add({ title: 'Template name is required', color: 'error', icon: 'i-lucide-alert-circle' })
         return
     }
-    addTemplate({
+    updateTemplate(id, {
         name: template.name.trim(),
         description: template.description.trim(),
         status,
@@ -97,14 +108,12 @@ function saveTemplate(status: 'Draft' | 'Published') {
                     <UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" to="/onboarding/templates"
                         aria-label="Back to templates" />
                     <UPageCard
-                        title="New Template"
-                        description="Define the checklist tasks for a new-hire onboarding template"
+                        title="Edit Template"
+                        description="Update the checklist tasks for this onboarding template"
                         variant="naked"
                         orientation="horizontal"
                         class="flex-1"
-                        :ui="{
-                            title: 'text-2xl font-bold'
-                        }"
+                        :ui="{ title: 'text-2xl font-bold' }"
                     >
                         <div class="flex justify-end gap-2 flex-1">
                             <UButton color="neutral" variant="outline" icon="i-lucide-save" @click="saveTemplate('Draft')">
@@ -219,7 +228,7 @@ function saveTemplate(status: 'Draft' | 'Published') {
                             <UInputNumber v-model="task.dueDays" :min="1" class="w-20" />
                         </div>
 
-                        <!-- Expanded: description (smooth height animation via grid) -->
+                        <!-- Expanded: description -->
                         <div class="grid transition-[grid-template-rows] duration-200 ease-out"
                             :class="expandedTasks.has(task.id) ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'">
                             <div class="overflow-hidden">
@@ -234,7 +243,6 @@ function saveTemplate(status: 'Draft' | 'Published') {
                         </div>
                     </UCard>
 
-
                     <!-- Add Task Button (secondary, bottom) -->
                     <UButton v-if="tasks.length > 0" color="neutral" variant="subtle" icon="i-lucide-plus"
                         class="w-full justify-center" @click="addTask">
@@ -243,26 +251,5 @@ function saveTemplate(status: 'Draft' | 'Published') {
                 </div>
             </UContainer>
         </div>
-
-        <!-- Sticky Footer -->
-        <!-- <div class="sticky bottom-0 bg-default/95 backdrop-blur border-t border-default p-4 z-10">
-            <div class="flex items-center justify-between">
-                <p class="text-sm text-dimmed hidden sm:block">
-                    <UIcon name="i-lucide-info" class="size-3.5 inline-block mr-1" />
-                    {{ tasks.length }} task{{ tasks.length !== 1 ? 's' : '' }} in this template
-                </p>
-                <div class="flex items-center gap-3 ml-auto">
-                    <UButton color="neutral" variant="ghost" to="/onboarding/templates">
-                        Cancel
-                    </UButton>
-                    <UButton color="neutral" variant="outline" icon="i-lucide-save">
-                        Save as Draft
-                    </UButton>
-                    <UButton color="primary" icon="i-lucide-send-horizontal">
-                        Publish
-                    </UButton>
-                </div>
-            </div>
-        </div> -->
     </div>
 </template>

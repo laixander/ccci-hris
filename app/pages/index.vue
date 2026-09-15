@@ -28,6 +28,17 @@ const isTimedIn = ref(false)
 const isLeaveModalOpen = ref(false)
 const isOvertimeModalOpen = ref(false)
 
+const activityBoxClass = (color: string) => {
+    const map: Record<string, string> = {
+        'text-primary': 'bg-primary-50 dark:bg-primary-950',
+        'text-success': 'bg-success-50 dark:bg-success-950',
+        'text-error': 'bg-error-50 dark:bg-error-950',
+        'text-warning': 'bg-warning-50 dark:bg-warning-950',
+        'text-neutral-500': 'bg-neutral-100 dark:bg-neutral-800',
+    }
+    return map[color] ?? 'bg-neutral-100 dark:bg-neutral-800'
+}
+
 
 const onLeaveTodayList = [
     { name: 'DELA CRUZ, JUAN', role: 'Software Engineer', leaveType: 'Sick Leave', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Juan' },
@@ -546,15 +557,15 @@ const { aiInput, quickPrompts, sendMessage } = useAIChat()
 
                     <UEmpty variant="naked" v-if="recentActivities.length === 0" icon="i-lucide-activity" title="No recent activities" description="There are no recent activities to show." />
                     <div v-else class="space-y-6">
-                        <div v-for="(activity, i) in recentActivities" :key="i" class="flex gap-4">
-                            <div class="mt-1">
+                        <div v-for="(activity, i) in recentActivities" :key="i" class="flex items-center gap-4">
+                            <div :class="[activityBoxClass(activity.color), 'flex-shrink-0 size-8 rounded-lg flex items-center justify-center']">
                                 <UIcon :name="activity.icon" :class="[activity.color, 'size-4']" />
                             </div>
-                            <div>
-                                <p class="font-medium text-sm text-neutral-800 dark:text-neutral-200">
+                            <div class="min-w-0">
+                                <p class="font-medium text-sm text-neutral-800 dark:text-neutral-200 truncate">
                                     {{ activity.text }}
                                 </p>
-                                <p class="text-xs text-neutral-500 mt-1">
+                                <p class="text-xs text-neutral-500">
                                     {{ activity.time }}
                                 </p>
                             </div>

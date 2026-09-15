@@ -271,7 +271,7 @@ const headerTextureStyle = {
 
         <div
             class="flex-1 flex flex-col overflow-hidden lg:peer-data-[variant=floating]:my-4 peer-data-[variant=inset]:m-4 lg:peer-data-[variant=inset]:not-peer-data-[collapsible=offcanvas]:ms-0 peer-data-[variant=inset]:rounded-xl peer-data-[variant=inset]:shadow-sm peer-data-[variant=inset]:ring peer-data-[variant=inset]:ring-default bg-default">
-            <div class="h-(--ui-header-height) shrink-0 flex items-center px-4 relative overflow-hidden" :class="[
+            <div class="h-(--ui-header-height) shrink-0 flex items-center px-4 relative overflow-hidden bg-default z-50" :class="[
                 variant !== 'floating' && 'border-b border-default',
                 side === 'right' && 'justify-end'
             ]">
@@ -315,7 +315,7 @@ const headerTextureStyle = {
                 close
                 @update:open="(val) => !val && clearAlert()"
                 :ui="{
-                    root: 'rounded-none border-b border-error/20',
+                    root: 'rounded-none border-b border-error/20 alert-glow',
                     title: 'flex w-full items-center gap-3',
                 }" 
                 :actions="[
@@ -344,3 +344,17 @@ const headerTextureStyle = {
     <!-- Global AI FAB + Chat Drawer -->
     <AIChatDrawer />
 </template>
+<style scoped>
+@keyframes glow-error {
+    0%, 100% {
+        box-shadow: 0 2px 6px -3px color-mix(in srgb, var(--ui-color-error-500) 15%, transparent);
+    }
+    50% {
+        box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--ui-color-error-500) 35%, transparent);
+    }
+}
+
+:deep(.alert-glow) {
+    animation: glow-error 2.8s ease-in-out infinite;
+}
+</style>
