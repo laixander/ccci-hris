@@ -29,7 +29,7 @@ register(open)
     }">
         <template #header>
             <div class="absolute overflow-hidden inset-0">
-                <UIcon name="i-lucide-calendar-plus" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2" />
+                <UIcon name="i-lucide-calendar" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2" />
             </div>
             <div class="flex flex-col">
                 <h2 class="text-primary font-semibold">Schedule Onboarding</h2>

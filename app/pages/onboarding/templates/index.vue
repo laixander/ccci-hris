@@ -9,6 +9,22 @@ definePageMeta({
 // Shared template store (module-level so new.vue can push here via navigateTo + state)
 const { templates, deleteTemplate } = useTemplates()
 
+const isConfirmDeleteOpen = ref(false)
+const templateIdToDelete = ref<number | null>(null)
+
+function confirmDelete(id: number) {
+    templateIdToDelete.value = id
+    isConfirmDeleteOpen.value = true
+}
+
+function executeDelete() {
+    if (templateIdToDelete.value !== null) {
+        deleteTemplate(templateIdToDelete.value)
+        templateIdToDelete.value = null
+        isConfirmDeleteOpen.value = false
+    }
+}
+
 type OnboardingTemplate = {
     id: number
     name: string
@@ -52,7 +68,7 @@ const columns: TableColumn<OnboardingTemplate>[] = [
                 icon: 'i-lucide-trash-2',
                 size: 'sm',
                 'aria-label': 'Delete template',
-                onClick: () => deleteTemplate(row.original.id),
+                onClick: () => confirmDelete(row.original.id),
             }),
         ],
     },
@@ -184,7 +200,7 @@ const filteredTemplates = computed(() => {
                                 color="error"
                                 variant="ghost"
                                 aria-label="Delete template"
-                                @click="deleteTemplate(template.id)"
+                                @click="confirmDelete(template.id)"
                                 class="flex-1 rounded-none py-2"
                             >
                                 <UIcon name="i-lucide-trash-2" class="size-4" />
@@ -203,5 +219,16 @@ const filteredTemplates = computed(() => {
                 />
             </div>
         </div>
+
+        <ConfirmModal
+            v-model:open="isConfirmDeleteOpen"
+            title="Delete Template"
+            description="Are you sure you want to delete this template? This action cannot be undone."
+            confirm-label="Delete"
+            color="error"
+            icon="i-lucide-trash-2"
+            :success-toast="{ title: 'Template deleted successfully' }"
+            @confirm="executeDelete"
+        />
     </div>
 </template>

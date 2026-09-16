@@ -168,16 +168,20 @@ const filteredOnboardings = computed(() => {
                         class="shrink-0"
                     />
                 </div>
-                
-                <div class="space-y-1 mt-auto">
-                    <div class="flex justify-between text-xs">
-                        <span class="text-muted">Progress</span>
-                        <span class="font-medium">{{ item.progress }}%</span>
+
+                <div class="grid grid-cols-1 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md">
+                    <div>
+                        <div class="text-xs text-dimmed mb-0.5">Template</div>
+                        <div class="font-medium">{{ item.template }}</div>
                     </div>
-                    <UProgress :model-value="item.progress" size="xs" :color="item.progress === 100 ? 'success' : 'primary'" />
+                    <USeparator />
+                    <div>
+                        <div class="text-xs text-dimmed mb-0.5">Start Date</div>
+                        <div class="font-medium">{{ item.startDate }}</div>
+                    </div>
                 </div>
                 
-                <div class="text-sm pt-2 border-t border-border">
+                <!-- <div class="text-sm space-y-1">
                     <div class="flex justify-between py-0.5">
                         <span class="text-muted">Template</span>
                         <span class="font-medium text-highlighted truncate max-w-[120px]" :title="item.template">{{ item.template }}</span>
@@ -186,7 +190,42 @@ const filteredOnboardings = computed(() => {
                         <span class="text-muted">Start Date</span>
                         <span class="font-medium text-highlighted">{{ item.startDate }}</span>
                     </div>
+                </div> -->
+
+                <div class="space-y-1 mt-auto">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-muted">Progress</span>
+                        <span class="font-medium">{{ item.progress }}%</span>
+                    </div>
+                    <UProgress :model-value="item.progress" size="xs" :color="item.progress === 100 ? 'success' : 'primary'" />
                 </div>
+                
+                <!-- <template #footer>
+                    <div class="flex items-stretch">
+                        <UButton
+                            block
+                            color="neutral"
+                            variant="ghost"
+                            :to="`/onboarding/${item.id}`"
+                            aria-label="View details"
+                            class="flex-1 rounded-none py-2"
+                        >
+                            <UIcon name="i-lucide-eye" class="size-4" />
+                            View
+                        </UButton>
+                        <USeparator orientation="vertical" class="h-auto" />
+                        <UButton
+                            block
+                            color="error"
+                            variant="ghost"
+                            aria-label="Delete schedule"
+                            class="flex-1 rounded-none py-2"
+                        >
+                            <UIcon name="i-lucide-trash-2" class="size-4" />
+                            Delete
+                        </UButton>
+                    </div>
+                </template> -->
             </UCard>
         </div>
     </div>
