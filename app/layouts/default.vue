@@ -7,8 +7,8 @@ function withActive(item: NavigationMenuItem): NavigationMenuItem {
     if (!item.to || typeof item.to !== 'string') return item
     return {
         ...item,
-        active: item.to === '/' 
-            ? route.path === '/' 
+        active: item.to === '/'
+            ? route.path === '/'
             : route.path === item.to || route.path.startsWith(item.to + '/')
     }
 }
@@ -27,9 +27,9 @@ const isCollapsed = computed(() => collapsible.value === 'icon' && !open.value)
 
 const items = computed<NavigationMenuItem[][]>(() => [
     [
-        ...(isCollapsed.value ? [] : [{ 
-            type: 'label' as const, 
-            label: 'Self-Service' 
+        ...(isCollapsed.value ? [] : [{
+            type: 'label' as const,
+            label: 'Self-Service'
         }]),
         withActive({
             label: 'Home',
@@ -93,9 +93,9 @@ const items = computed<NavigationMenuItem[][]>(() => [
         }
     ],
     [
-        ...(isCollapsed.value ? [] : [{ 
-            type: 'label' as const, 
-            label: 'Human Resources' 
+        ...(isCollapsed.value ? [] : [{
+            type: 'label' as const,
+            label: 'Human Resources'
         }]),
         {
             label: 'Expenses',
@@ -103,9 +103,9 @@ const items = computed<NavigationMenuItem[][]>(() => [
         }
     ],
     [
-        ...(isCollapsed.value ? [] : [{ 
-            type: 'label' as const, 
-            label: 'Employee Lifecycle' 
+        ...(isCollapsed.value ? [] : [{
+            type: 'label' as const,
+            label: 'Employee Lifecycle'
         }]),
         withActive({
             label: 'Onboarding Templates',
@@ -119,36 +119,41 @@ const items = computed<NavigationMenuItem[][]>(() => [
         }
     ],
     [
-        ...(isCollapsed.value ? [] : [{ 
-            type: 'label' as const, 
-            label: 'Asset Management' 
+        ...(isCollapsed.value ? [] : [{
+            type: 'label' as const,
+            label: 'Asset Management'
         }]),
         {
             label: 'Inventory',
-            icon: 'i-lucide-boxes'
+            icon: 'i-lucide-boxes',
+            to: '/assets/inventory'
         },
         {
             label: 'Asset Assignment',
-            icon: 'i-lucide-arrow-left-right'
+            icon: 'i-lucide-arrow-left-right',
+            to: '/assets/assignments'
         },
         {
             label: 'Asset Categories',
-            icon: 'i-lucide-tag'
+            icon: 'i-lucide-tag',
+            to: '/assets/categories'
         },
         {
             label: 'Asset Locations',
-            icon: 'i-lucide-map-pin'
+            icon: 'i-lucide-map-pin',
+            to: '/assets/locations'
         },
         {
             label: 'Asset Analytics',
-            icon: 'i-lucide-pie-chart'
+            icon: 'i-lucide-pie-chart',
+            to: '/assets/analytics'
         }
     ]
 ])
 
 const pageTitle = computed(() => {
     if (route.meta.title) return route.meta.title as string
-    
+
     for (const group of items.value) {
         for (const item of group) {
             if ('to' in item && item.to === route.path) {
@@ -156,10 +161,10 @@ const pageTitle = computed(() => {
             }
         }
     }
-    
+
     const path = route.path
     if (path === '/') return 'Dashboard'
-    
+
     const segment = path.split('/').filter(Boolean).pop() || ''
     return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
 })
@@ -271,25 +276,30 @@ const headerTextureStyle = {
 
         <div
             class="flex-1 flex flex-col overflow-hidden lg:peer-data-[variant=floating]:my-4 peer-data-[variant=inset]:m-4 lg:peer-data-[variant=inset]:not-peer-data-[collapsible=offcanvas]:ms-0 peer-data-[variant=inset]:rounded-xl peer-data-[variant=inset]:shadow-sm peer-data-[variant=inset]:ring peer-data-[variant=inset]:ring-default bg-default">
-            <div class="h-(--ui-header-height) shrink-0 flex items-center px-4 relative overflow-hidden bg-default z-50" :class="[
-                variant !== 'floating' && 'border-b border-default',
-                side === 'right' && 'justify-end'
-            ]">
+            <div class="h-(--ui-header-height) shrink-0 flex items-center px-4 relative overflow-hidden bg-default z-50"
+                :class="[
+                    variant !== 'floating' && 'border-b border-default',
+                    side === 'right' && 'justify-end'
+                ]">
                 <!-- Texture BG -->
-                <div class="absolute inset-0 w-2/3 md:w-1/2 pointer-events-none transition-colors duration-1000" :class="timeGreeting.bgClass">
+                <div class="absolute inset-0 w-2/3 md:w-1/2 pointer-events-none transition-colors duration-1000"
+                    :class="timeGreeting.bgClass">
                     <div class="absolute inset-0" :style="headerTextureStyle"></div>
                 </div>
-                
+
                 <UButton :icon="side === 'left' ? 'i-lucide-panel-left' : 'i-lucide-panel-right'" color="neutral"
                     variant="ghost" aria-label="Toggle sidebar" @click="open = !open" class="lg:hidden mr-1 z-10" />
 
                 <div class="flex items-center gap-3 z-10">
                     <div class="flex items-center gap-2">
                         <UIcon :name="timeGreeting.icon" :class="['size-5', timeGreeting.colorClass]" />
-                        <span class="hidden sm:block font-semibold" :class="timeGreeting.colorClass">{{ timeGreeting.text }}, {{ firstName }}!</span>
+                        <span class="hidden sm:block font-semibold" :class="timeGreeting.colorClass">{{
+                            timeGreeting.text }}, {{
+                                firstName }}!</span>
                     </div>
                     <div class="h-4 w-px" :class="timeGreeting.borderColorClass"></div>
-                    <span class="hidden sm:block text-xs opacity-60" :class="timeGreeting.colorClass">{{ formattedDate }}</span>
+                    <span class="hidden sm:block text-xs opacity-60" :class="timeGreeting.colorClass">{{ formattedDate
+                    }}</span>
                 </div>
 
                 <!-- page title / breadcrumbs -->
@@ -298,36 +308,27 @@ const headerTextureStyle = {
                 <div class="ml-auto z-10 flex items-center gap-2">
                     <!-- notification button -->
                     <UColorModeButton />
-                    <UButton 
-                        icon="i-lucide-bell"
-                        variant="ghost"
-                        color="neutral"
-                        aria-label="Notifications"
+                    <UButton icon="i-lucide-bell" variant="ghost" color="neutral" aria-label="Notifications"
                         to="/notifications" />
                     <UserMenu :collapsed="isCollapsed" />
                 </div>
             </div>
-            
-            <UAlert 
-                color="error"
-                variant="soft" 
-                orientation="horizontal"
-                close
-                @update:open="(val) => !val && clearAlert()"
-                :ui="{
+
+            <UAlert color="error" variant="soft" orientation="horizontal" close
+                @update:open="(val) => !val && clearAlert()" :ui="{
                     root: 'rounded-none border-b border-error/20 alert-glow',
                     title: 'flex w-full items-center gap-3',
-                }" 
-                :actions="[
-                {
-                    label: 'Review Timesheet',
-                    color: 'error',
-                    variant: 'soft'
-                }
+                }" :actions="[
+                    {
+                        label: 'Review Timesheet',
+                        color: 'error',
+                        variant: 'soft'
+                    }
                 ]" v-if="alertMsg">
                 <template #title>
                     <span class="relative flex size-4">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-error opacity-75"></span>
+                        <span
+                            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-error opacity-75"></span>
                         <UIcon name="i-lucide-circle-alert" class="size-4 text-error" />
                     </span>
                     {{ alertMsg }}
@@ -335,7 +336,8 @@ const headerTextureStyle = {
             </UAlert>
 
             <!-- if isTable true, no padding -->
-            <div :class="[ isTable ? 'flex flex-col overflow-hidden min-h-0' : 'p-4 overflow-y-auto scrollbar' ]" class="flex-1">
+            <div :class="[isTable ? 'flex flex-col overflow-hidden min-h-0' : 'p-4 overflow-y-auto scrollbar']"
+                class="flex-1">
                 <slot />
             </div>
         </div>
@@ -346,9 +348,12 @@ const headerTextureStyle = {
 </template>
 <style scoped>
 @keyframes glow-error {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 2px 6px -3px color-mix(in srgb, var(--ui-color-error-500) 15%, transparent);
     }
+
     50% {
         box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--ui-color-error-500) 35%, transparent);
     }
