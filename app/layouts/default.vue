@@ -246,7 +246,7 @@ const headerTextureStyle = {
         side === 'right' && 'flex-row-reverse'
     ]">
         <USidebar v-model:open="open" :variant="variant" :collapsible="collapsible" :side="side"
-            :ui="{ root: '[--sidebar-width-icon:4.5625rem]', container: 'h-full', header: 'px-5', body: 'scrollbar' }">
+            :ui="{ root: '[--sidebar-width-icon:4.5625rem] data-[state=collapsed]:[--sidebar-width-icon:5.0625rem]', container: 'h-full', header: 'px-5', body: 'group-data-[state=collapsed]/sidebar:overflow-y-auto scrollbar' }">
             <template #header="{ close }">
                 <div v-if="!isCollapsed" class="flex items-center gap-2.5 flex-1">
                     <UIcon name="i-logos-nuxt-icon" class="size-8" />

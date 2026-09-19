@@ -34,12 +34,12 @@ if (!existing) {
 const template = reactive({
     name: existing?.name ?? '',
     description: existing?.description ?? '',
-    status: (existing?.status ?? 'Draft') as 'Draft' | 'Published',
+    status: (existing?.status ?? 'DRAFT') as 'DRAFT' | 'PUBLISHED',
 })
 
 const categories = ['Documentation', 'Hardware', 'Software', 'Training', 'Introduction']
 const assignees = ['HR', 'IT', 'Manager', 'Buddy']
-const statuses = ['Draft', 'Published']
+const statuses = ['DRAFT', 'PUBLISHED']
 
 const tasks = ref<OnboardingTask[]>(
     existing?.tasks?.length
@@ -122,7 +122,7 @@ function onDragEnd() {
     draggedIndex.value = null
 }
 
-function saveTemplate(status: 'Draft' | 'Published') {
+function saveTemplate(status: 'DRAFT' | 'PUBLISHED') {
     if (!template.name.trim()) {
         toast.add({ title: 'Template name is required', color: 'error', icon: 'i-lucide-alert-circle' })
         return
@@ -134,7 +134,7 @@ function saveTemplate(status: 'Draft' | 'Published') {
         tasks: tasks.value,
     })
     toast.add({
-        title: status === 'Published' ? 'Template published!' : 'Template saved as draft',
+        title: status === 'PUBLISHED' ? 'Template published!' : 'Template saved as draft',
         color: 'success',
         icon: 'i-lucide-check-circle',
     })
@@ -161,10 +161,10 @@ function saveTemplate(status: 'Draft' | 'Published') {
                         }"
                     >
                         <div class="flex justify-end gap-2 flex-1 transition-opacity duration-300" :class="isSticky ? 'opacity-0 pointer-events-none' : 'opacity-100'">
-                            <UButton color="neutral" variant="outline" icon="i-lucide-save" @click="saveTemplate('Draft')">
+                            <UButton color="neutral" variant="outline" icon="i-lucide-save" @click="saveTemplate('DRAFT')">
                                 Save as Draft
                             </UButton>
-                            <UButton color="primary" icon="i-lucide-send-horizontal" @click="saveTemplate('Published')">
+                            <UButton color="primary" icon="i-lucide-send-horizontal" @click="saveTemplate('PUBLISHED')">
                                 Publish
                             </UButton>
                         </div>
@@ -204,10 +204,10 @@ function saveTemplate(status: 'Draft' | 'Published') {
 
                         <!-- show this only if wrapper reach top-0 -->
                         <div class="flex gap-2 w-full transition-all duration-300" :class="isSticky ? 'opacity-100 translate-y-0' : 'opacity-0 pointer-events-none -translate-y-2'">
-                            <UButton block color="neutral" variant="outline" icon="i-lucide-save" @click="saveTemplate('Draft')">
+                            <UButton block color="neutral" variant="outline" icon="i-lucide-save" @click="saveTemplate('DRAFT')">
                                 Save as Draft
                             </UButton>
-                            <UButton block color="primary" icon="i-lucide-send-horizontal" @click="saveTemplate('Published')">
+                            <UButton block color="primary" icon="i-lucide-send-horizontal" @click="saveTemplate('PUBLISHED')">
                                 Publish
                             </UButton>
                         </div>

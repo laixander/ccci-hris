@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
+import type { OnboardingTemplate } from '~~/app/types'
 
 definePageMeta({
     isTable: true
 })
 
+// ─── Data ─────────────────────────────────────────────────────────────────────
 // Shared template store (module-level so new.vue can push here via navigateTo + state)
 const { templates, deleteTemplate } = useTemplates()
 
+// ─── State ────────────────────────────────────────────────────────────────────
 const isConfirmDeleteOpen = ref(false)
 const templateIdToDelete = ref<number | null>(null)
 
+// ─── Methods ──────────────────────────────────────────────────────────────────
 function confirmDelete(id: number) {
     templateIdToDelete.value = id
     isConfirmDeleteOpen.value = true
@@ -25,15 +29,8 @@ function executeDelete() {
     }
 }
 
-type OnboardingTemplate = {
-    id: number
-    name: string
-    description: string
-    status: 'Draft' | 'Published'
-    dateCreated: string
-}
-
-const UBadge = resolveComponent('UBadge')
+// ─── Table columns ────────────────────────────────────────────────────────────
+const StatusBadge = resolveComponent('StatusBadge')
 const UButton = resolveComponent('UButton')
 
 const columns: TableColumn<OnboardingTemplate>[] = [
@@ -42,11 +39,8 @@ const columns: TableColumn<OnboardingTemplate>[] = [
     {
         accessorKey: 'status',
         header: 'Status',
-        cell: ({ row }) => h(UBadge, {
-            label: row.original.status,
-            color: row.original.status === 'Published' ? 'success' : 'neutral',
-            variant: 'subtle',
-            size: 'sm',
+        cell: ({ row }) => h(StatusBadge, {
+            status: row.original.status
         }),
     },
     {
@@ -85,8 +79,8 @@ const selectedStatus = ref('All')
 const viewMode = ref<'grid' | 'table'>('table') // Default to table
 const status = [
     { label: 'All', value: 'All' },
-    { label: 'Draft', value: 'Draft' },
-    { label: 'Published', value: 'Published' },
+    { label: 'Draft', value: 'DRAFT' },
+    { label: 'Published', value: 'PUBLISHED' },
 ]
 
 const filteredTemplates = computed(() => {
@@ -164,50 +158,53 @@ const filteredTemplates = computed(() => {
         <!-- Templates Grid -->
         <div v-else>
             <div v-if="filteredTemplates.length > 0" class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                <UCard v-for="template in filteredTemplates" :key="template.id" class="flex flex-col h-full shadow-sm group hover:ring-1 hover:ring-primary/50 transition-all" :ui="{ root: 'flex flex-col', body: 'flex-1 flex flex-col gap-4 sm:p-4', footer: 'p-0 sm:p-0' }">
+                <UCard v-for="template in filteredTemplates" :key="template.id" class="flex flex-col h-full shadow-sm group hover:ring-1 hover:ring-primary/50 transition-all" :ui="{ root: 'flex flex-col', body: 'flex-1 flex flex-col gap-4 sm:p-4 group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out' }">
                     <div class="flex items-start justify-between gap-2">
-                        <div class="space-y-0.5 min-w-0">
+                        <div class="min-w-0">
                             <div class="font-semibold text-highlighted group-hover:text-primary transition-colors truncate">{{ template.name }}</div>
-                            <div class="text-xs text-dimmed">{{ template.dateCreated }}</div>
+                            <!-- <div class="text-xs text-dimmed">{{ template.dateCreated }}</div> -->
                         </div>
-                        <UBadge
-                            :label="template.status"
-                            :color="template.status === 'Published' ? 'success' : 'neutral'"
-                            variant="subtle"
-                            size="sm"
-                            class="shrink-0"
-                        />
+                        <!-- <StatusBadge :status="template.status" class="shrink-0" /> -->
                     </div>
-                    <p class="text-sm text-muted">
+                    <p class="text-sm text-muted flex-1">
                         {{ template.description }}
                     </p>
-                    <template #footer>
-                        <div class="flex items-stretch">
-                            <UButton
-                                block
-                                color="neutral"
-                                variant="ghost"
-                                :to="`/onboarding/templates/${template.id}/edit`"
-                                aria-label="Edit template"
-                                class="flex-1 rounded-none py-2"
-                            >
-                                <UIcon name="i-lucide-pencil" class="size-4" />
-                                Edit
-                            </UButton>
-                            <USeparator orientation="vertical" class="h-auto" />
-                            <UButton
-                                block
-                                color="error"
-                                variant="ghost"
-                                aria-label="Delete template"
-                                @click="confirmDelete(template.id)"
-                                class="flex-1 rounded-none py-2"
-                            >
-                                <UIcon name="i-lucide-trash-2" class="size-4" />
-                                Delete
-                            </UButton>
+
+                    <!-- Animated bottom row -->
+                    <div class="relative mt-auto">
+                        <!-- Default: status + dateCreated -->
+                        <div class="flex items-center justify-between transition-all duration-200 group-hover:opacity-0 group-hover:-translate-y-1">
+                            <StatusBadge :status="template.status" />
+                            <span class="text-[10px] font-semibold text-dimmed/70 uppercase tracking-wider">{{ template.dateCreated }}</span>
                         </div>
-                    </template>
+                        <!-- Hover: Actions -->
+                        <div class="absolute inset-0 flex items-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+                            <UFieldGroup class="w-full flex">
+                                <UButton
+                                    block
+                                    color="warning"
+                                    variant="soft"
+                                    :to="`/onboarding/templates/${template.id}/edit`"
+                                    aria-label="Edit template"
+                                    class="flex-1 py-2"
+                                >
+                                    <UIcon name="i-lucide-pencil" class="size-4" />
+                                    Edit
+                                </UButton>
+                                <UButton
+                                    block
+                                    color="error"
+                                    variant="soft"
+                                    aria-label="Delete template"
+                                    @click="confirmDelete(template.id)"
+                                    class="flex-1 py-2"
+                                >
+                                    <UIcon name="i-lucide-trash-2" class="size-4" />
+                                    Delete
+                                </UButton>
+                            </UFieldGroup>
+                        </div>
+                    </div>
                 </UCard>
             </div>
             <div v-else class="p-4">

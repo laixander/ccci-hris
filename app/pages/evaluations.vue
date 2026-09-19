@@ -1,80 +1,20 @@
 <script setup lang="ts">
 import { ref, computed, h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
-
-const UButton = resolveComponent('UButton')
-const StatusBadge = resolveComponent('StatusBadge')
-const UBadge = resolveComponent('UBadge')
+import type { TimesheetRecord, EvaluationRecord } from '~~/app/types'
 
 definePageMeta({
     isTable: true,
 })
 
-type TimesheetRecord = {
-  day: number
-  timeIn: string | null
-  timeOut: string | null
-  duration: number
-  status: 'PRESENT' | 'HOLIDAY' | 'WEEKEND' | 'LWOP' | 'ON LEAVE'
-  overtime: number
-  late: number
-  undertime: number
-  leave: number
-  lwop: number
-}
+const UButton = resolveComponent('UButton')
+const StatusBadge = resolveComponent('StatusBadge')
+const UBadge = resolveComponent('UBadge')
 
-type EvaluationRecord = {
-  cutoffPeriod: string
-  confirmedDate: string
-  status: 'PENDING' | 'CONFIRMED'
-}
-
-const data = ref<TimesheetRecord[]>([
-  { day: 31, timeIn: null, timeOut: null, duration: 0, status: 'HOLIDAY', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 30, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 29, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 28, timeIn: '07:21:00 AM', timeOut: '05:13:00 PM', duration: 9.87, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 27, timeIn: '08:08:00 AM', timeOut: '05:01:00 PM', duration: 8.88, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 26, timeIn: '08:06:00 AM', timeOut: '05:00:00 PM', duration: 8.90, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 25, timeIn: '07:37:00 AM', timeOut: '05:01:00 PM', duration: 9.40, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 24, timeIn: '08:04:00 AM', timeOut: '05:02:00 PM', duration: 8.97, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 23, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 22, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 21, timeIn: null, timeOut: null, duration: 0, status: 'HOLIDAY', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 20, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 19, timeIn: '07:57:00 AM', timeOut: '05:00:00 PM', duration: 9.05, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 18, timeIn: '07:31:00 AM', timeOut: '05:11:00 PM', duration: 9.67, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 17, timeIn: null, timeOut: null, duration: 0, status: 'LWOP', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 8.00 },
-  { day: 16, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 15, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 14, timeIn: '07:32:00 AM', timeOut: '05:23:00 PM', duration: 9.85, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 13, timeIn: '08:06:00 AM', timeOut: '05:01:00 PM', duration: 8.92, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 12, timeIn: '08:06:00 AM', timeOut: '05:02:00 PM', duration: 8.93, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 11, timeIn: null, timeOut: null, duration: 0, status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
-  { day: 10, timeIn: '07:30:00 AM', timeOut: '05:05:00 PM', duration: 9.58, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 9, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 8, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 7, timeIn: '07:32:00 AM', timeOut: '05:08:00 PM', duration: 9.60, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 6, timeIn: '07:55:00 AM', timeOut: '05:04:00 PM', duration: 9.15, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 5, timeIn: '08:07:00 AM', timeOut: '05:00:00 PM', duration: 8.88, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 4, timeIn: null, timeOut: null, duration: 0, status: 'ON LEAVE', overtime: 0, late: 0, undertime: 0, leave: 8.00, lwop: 0 },
-  { day: 3, timeIn: '08:08:00 AM', timeOut: '05:02:00 PM', duration: 8.90, status: 'PRESENT', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 2, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-  { day: 1, timeIn: null, timeOut: null, duration: 0, status: 'WEEKEND', overtime: 0, late: 0, undertime: 0, leave: 0, lwop: 0 },
-])
-
-const evaluationData = ref<EvaluationRecord[]>([
-  { cutoffPeriod: 'August 14, 2026 – August 27, 2026', confirmedDate: 'Not yet confirmed', status: 'PENDING' },
-  { cutoffPeriod: 'July 31, 2026 – August 13, 2026', confirmedDate: 'August 14, 2026 at 11:58 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'July 15, 2026 – July 30, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'June 30, 2026 – July 14, 2026', confirmedDate: 'August 05, 2026 at 08:37 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'June 15, 2026 – June 29, 2026', confirmedDate: 'July 03, 2026 at 07:36 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'May 29, 2026 – June 12, 2026', confirmedDate: 'June 11, 2026 at 06:30 PM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'May 15, 2026 – May 28, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'April 30, 2026 – May 14, 2026', confirmedDate: 'May 29, 2026 at 11:36 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'April 15, 2026 – April 29, 2026', confirmedDate: 'May 11, 2026 at 09:49 AM', status: 'CONFIRMED' },
-  { cutoffPeriod: 'March 31, 2026 – April 14, 2026', confirmedDate: 'April 30, 2026 at 08:26 AM', status: 'CONFIRMED' },
-])
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const { data: apiData } = useLazyFetch('/api/evaluations')
+const data = computed(() => apiData.value?.timesheet ?? [])
+const evaluationData = computed(() => apiData.value?.evaluations ?? [])
 
 const cutoffs = [
   { label: 'August 14, 2026 – August 27, 2026', value: 'aug-14-2026' },
@@ -100,6 +40,7 @@ function getCutoffHalf(cutoffPeriod: string) {
   return ''
 }
 
+// ─── State ────────────────────────────────────────────────────────────────────
 const search = ref('')
 const status = ref('All Status')
 const period = ref('Monthly')

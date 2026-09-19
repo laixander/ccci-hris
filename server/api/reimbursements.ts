@@ -1,0 +1,78 @@
+import type { Reimbursement } from '~~/app/types'
+
+export default defineEventHandler((): Reimbursement[] => {
+  return [
+    {
+      id: 1,
+      dateApplied: 'September 5, 2026 at 09:00 AM',
+      dateOfExpense: 'September 4, 2026',
+      category: 'Meals',
+      merchant: 'Jollibee Foods Corp.',
+      amount: '₱850.00',
+      status: 'PENDING',
+    },
+    {
+      id: 2,
+      dateApplied: 'September 3, 2026 at 02:15 PM',
+      dateOfExpense: 'September 2, 2026',
+      category: 'Transportation',
+      merchant: 'Grab Philippines',
+      amount: '₱320.00',
+      status: 'APPROVED',
+    },
+    {
+      id: 3,
+      dateApplied: 'August 28, 2026 at 10:45 AM',
+      dateOfExpense: 'August 27, 2026',
+      category: 'Office Supplies',
+      merchant: 'National Bookstore',
+      amount: '₱1,200.00',
+      status: 'APPROVED',
+    },
+    {
+      id: 4,
+      dateApplied: 'August 20, 2026 at 08:30 AM',
+      dateOfExpense: 'August 19, 2026',
+      category: 'Travel',
+      merchant: 'Philippine Airlines',
+      amount: '₱5,400.00',
+      status: 'APPROVED',
+    },
+    {
+      id: 5,
+      dateApplied: 'August 15, 2026 at 03:00 PM',
+      dateOfExpense: 'August 14, 2026',
+      category: 'Meals',
+      merchant: 'SM Food Court',
+      amount: '₱640.00',
+      status: 'DECLINED',
+    },
+    {
+      id: 6,
+      dateApplied: 'August 10, 2026 at 11:20 AM',
+      dateOfExpense: 'August 9, 2026',
+      category: 'Transportation',
+      merchant: 'Meralco Metered Taxi',
+      amount: '₱180.00',
+      status: 'APPROVED',
+    },
+    {
+      id: 7,
+      dateApplied: 'July 30, 2026 at 09:55 AM',
+      dateOfExpense: 'July 29, 2026',
+      category: 'Others',
+      merchant: 'Mercury Drug',
+      amount: '₱450.00',
+      status: 'PENDING',
+    },
+    {
+      id: 8,
+      dateApplied: 'July 22, 2026 at 04:10 PM',
+      dateOfExpense: 'July 21, 2026',
+      category: 'Meals',
+      merchant: 'Mang Inasal',
+      amount: '₱390.00',
+      status: 'APPROVED',
+    },
+  ]
+})

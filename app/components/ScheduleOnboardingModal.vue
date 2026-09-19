@@ -5,7 +5,7 @@ const open = defineModel<boolean>('open', { default: false })
 
 const { templates } = useTemplates()
 const publishedTemplates = computed(() => 
-    templates.value.filter(t => t.status === 'Published').map(t => t.name)
+    templates.value.filter(t => t.status === 'PUBLISHED').map(t => t.name)
 )
 
 const employees = ['John Doe', 'Jane Smith', 'Alice Johnson']

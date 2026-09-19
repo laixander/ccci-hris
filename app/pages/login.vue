@@ -3,6 +3,7 @@ definePageMeta({
   layout: false
 })
 
+// ─── State ────────────────────────────────────────────────────────────────────
 const router = useRouter()
 const toast = useToast()
 const loading = ref(false)
@@ -13,6 +14,7 @@ const state = reactive({
   remember: false
 })
 
+// ─── Methods ──────────────────────────────────────────────────────────────────
 const onSubmit = async () => {
   loading.value = true
   

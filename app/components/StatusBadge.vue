@@ -52,6 +52,24 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     // Directory statuses
     ACTIVE:     { color: 'success', icon: 'i-lucide-user-check' },
     INACTIVE:   { color: 'neutral', icon: 'i-lucide-user-minus' },
+
+    // Onboarding template statuses
+    DRAFT:      { color: 'neutral', icon: 'i-lucide-file-edit' },
+    PUBLISHED:  { color: 'success', icon: 'i-lucide-check-circle' },
+
+    // Onboarding statuses
+    SCHEDULED:  { color: 'info',    icon: 'i-lucide-calendar' },
+    'IN PROGRESS':{ color: 'primary', icon: 'i-lucide-loader-2' },
+    COMPLETED:  { color: 'success', icon: 'i-lucide-check-circle' },
+    CANCELLED:  { color: 'error',   icon: 'i-lucide-x-circle' },
+
+    // Asset statuses
+    AVAILABLE:  { color: 'success', icon: 'i-lucide-check-circle' },
+    ASSIGNED:   { color: 'primary', icon: 'i-lucide-user-check' },
+    MAINTENANCE:{ color: 'warning', icon: 'i-lucide-wrench' },
+    BROKEN:     { color: 'error',   icon: 'i-lucide-x-circle' },
+    'UNDER REPAIR':{ color: 'warning', icon: 'i-lucide-hammer' },
+    RETIRED:    { color: 'neutral', icon: 'i-lucide-archive' },
 }
 
 const config = computed<StatusConfig>(() => {

@@ -1,7 +1,16 @@
 <script setup lang="ts">
+import { h, resolveComponent, computed, ref } from 'vue'
+import type { OnboardingRecord } from '~~/app/types'
+
 definePageMeta({
     isTable: true
 })
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const { data: onboardingsResponse } = useLazyFetch<OnboardingRecord[]>('/api/onboarding')
+const onboardings = computed(() => onboardingsResponse.value || [])
+
+// ─── State ────────────────────────────────────────────────────────────────────
 
 const container = ref<HTMLElement | null>(null)
 const header = ref<HTMLElement | null>(null)
@@ -22,22 +31,8 @@ const isScheduleModalOpen = ref(false)
 
 const viewMode = ref<'grid' | 'table'>('table')
 
-const onboardings = ref([
-    { id: 1, employee: 'John Doe', role: 'Software Engineer', template: 'Software Engineer Onboarding', status: 'In Progress', progress: 45, startDate: '2026-09-10' },
-    { id: 2, employee: 'Jane Smith', role: 'HR Generalist', template: 'HR Generalist Onboarding', status: 'Scheduled', progress: 0, startDate: '2026-09-20' },
-    { id: 3, employee: 'Alice Johnson', role: 'Sales Representative', template: 'Sales Representative Onboarding', status: 'Completed', progress: 100, startDate: '2026-08-01' },
-    { id: 4, employee: 'Michael Brown', role: 'Marketing Manager', template: 'Marketing Manager Onboarding', status: 'Cancelled', progress: 10, startDate: '2026-08-15' },
-    { id: 5, employee: 'David Wilson', role: 'Customer Support Specialist', template: 'Customer Support Onboarding', status: 'In Progress', progress: 75, startDate: '2026-09-05' },
-    { id: 6, employee: 'Sarah Miller', role: 'Executive Assistant', template: 'Executive Onboarding', status: 'Scheduled', progress: 0, startDate: '2026-09-25' },
-    { id: 7, employee: 'James Taylor', role: 'Intern', template: 'Intern Onboarding', status: 'In Progress', progress: 20, startDate: '2026-09-12' },
-    { id: 8, employee: 'Jessica Anderson', role: 'Contractor', template: 'Contractor Onboarding', status: 'Completed', progress: 100, startDate: '2026-07-20' },
-    { id: 9, employee: 'Thomas Martinez', role: 'Software Engineer', template: 'Software Engineer Onboarding', status: 'Scheduled', progress: 0, startDate: '2026-09-22' },
-    { id: 10, employee: 'Lisa Thomas', role: 'HR Generalist', template: 'HR Generalist Onboarding', status: 'In Progress', progress: 60, startDate: '2026-09-08' },
-    { id: 11, employee: 'William Jackson', role: 'Sales Representative', template: 'Sales Representative Onboarding', status: 'Scheduled', progress: 0, startDate: '2026-09-28' },
-    { id: 12, employee: 'Ashley White', role: 'Marketing Manager', template: 'Marketing Manager Onboarding', status: 'Completed', progress: 100, startDate: '2026-06-15' },
-])
-
-const UBadge = resolveComponent('UBadge')
+// ─── Table columns ────────────────────────────────────────────────────────────
+const StatusBadge = resolveComponent('StatusBadge')
 const UProgress = resolveComponent('UProgress')
 
 const columns = [
@@ -66,23 +61,21 @@ const columns = [
         header: 'Status',
         cell: ({ row }: any) => {
             const status = row.getValue('status') as string
-            return h(UBadge, {
-                label: status,
-                color: status === 'Completed' ? 'success' : status === 'In Progress' ? 'primary' : status === 'Cancelled' ? 'error' : 'neutral',
-                variant: 'subtle',
-                size: 'sm'
+            return h(StatusBadge, {
+                status: status
             })
         }
     },
 ]
 
+// ─── Filters & Computeds ──────────────────────────────────────────────────────
 const filteredOnboardings = computed(() => {
     return onboardings.value.filter(o => {
         const matchStatus = selectedStatus.value === 'all' || 
-            (selectedStatus.value === 'scheduled' && o.status === 'Scheduled') ||
-            (selectedStatus.value === 'inProgress' && o.status === 'In Progress') ||
-            (selectedStatus.value === 'completed' && o.status === 'Completed') ||
-            (selectedStatus.value === 'cancelled' && o.status === 'Cancelled');
+            (selectedStatus.value === 'scheduled' && o.status === 'SCHEDULED') ||
+            (selectedStatus.value === 'inProgress' && o.status === 'IN PROGRESS') ||
+            (selectedStatus.value === 'completed' && o.status === 'COMPLETED') ||
+            (selectedStatus.value === 'cancelled' && o.status === 'CANCELLED');
         
         const matchSearch = search.value === '' || 
             o.employee.toLowerCase().includes(search.value.toLowerCase()) || 
@@ -160,13 +153,7 @@ const filteredOnboardings = computed(() => {
                         <div class="font-semibold text-highlighted group-hover:text-primary transition-colors truncate">{{ item.employee }}</div>
                         <div class="text-xs text-dimmed">{{ item.role }}</div>
                     </div>
-                    <UBadge
-                        :label="item.status"
-                        :color="item.status === 'Completed' ? 'success' : item.status === 'In Progress' ? 'primary' : item.status === 'Cancelled' ? 'error' : 'neutral'"
-                        variant="subtle"
-                        size="sm"
-                        class="shrink-0"
-                    />
+                    <StatusBadge :status="item.status" class="shrink-0" />
                 </div>
 
                 <div class="grid grid-cols-1 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md">

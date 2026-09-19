@@ -1,0 +1,78 @@
+import type { ServiceRequest } from '~~/app/types'
+
+export default defineEventHandler((): ServiceRequest[] => {
+    return [
+        {
+            id: 1,
+            dateApplied: 'September 5, 2026 at 09:00 AM',
+            requestType: 'IT Support',
+            remarks: 'Cannot access the HR portal since this morning.',
+            status: 'PENDING',
+            lastUpdatedBy: '—',
+            lastUpdate: 'September 5, 2026 at 09:00 AM',
+        },
+        {
+            id: 2,
+            dateApplied: 'August 20, 2026 at 02:30 PM',
+            requestType: 'Document Request',
+            remarks: 'Requesting Certificate of Employment for visa application.',
+            status: 'APPROVED',
+            lastUpdatedBy: 'HR Admin',
+            lastUpdate: 'August 21, 2026 at 10:15 AM',
+        },
+        {
+            id: 3,
+            dateApplied: 'August 10, 2026 at 08:45 AM',
+            requestType: 'Payroll Inquiry',
+            remarks: 'Discrepancy on my August 1–15 payslip.',
+            status: 'APPROVED',
+            lastUpdatedBy: 'Payroll Team',
+            lastUpdate: 'August 12, 2026 at 03:00 PM',
+        },
+        {
+            id: 4,
+            dateApplied: 'July 28, 2026 at 11:00 AM',
+            requestType: 'Facilities & Maintenance',
+            remarks: 'Air conditioner in Room 204 is not working.',
+            status: 'REJECTED',
+            lastUpdatedBy: 'Facilities',
+            lastUpdate: 'July 29, 2026 at 09:00 AM',
+        },
+        {
+            id: 5,
+            dateApplied: 'July 15, 2026 at 03:15 PM',
+            requestType: 'Administrative Request',
+            remarks: 'Request for a new parking slot assignment.',
+            status: 'APPROVED',
+            lastUpdatedBy: 'Admin Officer',
+            lastUpdate: 'July 16, 2026 at 02:00 PM',
+        },
+        {
+            id: 6,
+            dateApplied: 'June 30, 2026 at 09:30 AM',
+            requestType: 'HR Concern',
+            remarks: 'Clarification on the updated leave policy.',
+            status: 'APPROVED',
+            lastUpdatedBy: 'HR Admin',
+            lastUpdate: 'July 01, 2026 at 11:00 AM',
+        },
+        {
+            id: 7,
+            dateApplied: 'June 18, 2026 at 01:00 PM',
+            requestType: 'IT Support',
+            remarks: 'Requesting a replacement for my broken keyboard.',
+            status: 'APPROVED',
+            lastUpdatedBy: 'IT Team',
+            lastUpdate: 'June 19, 2026 at 04:30 PM',
+        },
+        {
+            id: 8,
+            dateApplied: 'June 02, 2026 at 10:00 AM',
+            requestType: 'Other',
+            remarks: 'Request for company ID replacement.',
+            status: 'PENDING',
+            lastUpdatedBy: '—',
+            lastUpdate: 'June 02, 2026 at 10:00 AM',
+        },
+    ]
+})

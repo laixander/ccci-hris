@@ -1,29 +1,20 @@
 <script setup lang="ts">
 import type { TabsItem } from '@nuxt/ui'
 
-const timeInList = [
-    { name: 'PAOR, SAGE RYAN ARGAMOSA', role: 'Team Lead Developer', time: '08:28:23 AM', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Sage' },
-    { name: 'SURRIGA, JOSEPH EBRON', role: 'Team Lead Developer', time: '08:15:23 AM', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Joseph' },
-    { name: 'GALAS, WILLIAM SALUNSON', role: 'Team Lead Developer', time: '08:09:38 AM', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=William' },
-]
+import type { DashboardData } from '~/types'
 
-const timeOutList = [
-    { name: 'PAOR, MARIA HEIDI', role: 'Chief Operating Officer', time: '08:49:12 AM', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Heidi' },
-    { name: 'SUPREMO, ARIEL', role: 'Company Driver', time: '--', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Ariel' },
-    { name: 'SUPREMO, ARIES', role: 'Chief Executive Officer', time: '10:07:30 AM', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Aries' },
-]
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const { data, status } = useLazyFetch<DashboardData>('/api/dashboard')
 
-const recentActivities = [
-    { text: 'Successfully timed in.', time: '4h ago', icon: 'i-lucide-zap', color: 'text-primary' },
-    { text: 'Approved Leave Request for SURRIGA, JOSEPH EBRON', time: '5h ago', icon: 'i-lucide-check-circle', color: 'text-success' },
-    { text: 'System Maintenance Scheduled', time: '1d ago', icon: 'i-lucide-settings', color: 'text-neutral-500' },
-    { text: 'Successfully Applied Leave Request', time: '3d ago', icon: 'i-lucide-zap', color: 'text-primary' },
-    { text: 'Successfully timed in.', time: '4d ago', icon: 'i-lucide-zap', color: 'text-primary' },
-    { text: 'Overtime Request Rejected', time: '4d ago', icon: 'i-lucide-x-circle', color: 'text-error' },
-    { text: 'Successful Login Attempt', time: '4d ago', icon: 'i-lucide-arrow-right', color: 'text-success' },
-    { text: 'Updated Profile Information', time: '1w ago', icon: 'i-lucide-user', color: 'text-primary' },
-]
+const timeInList = computed(() => data.value?.timeInList || [])
+const timeOutList = computed(() => data.value?.timeOutList || [])
+const recentActivities = computed(() => data.value?.recentActivities || [])
+const onLeaveTodayList = computed(() => data.value?.onLeaveTodayList || [])
+const upcomingLeaveList = computed(() => data.value?.upcomingLeaveList || [])
+const birthdaysTodayList = computed(() => data.value?.birthdaysTodayList || [])
+const upcomingBirthdaysList = computed(() => data.value?.upcomingBirthdaysList || [])
 
+// ─── State ────────────────────────────────────────────────────────────────────
 const isTimedIn = ref(false)
 const isLeaveModalOpen = ref(false)
 const isOvertimeModalOpen = ref(false)
@@ -39,17 +30,6 @@ const activityBoxClass = (color: string) => {
     return map[color] ?? 'bg-neutral-100 dark:bg-neutral-800'
 }
 
-
-const onLeaveTodayList = [
-    { name: 'DELA CRUZ, JUAN', role: 'Software Engineer', leaveType: 'Sick Leave', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Juan' },
-    { name: 'SANTOS, MARIA', role: 'HR Manager', leaveType: 'Vacation Leave', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Maria' }
-]
-
-const upcomingLeaveList = [
-    { name: 'REYES, CARLOS', role: 'UI/UX Designer', leaveType: 'Vacation Leave (Aug 15-18)', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Carlos' },
-    { name: 'GARCIA, ANA', role: 'Project Manager', leaveType: 'Maternity Leave', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Ana' }
-]
-
 const activeLeaveTab = ref('on-leave')
 
 const leaveItems = computed(() => [
@@ -58,22 +38,16 @@ const leaveItems = computed(() => [
         value: 'on-leave',
         slot: 'on-leave',
         chipColor: 'orange' as const,
-        badge: { label: onLeaveTodayList.length, variant: 'soft' as const, color: 'neutral' as const }
+        badge: { label: onLeaveTodayList.value.length, variant: 'soft' as const, color: 'neutral' as const }
     },
     {
         label: 'Upcoming This Week',
         value: 'upcoming',
         slot: 'upcoming',
         chipColor: 'blue' as const,
-        badge: { label: upcomingLeaveList.length, variant: 'soft' as const, color: 'neutral' as const }
+        badge: { label: upcomingLeaveList.value.length, variant: 'soft' as const, color: 'neutral' as const }
     }
 ])
-
-const birthdaysTodayList = [] as any[]
-
-const upcomingBirthdaysList = [
-    { name: 'SUPREMO, ARIES', role: 'Chief Executive Officer', date: 'Aug 28', avatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=Aries' }
-]
 
 const activeBirthdayTab = ref('today')
 
@@ -83,14 +57,14 @@ const birthdayItems = computed(() => [
         value: 'today',
         slot: 'today',
         chipColor: 'pink' as const,
-        badge: { label: birthdaysTodayList.length, variant: 'soft' as const, color: 'neutral' as const }
+        badge: { label: birthdaysTodayList.value.length, variant: 'soft' as const, color: 'neutral' as const }
     },
     {
         label: 'Upcoming This Month',
         value: 'upcoming',
         slot: 'upcoming',
         chipColor: 'purple' as const,
-        badge: { label: upcomingBirthdaysList.length, variant: 'soft' as const, color: 'neutral' as const }
+        badge: { label: upcomingBirthdaysList.value.length, variant: 'soft' as const, color: 'neutral' as const }
     }
 ])
 

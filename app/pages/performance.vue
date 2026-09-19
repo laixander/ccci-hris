@@ -28,8 +28,10 @@ ChartJS.register(
   LinearScale
 )
 
-// ─── State ───────────────────────────────────────────────────────────────────
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const { data } = useLazyFetch('/api/performance')
 
+// ─── State ───────────────────────────────────────────────────────────────────
 const year = ref(new Date().getFullYear())
 const quarter = ref(Math.ceil((new Date().getMonth() + 1) / 3))
 
@@ -46,7 +48,6 @@ const quarters = [
 ]
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
-
 const kpis = [
   { label: 'Overall Rating', icon: 'i-lucide-star', color: 'text-amber-500', bg: 'bg-amber-500/10', value: '4.2', sublabel: 'OUT OF 5.0' },
   { label: 'Goals Completed', icon: 'i-lucide-target', color: 'text-sky-500', bg: 'bg-sky-500/10', value: '85%', sublabel: 'ON TRACK' },
@@ -55,7 +56,6 @@ const kpis = [
 ]
 
 // ─── Chart Data ──────────────────────────────────────────────────────────────
-
 const radarData = computed(() => ({
   labels: ['Technical', 'Leadership', 'Communication', 'Teamwork', 'Problem Solving', 'Adaptability'],
   datasets: [
@@ -66,7 +66,7 @@ const radarData = computed(() => ({
       pointBackgroundColor: 'rgba(56, 189, 248, 1)',
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: 'rgba(56, 189, 248, 1)',
-      data: [4.5, 3.8, 4.2, 4.8, 4.5, 4.0]
+      data: data.value?.radar.selfEvaluation ?? []
     },
     {
       label: 'Manager Evaluation',
@@ -75,7 +75,7 @@ const radarData = computed(() => ({
       pointBackgroundColor: 'rgba(34, 197, 94, 1)',
       pointHoverBackgroundColor: '#fff',
       pointHoverBorderColor: 'rgba(34, 197, 94, 1)',
-      data: [4.2, 4.0, 4.5, 4.5, 4.2, 4.3]
+      data: data.value?.radar.managerEvaluation ?? []
     }
   ]
 }))
@@ -115,13 +115,13 @@ const barData = computed(() => ({
       label: 'Your Score',
       backgroundColor: 'rgba(56, 189, 248, 0.8)',
       borderRadius: 4,
-      data: [3.8, 4.0, 4.1, 4.2]
+      data: data.value?.historical.yourScore ?? []
     },
     {
       label: 'Company Average',
       backgroundColor: 'rgba(156, 163, 175, 0.4)',
       borderRadius: 4,
-      data: [3.5, 3.6, 3.8, 3.7]
+      data: data.value?.historical.companyAverage ?? []
     }
   ]
 }))
@@ -159,18 +159,8 @@ const barOptions = {
 
 // ─── Data Sections ───────────────────────────────────────────────────────────
 
-const okrs = [
-  { id: 1, title: 'Launch New Internal Dashboard', progress: 100, status: 'Completed', color: 'success' },
-  { id: 2, title: 'Reduce Onboarding Time by 20%', progress: 75, status: 'On Track', color: 'primary' },
-  { id: 3, title: 'Implement Automated Testing Suite', progress: 40, status: 'At Risk', color: 'warning' },
-  { id: 4, title: 'Improve Employee Retention Rate', progress: 90, status: 'On Track', color: 'primary' }
-]
-
-const feedbackList = [
-  { id: 1, author: 'Maxiane Maniquiz', role: 'Direct Manager', rating: '4.5', comment: 'Consistently delivers high-quality work and mentors junior team members effectively.' },
-  { id: 2, author: 'Alex Chen', role: 'Peer', rating: '4.8', comment: 'Great collaborator. Always willing to jump in and help troubleshoot complex issues.' },
-  { id: 3, author: 'Sarah Jenkins', role: 'Peer', rating: '4.2', comment: 'Strong technical skills, but could improve on cross-departmental communication.' }
-]
+const okrs = computed(() => data.value?.okrs ?? [])
+const feedbackList = computed(() => data.value?.feedbackList ?? [])
 
 // function getStatusColor(status: string) {
 //   if (status === 'Completed') return 'bg-success-500/10 text-success-600 dark:text-success-400'
