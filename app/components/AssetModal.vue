@@ -1,5 +1,11 @@
 <script setup lang="ts">
+import { watch } from 'vue'
+import type { Asset } from '~/types'
+
 const open = defineModel<boolean>('open', { default: false })
+const props = defineProps<{
+    asset?: Asset
+}>()
 
 const categories = ['Electronics', 'Furniture', 'Vehicle', 'Software', 'Other']
 const statuses = [
@@ -24,6 +30,30 @@ const state = reactive({
     location: ''
 })
 
+watch(() => props.asset, (newAsset) => {
+    if (newAsset) {
+        state.assetTag = newAsset.assetTag
+        state.name = newAsset.name
+        state.category = newAsset.category
+        state.brand = newAsset.brandModel?.split(' / ')[0] || ''
+        state.model = newAsset.brandModel?.split(' / ')[1] || ''
+        state.purchaseDate = newAsset.purchased
+        state.cost = newAsset.cost
+        state.status = newAsset.status
+        state.location = newAsset.location
+    } else {
+        state.assetTag = ''
+        state.name = ''
+        state.category = ''
+        state.brand = ''
+        state.model = ''
+        state.purchaseDate = ''
+        state.cost = 0
+        state.status = 'AVAILABLE'
+        state.location = ''
+    }
+}, { immediate: true })
+
 const { register } = useOverlayVisibility()
 register(open)
 </script>
@@ -39,8 +69,8 @@ register(open)
                 <UIcon name="i-lucide-box" class="size-24 text-primary-500 opacity-10 absolute -bottom-7 end-2" />
             </div>
             <div class="flex flex-col">
-                <h2 class="text-primary font-semibold">Add Asset</h2>
-                <p class="text-primary/60 text-sm mt-1">Fill in the form below to add a new asset.</p>
+                <h2 class="text-primary font-semibold">{{ asset ? 'Edit Asset' : 'Add Asset' }}</h2>
+                <p class="text-primary/60 text-sm mt-1">{{ asset ? 'Update the details of the asset below.' : 'Fill in the form below to add a new asset.' }}</p>
             </div>
             <UButton icon="i-lucide-x" variant="outline" color="neutral"
                 class="absolute -top-4 -end-4 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -92,7 +122,7 @@ register(open)
         <template #footer>
             <div class="flex justify-end gap-3">
                 <UButton label="Cancel" variant="ghost" color="neutral" @click="open = false" />
-                <UButton label="Add Asset" color="primary" />
+                <UButton :label="asset ? 'Save Changes' : 'Add Asset'" color="primary" />
             </div>
         </template>
     </UModal>

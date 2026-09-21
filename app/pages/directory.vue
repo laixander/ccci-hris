@@ -27,7 +27,7 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 // ─── State ────────────────────────────────────────────────────────────────────
 const search = ref('')
 const selectedDepartment = ref('All')
-const viewMode = ref<'grid' | 'table'>('grid')
+const viewMode = ref<'grid' | 'table'>('table')
 
 const departments = computed(() => [
     'All',
@@ -124,12 +124,12 @@ const isOrgChartOpen = ref(false)
                 />
                 <div class="flex items-center gap-2">
                     <UFieldGroup>
-                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                         <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                     </UFieldGroup>
 
                     <UButton variant="soft" @click="isOrgChartOpen = true">
-                        <UIcon name="i-lucide-building" class="size-5" /> Open Org Chart
+                        <UIcon name="i-lucide-building" class="size-5" /> Org Chart
                     </UButton>
                 </div>
             </div>

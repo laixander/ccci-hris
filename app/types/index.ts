@@ -322,3 +322,14 @@ export interface Asset {
   status: 'AVAILABLE' | 'ASSIGNED' | 'MAINTENANCE' | 'BROKEN' | 'UNDER REPAIR' | 'RETIRED'
   location: string
 }
+
+export interface AssetAssignment {
+  id: number
+  assetTag: string
+  name: string
+  category: string
+  employee: string
+  assignedDate: string
+  status: 'Active' | 'Returned'
+  returnDate: string
+}

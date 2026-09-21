@@ -102,7 +102,7 @@ const filteredEvaluations = computed(() => {
 const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
 const selectedEvaluation = ref<EvaluationRecord | null>(null)
-const viewMode = ref<'grid' | 'table'>('grid')
+const viewMode = ref<'grid' | 'table'>('table')
 const detailsViewMode = ref<'grid' | 'table'>('grid')
 
 const { register } = useOverlayVisibility()
@@ -203,8 +203,8 @@ const handleConfirm = async () => {
             }" >
             <div class="flex justify-end gap-2 flex-1">
               <UFieldGroup>
-                <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                 <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
               </UFieldGroup>
             </div>
         </UPageCard>
@@ -379,7 +379,7 @@ const handleConfirm = async () => {
       <template #footer>
         <div class="flex items-center gap-2">
           <UButton :label="selectedEvaluation?.status === 'PENDING' ? 'Cancel' : 'Close'" variant="ghost" color="neutral" @click="isDrawerOpen = false" />
-          <UButton v-if="selectedEvaluation?.status === 'PENDING'" label="Confirm" color="warning" @click="isModalOpen = true" />
+          <UButton v-if="selectedEvaluation?.status === 'PENDING'" label="Confirm" variant="soft" color="warning" @click="isModalOpen = true" />
         </div>
       </template>
     </UDrawer>

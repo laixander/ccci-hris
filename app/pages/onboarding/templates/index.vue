@@ -117,8 +117,8 @@ const filteredTemplates = computed(() => {
                 >
                     <div class="flex justify-end gap-2 flex-1">
                         <UFieldGroup>
-                            <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                             <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                            <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                         </UFieldGroup>
                         <UButton color="primary" to="/onboarding/templates/new">
                             <UIcon name="i-lucide-plus" class="size-4" />

@@ -24,7 +24,7 @@ const getScrollElement = () => container.value
 
 const { height: headerHeight } = useElementSize(header, undefined, { box: 'border-box' })
 
-const viewMode = ref('table')
+const viewMode = ref<'grid' | 'table'>('table')
 const isModalOpen = ref(false)
 
 const { register } = useOverlayVisibility()
@@ -122,8 +122,8 @@ const kpis = computed(() => [
                 </UPageCard>
                 <div class="flex items-center justify-end gap-2 flex-1">
                     <UFieldGroup>
-                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                         <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                     </UFieldGroup>
                     <UButton @click="isModalOpen = true">
                         <UIcon name="i-lucide-plus" class="size-4" />

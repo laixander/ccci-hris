@@ -153,12 +153,12 @@ function openDetail(row: (typeof payslipData.value)[0]) {
                 />
                 <div class="flex items-center gap-2">
                     <UFieldGroup>
-                        <UButton icon="i-lucide-layout-grid" color="neutral"
-                            :variant="viewMode === 'grid' ? 'subtle' : 'outline'"
-                            @click="viewMode = 'grid'" />
                         <UButton icon="i-lucide-list" color="neutral"
                             :variant="viewMode === 'table' ? 'subtle' : 'outline'"
                             @click="viewMode = 'table'" />
+                        <UButton icon="i-lucide-layout-grid" color="neutral"
+                            :variant="viewMode === 'grid' ? 'subtle' : 'outline'"
+                            @click="viewMode = 'grid'" />
                     </UFieldGroup>
                 </div>
             </div>

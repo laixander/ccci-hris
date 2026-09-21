@@ -36,7 +36,7 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 
 const isDrawerOpen = ref(false)
 const isModalOpen = ref(false)
-const viewMode = ref<'grid' | 'table' | 'month'>('grid')
+const viewMode = ref<'grid' | 'table' | 'month'>('table')
 
 const { register } = useOverlayVisibility()
 register(isDrawerOpen)
@@ -183,8 +183,8 @@ function nextMonth() {
                 }">
             <div class="flex justify-end gap-2 flex-1">
               <UFieldGroup>
-                <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                 <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                 <UButton icon="i-lucide-calendar-days" color="neutral" :variant="viewMode === 'month' ? 'subtle' : 'outline'" @click="viewMode = 'month'" />
               </UFieldGroup>
               <UButton variant="soft" @click="isDrawerOpen = true">

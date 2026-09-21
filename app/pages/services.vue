@@ -21,7 +21,7 @@ const getScrollElement = () => container.value
 
 const { height: headerHeight } = useElementSize(header, undefined, { box: 'border-box' })
 
-const viewMode = ref<'grid' | 'table'>('grid')
+const viewMode = ref<'grid' | 'table'>('table')
 const isRequestModalOpen = ref(false)
 const isDetailModalOpen = ref(false)
 const selectedRequest = ref<ServiceRequest | null>(null)
@@ -109,8 +109,8 @@ const openDetails = (request: ServiceRequest) => {
                 />
                 <div class="flex items-center gap-2">
                     <UFieldGroup>
-                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                         <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                     </UFieldGroup>
                     <UButton icon="i-lucide-plus" @click="isRequestModalOpen = true">
                         New Request

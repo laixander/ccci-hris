@@ -70,6 +70,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     BROKEN:     { color: 'error',   icon: 'i-lucide-x-circle' },
     'UNDER REPAIR':{ color: 'warning', icon: 'i-lucide-hammer' },
     RETIRED:    { color: 'neutral', icon: 'i-lucide-archive' },
+    RETURNED:   { color: 'primary', icon: 'i-lucide-corner-down-left' },
 }
 
 const config = computed<StatusConfig>(() => {

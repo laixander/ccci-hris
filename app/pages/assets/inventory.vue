@@ -80,28 +80,67 @@ const columns: TableColumn<Asset>[] = [
                     color: 'neutral',
                     variant: 'ghost',
                     size: 'sm',
-                    'aria-label': 'QR Code'
+                    'aria-label': 'QR Code',
+                    onClick: () => openPrintModal(row.original)
                 }),
                 h(UButton, {
                     icon: 'i-lucide-edit-3',
                     color: 'neutral',
                     variant: 'ghost',
                     size: 'sm',
-                    'aria-label': 'Edit'
+                    'aria-label': 'Edit',
+                    onClick: () => openEditModal(row.original)
                 }),
                 h(UButton, {
                     icon: 'i-lucide-trash-2',
                     color: 'error',
                     variant: 'ghost',
                     size: 'sm',
-                    'aria-label': 'Delete'
+                    'aria-label': 'Delete',
+                    onClick: () => openDeleteModal(row.original)
                 })
             ])
         }
     }
 ]
 
-const isAddAssetModalOpen = ref(false)
+const isAssetModalOpen = ref(false)
+const selectedAsset = ref<Asset | undefined>()
+
+const openEditModal = (asset: Asset) => {
+    selectedAsset.value = asset
+    isAssetModalOpen.value = true
+}
+
+const openAddModal = () => {
+    selectedAsset.value = undefined
+    isAssetModalOpen.value = true
+}
+
+const isPrintModalOpen = ref(false)
+const openPrintModal = (asset: Asset) => {
+    selectedAsset.value = asset
+    isPrintModalOpen.value = true
+}
+
+const isDeleteModalOpen = ref(false)
+const assetToDelete = ref<Asset | undefined>()
+
+const openDeleteModal = (asset: Asset) => {
+    assetToDelete.value = asset
+    isDeleteModalOpen.value = true
+}
+
+const confirmDelete = () => {
+    if (!assetToDelete.value || !data.value) return
+    
+    const index = data.value.assets.findIndex(a => a.id === assetToDelete.value?.id)
+    if (index !== -1) {
+        data.value.assets.splice(index, 1)
+    }
+    
+    isDeleteModalOpen.value = false
+}
 </script>
 
 <template>
@@ -120,10 +159,10 @@ const isAddAssetModalOpen = ref(false)
                 />
                 <div class="flex items-center gap-2">
                     <UFieldGroup>
-                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                         <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
+                        <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                     </UFieldGroup>
-                    <UButton icon="i-lucide-plus" label="Add Asset" @click="isAddAssetModalOpen = true" />
+                    <UButton icon="i-lucide-plus" label="Add Asset" @click="openAddModal" />
                 </div>
             </div>
 
@@ -133,7 +172,7 @@ const isAddAssetModalOpen = ref(false)
                     v-model="search"
                     placeholder="Search asset tag, name, brand, model..."
                     icon="i-lucide-search"
-                    class="flex-1 max-w-md"
+                    class="flex-1"
                 />
                 <USelect
                     v-model="selectedStatus"
@@ -182,26 +221,32 @@ const isAddAssetModalOpen = ref(false)
                             <span class="text-xs text-dimmed">Category</span>
                             <span class="text-xs font-medium">{{ asset.category }}</span>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <!-- <div class="flex items-center justify-between">
                             <span class="text-xs text-dimmed">Brand / Model</span>
                             <span class="text-xs font-medium truncate ml-2 text-right">{{ asset.brandModel }}</span>
-                        </div>
+                        </div> -->
                         <div class="flex items-center justify-between">
                             <span class="text-xs text-dimmed">Location</span>
                             <span class="text-xs font-medium truncate ml-2 text-right">{{ asset.location }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-dimmed">Cost</span>
+                            <span class="text-xs font-bold truncate ml-2 text-right">₱ {{ (asset.cost).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
                         </div>
                     </div>
 
                     <!-- Animated bottom row -->
                     <div class="relative mt-auto">
                         <div class="flex items-center justify-between transition-all duration-200 group-hover:opacity-0 group-hover:-translate-y-1">
-                            <span class="text-xs text-dimmed">{{ asset.purchased }}</span>
-                            <span class="text-sm font-semibold">₱ {{ (asset.cost).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span>
+                            <span class="text-xs text-dimmed">Purchased on</span>
+                            <span class="text-xs">{{ asset.purchased }}</span>
+                            <!-- <span class="text-sm font-semibold">₱ {{ (asset.cost).toLocaleString(undefined, { minimumFractionDigits: 2 }) }}</span> -->
                         </div>
                         <!-- Hover: View Details button -->
                         <div class="absolute inset-0 flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 gap-2">
-                            <UButton icon="i-lucide-qr-code" variant="soft" color="primary" />
-                            <UButton icon="i-lucide-edit-3" variant="soft" color="primary" />
+                            <UButton icon="i-lucide-qr-code" variant="soft" color="primary" @click.stop="openPrintModal(asset)" />
+                            <UButton icon="i-lucide-edit-3" variant="soft" color="primary" @click.stop="openEditModal(asset)" />
+                            <UButton icon="i-lucide-trash-2" variant="soft" color="error" @click.stop="openDeleteModal(asset)" />
                         </div>
                     </div>
                 </UCard>
@@ -226,7 +271,19 @@ const isAddAssetModalOpen = ref(false)
                 />
             </template>
         </UTable>
-        
-        <AddAssetModal v-model:open="isAddAssetModalOpen" />
     </div>
+        
+    <AssetModal v-model:open="isAssetModalOpen" :asset="selectedAsset" />
+    <PrintAssetModal v-model:open="isPrintModalOpen" :asset="selectedAsset" />
+    
+    <ConfirmModal
+        v-model:open="isDeleteModalOpen"
+        title="Delete Asset"
+        :description="`Are you sure you want to delete ${assetToDelete?.name} (${assetToDelete?.assetTag})? This action cannot be undone.`"
+        confirm-label="Delete Asset"
+        color="error"
+        icon="i-lucide-trash-2"
+        @confirm="confirmDelete"
+        :success-toast="{ title: 'Asset deleted', description: 'The asset has been successfully removed.' }"
+    />
 </template>
