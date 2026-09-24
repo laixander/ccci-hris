@@ -333,3 +333,17 @@ export interface AssetAssignment {
   status: 'Active' | 'Returned'
   returnDate: string
 }
+
+export interface AssetCategory {
+  id: number
+  name: string
+  description: string
+  icon: string
+}
+
+export interface AssetLocation {
+  id: number
+  name: string
+  description: string
+  icon: string
+}

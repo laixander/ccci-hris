@@ -135,6 +135,8 @@ function openDetail(row: (typeof payslipData.value)[0]) {
     selectedPayslip.value = row
     isDetailOpen.value = true
 }
+
+const viewStats = ref(true)
 </script>
 
 <template>
@@ -152,6 +154,14 @@ function openDetail(row: (typeof payslipData.value)[0]) {
                     }"
                 />
                 <div class="flex items-center gap-2">
+                    <UTooltip :text="viewStats ? 'Hide Stats' : 'View Stats'">
+                        <UButton
+                            :icon="viewStats ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                            color="neutral"
+                            variant="ghost"
+                            @click="viewStats = !viewStats"
+                        />
+                    </UTooltip>
                     <UFieldGroup>
                         <UButton icon="i-lucide-list" color="neutral"
                             :variant="viewMode === 'table' ? 'subtle' : 'outline'"
@@ -164,7 +174,7 @@ function openDetail(row: (typeof payslipData.value)[0]) {
             </div>
 
             <!-- KPIs -->
-            <div class="flex gap-3 px-4 pb-4">
+            <div v-if="viewStats" class="flex gap-3 px-4 pb-4">
                 <UCard v-for="(kpi, index) in kpis" :key="index" class="shadow-sm flex-1" :ui="{ body: 'sm:p-4' }">
                     <div class="flex items-center gap-3">
                         <div class="rounded-lg p-2 shrink-0 flex" :class="kpi.bg">

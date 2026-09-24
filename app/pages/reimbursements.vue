@@ -109,6 +109,8 @@ const kpis = computed(() => [
     { label: 'Pending', icon: 'i-lucide-hourglass', color: 'text-amber-500', bg: 'bg-amber-500/10', value: pendingItems.value.length.toString(), sublabel: 'awaiting review' },
     { label: 'Denied', icon: 'i-lucide-ban', color: 'text-rose-500', bg: 'bg-rose-500/10', value: declinedItems.value.length.toString(), sublabel: formatAmount(declinedItems.value.reduce((acc, i) => acc + parseAmount(i.amount), 0)) },
 ])
+
+const viewStats = ref(true)
 </script>
 
 <template>
@@ -121,6 +123,14 @@ const kpis = computed(() => [
                 }">
                 </UPageCard>
                 <div class="flex items-center justify-end gap-2 flex-1">
+                    <UTooltip :text="viewStats ? 'Hide Stats' : 'View Stats'">
+                        <UButton
+                            :icon="viewStats ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                            color="neutral"
+                            variant="ghost"
+                            @click="viewStats = !viewStats"
+                        />
+                    </UTooltip>
                     <UFieldGroup>
                         <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
                         <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
@@ -154,7 +164,7 @@ const kpis = computed(() => [
             </div>
 
             <!-- Stats -->
-            <div class="flex gap-3 px-4 pb-4">
+            <div v-if="viewStats" class="flex gap-3 px-4 pb-4">
                 <UCard v-for="(kpi, index) in kpis" :key="index" class="shadow-sm flex-1" :ui="{ body: 'sm:p-4' }">
                     <div class="flex items-center gap-3">
                         <div class="rounded-lg p-2 shrink-0 flex" :class="kpi.bg">

@@ -178,31 +178,27 @@ const filteredTemplates = computed(() => {
                             <span class="text-[10px] font-semibold text-dimmed/70 uppercase tracking-wider">{{ template.dateCreated }}</span>
                         </div>
                         <!-- Hover: Actions -->
-                        <div class="absolute inset-0 flex items-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
-                            <UFieldGroup class="w-full flex">
-                                <UButton
-                                    block
-                                    color="warning"
-                                    variant="soft"
-                                    :to="`/onboarding/templates/${template.id}/edit`"
-                                    aria-label="Edit template"
-                                    class="flex-1 py-2"
-                                >
-                                    <UIcon name="i-lucide-pencil" class="size-4" />
-                                    Edit
-                                </UButton>
-                                <UButton
-                                    block
-                                    color="error"
-                                    variant="soft"
-                                    aria-label="Delete template"
-                                    @click="confirmDelete(template.id)"
-                                    class="flex-1 py-2"
-                                >
-                                    <UIcon name="i-lucide-trash-2" class="size-4" />
-                                    Delete
-                                </UButton>
-                            </UFieldGroup>
+                        <div class="absolute inset-0 flex items-center gap-2 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
+                            <UButton
+                                color="warning"
+                                variant="soft"
+                                :to="`/onboarding/templates/${template.id}/edit`"
+                                aria-label="Edit template"
+                                class="flex-1 justify-center"
+                            >
+                                <UIcon name="i-lucide-pencil" class="size-4" />
+                                Edit
+                            </UButton>
+                            <UButton
+                                color="error"
+                                variant="soft"
+                                aria-label="Delete template"
+                                @click="confirmDelete(template.id)"
+                                class="flex-1 justify-center"
+                            >
+                                <UIcon name="i-lucide-trash-2" class="size-4" />
+                                Delete
+                            </UButton>
                         </div>
                     </div>
                 </UCard>
