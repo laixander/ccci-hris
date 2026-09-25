@@ -99,7 +99,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
         }]),
         {
             label: 'Expenses',
-            icon: 'i-lucide-receipt-text'
+            icon: 'i-lucide-receipt-text',
+            to: '/hr/expenses'
         }
     ],
     [

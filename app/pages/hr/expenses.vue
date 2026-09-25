@@ -10,6 +10,10 @@ const UButton = resolveComponent('UButton')
 
 // ─── Table columns ────────────────────────────────────────────────────────────
 const columns = [
+    {
+        accessorKey: 'employeeName',
+        header: 'Employee',
+    },
     { accessorKey: 'dateApplied', header: 'Date Applied' },
     { accessorKey: 'dateOfExpense', header: 'Date of Expense' },
     { accessorKey: 'category', header: 'Category' },
@@ -19,23 +23,55 @@ const columns = [
     {
         id: 'actions',
         header: '',
-        meta: { class: { th: 'w-16', td: 'text-right' } },
-        cell: ({ row }: any) => h(UButton as any, {
-            icon: 'i-lucide-eye',
-            color: 'neutral',
-            variant: 'ghost',
-            size: 'sm',
-            'aria-label': 'View details',
-            onClick: (e: Event) => {
-                e.stopPropagation()
-                openDetails(row.original)
+        meta: { class: { th: 'w-32', td: 'text-right' } },
+        cell: ({ row }: any) => {
+            const buttons = [
+                h(UButton as any, {
+                    icon: 'i-lucide-eye',
+                    color: 'neutral',
+                    variant: 'ghost',
+                    size: 'sm',
+                    'aria-label': 'View details',
+                    onClick: (e: Event) => {
+                        e.stopPropagation()
+                        openDetails(row.original)
+                    }
+                })
+            ]
+            
+            if (row.original.status === 'PENDING') {
+                buttons.push(
+                    h(UButton as any, {
+                        icon: 'i-lucide-check',
+                        color: 'success',
+                        variant: 'ghost',
+                        size: 'sm',
+                        'aria-label': 'Approve',
+                        onClick: (e: Event) => {
+                            e.stopPropagation()
+                            // handle approve
+                        }
+                    }),
+                    h(UButton as any, {
+                        icon: 'i-lucide-x',
+                        color: 'error',
+                        variant: 'ghost',
+                        size: 'sm',
+                        'aria-label': 'Deny',
+                        onClick: (e: Event) => {
+                            e.stopPropagation()
+                            // handle deny
+                        }
+                    })
+                )
             }
-        })
+            return h('div', { class: 'flex items-center justify-end gap-1' }, buttons)
+        }
     }
 ]
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-const { data } = useLazyFetch('/api/reimbursements')
+const { data } = useLazyFetch('/api/hr/expenses')
 const reimbursementData = computed(() => data.value ?? [])
 
 // ─── State ────────────────────────────────────────────────────────────────────
@@ -59,7 +95,7 @@ const { register } = useOverlayVisibility()
 register(isModalOpen)
 register(isDrawerOpen)
 
-const status = ref('All Status')
+const status = ref('All')
 const period = ref('Monthly')
 const month = ref(new Date().getMonth() + 1)
 const year = ref(new Date().getFullYear())
@@ -85,26 +121,28 @@ const quarters = [
 const parseAmount = (amt: string) => parseFloat(amt.replace(/[₱,]/g, '')) || 0
 
 const search = ref('')
-const selectedType = ref('All Categories')
+const selectedEmployee = ref('All employees')
 
 // ─── Filters & Computeds ──────────────────────────────────────────────────────
-const requestTypes = computed(() => [
-    'All Categories',
-    ...new Set(reimbursementData.value.map(s => s.category))
-])
+const employees = computed(() => [
+    'All employees',
+    ...new Set(reimbursementData.value.map(s => s.employeeName).filter(Boolean))
+] as string[])
 
 const filteredReimbursements = computed(() => {
     return reimbursementData.value.filter(s => {
-        // Search & Category
-        const matchesSearch =
-            s.category.toLowerCase().includes(search.value.toLowerCase()) ||
-            s.merchant.toLowerCase().includes(search.value.toLowerCase()) ||
-            s.status.toLowerCase().includes(search.value.toLowerCase())
-            
-        const matchesType = selectedType.value === 'All Categories' || s.category === selectedType.value
+        // Search
+        const searchLower = search.value.toLowerCase()
+        const matchesSearch = !search.value || 
+            s.category.toLowerCase().includes(searchLower) || 
+            s.merchant.toLowerCase().includes(searchLower) ||
+            s.status.toLowerCase().includes(searchLower)
+
+        // Employee
+        const matchesEmployee = selectedEmployee.value === 'All employees' || s.employeeName === selectedEmployee.value
         
         // Status
-        const matchesStatus = status.value === 'All Status' || s.status.toUpperCase() === status.value.toUpperCase()
+        const matchesStatus = status.value === 'All' || s.status.toUpperCase() === status.value.toUpperCase()
         
         // Period (Date of Expense)
         const itemDate = new Date(s.dateOfExpense)
@@ -121,7 +159,7 @@ const filteredReimbursements = computed(() => {
             matchesPeriod = itemYear === year.value && itemMonth === month.value
         }
         
-        return matchesSearch && matchesType && matchesStatus && matchesPeriod
+        return matchesSearch && matchesEmployee && matchesStatus && matchesPeriod
     })
 })
 
@@ -146,7 +184,7 @@ const viewStats = ref(true)
     <div ref="container" class="flex-1 overflow-y-auto scrollbar">
         <div ref="header">
             <div class="flex items-center gap-4 p-4">
-                <UPageCard title="Reimbursements" description="Submit and track expense reimbursements"
+                <UPageCard title="Expenses" description="Manage and track employee expenses"
                     variant="naked" :ui="{
                     title: 'text-2xl font-bold'
                 }">
@@ -164,15 +202,13 @@ const viewStats = ref(true)
                         <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
                         <UButton icon="i-lucide-layout-grid" color="neutral" :variant="viewMode === 'grid' ? 'subtle' : 'outline'" @click="viewMode = 'grid'" />
                     </UFieldGroup>
-                    <UButton @click="isModalOpen = true">
-                        <UIcon name="i-lucide-plus" class="size-4" />
-                        Request Reimbursement
-                    </UButton>
+                    <UButton label="Download" icon="i-lucide-download" color="neutral" variant="outline" />
+                    <UButton label="Create Expense" icon="i-lucide-plus" @click="isModalOpen = true" />
                 </div>
             </div>
 
             <!-- Search & filter -->
-            <div class="flex items-center gap-3 px-4 pb-4">
+            <div class="flex items-center justify-between gap-3 px-4 pb-4">
                 <UInput
                     v-model="search"
                     placeholder="Search by category, merchant, or status..."
@@ -180,16 +216,15 @@ const viewStats = ref(true)
                     class="flex-1"
                 />
                 <USelect
-                    v-model="selectedType"
-                    :items="requestTypes"
-                    class="w-56"
+                    v-model="selectedEmployee"
+                    :items="employees"
+                    class="w-48"
                 />
-
-                <USelect v-model="status" :items="['All Status', 'Pending', 'Approved', 'Declined']" class="w-32" />
+                <USelect v-model="status" :items="['All', 'Pending', 'Approved', 'Declined']" class="w-32" />
                 <USelect v-model="period" :items="['Monthly', 'Quarterly', 'Yearly']" class="w-32" />
-                <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-24" />
-                <USelect v-if="period === 'Quarterly'" v-model="quarter" :items="quarters" class="w-24" />
-                <USelect v-model="year" :items="years" class="w-24" />
+                <USelect v-if="period === 'Monthly'" v-model="month" :items="months" class="w-32" />
+                <USelect v-if="period === 'Quarterly'" v-model="quarter" :items="quarters" class="w-32" />
+                <USelect v-model="year" :items="years" class="w-32" />
             </div>
 
             <!-- Stats -->
@@ -218,22 +253,25 @@ const viewStats = ref(true)
             <div v-if="reimbursementData.length === 0" class="flex-1 flex items-center justify-center">
                 <UEmpty
                     icon="i-lucide-receipt-text"
-                    title="No reimbursements"
-                    description="No reimbursement requests found for the selected period."
+                    title="No expenses"
+                    description="No expense requests found for the selected period."
                     variant="naked"
                 />
             </div>
             <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 <UCard v-for="item in filteredReimbursements" :key="item.id" class="flex flex-col shadow-sm cursor-pointer group hover:ring-1 hover:ring-primary/40 transition-all" :ui="{ body: 'flex flex-col h-full gap-4 sm:p-4 group-hover:bg-linear-to-tl group-hover:from-primary/10 group-hover:from-5% group-hover:to-default transition-all duration-300 ease-out' }" @click="openDetails(item)">
                     <div class="flex items-start justify-between gap-2">
-                        <div class="space-y-0.5 min-w-0">
-                            <div class="font-semibold text-highlighted truncate group-hover:text-primary transition-colors">{{ item.merchant }}</div>
-                            <div class="text-xs text-dimmed">{{ item.category }}</div>
+                        <div class="flex items-center gap-2 min-w-0">
+                            <UAvatar :src="item.employeeAvatar" :alt="item.employeeName" size="sm" />
+                            <div class="space-y-0.5 min-w-0">
+                                <div class="font-semibold text-highlighted truncate group-hover:text-primary transition-colors">{{ item.employeeName }}</div>
+                                <div class="text-xs text-dimmed truncate">{{ item.merchant }} &middot; {{ item.category }}</div>
+                            </div>
                         </div>
                         <StatusBadge :status="item.status" />
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md">
+                    <div class="grid grid-cols-2 gap-2 text-sm bg-muted dark:bg-muted/30 p-3 rounded-md mt-auto">
                         <div class="col-span-2">
                             <div class="text-xs text-dimmed mb-0.5">Date of Expense</div>
                             <div class="font-medium">{{ item.dateOfExpense }}</div>
@@ -251,9 +289,11 @@ const viewStats = ref(true)
                             <span class="text-xs text-dimmed">Date Applied</span>
                             <span class="text-xs font-medium">{{ item.dateApplied }}</span>
                         </div>
-                        <!-- Hover: View Details button -->
+                        <!-- Hover: Actions -->
                         <div class="absolute inset-0 flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 gap-2">
-                            <UButton block label="View Details" variant="soft" color="primary" @click.stop="openDetails(item)" />
+                            <UTooltip text="View Details"><UButton icon="i-lucide-eye" variant="soft" @click.stop="openDetails(item)" /></UTooltip>
+                            <UTooltip text="Approve" v-if="item.status === 'PENDING'"><UButton icon="i-lucide-check" variant="soft" color="success" @click.stop="" /></UTooltip>
+                            <UTooltip text="Deny" v-if="item.status === 'PENDING'"><UButton icon="i-lucide-x" variant="soft" color="error" @click.stop="" /></UTooltip>
                         </div>
                     </div>
                 </UCard>
@@ -269,6 +309,12 @@ const viewStats = ref(true)
             class="flex-1 min-h-0"
             :virtualize="{ scrollMargin: headerHeight, getScrollElement }"
         >
+            <template #employeeName-cell="{ row }">
+                <div class="flex items-center gap-2">
+                    <UAvatar :src="row.original.employeeAvatar" :alt="row.original.employeeName" size="xs" />
+                    <span class="font-medium text-highlighted">{{ row.original.employeeName }}</span>
+                </div>
+            </template>
             <template #amount-cell="{ row }">
                 <span class="font-medium tabular-nums">{{ row.original.amount }}</span>
             </template>
@@ -278,13 +324,13 @@ const viewStats = ref(true)
             <template #empty>
                 <UEmpty
                     icon="i-lucide-receipt-text"
-                    title="No reimbursements"
-                    description="No reimbursement requests found for the selected period."
+                    title="No expenses"
+                    description="No expense requests found for the selected period."
                     variant="naked"
                 />
             </template>
         </UTable>
     </div>
-    <ApplyReimbursementModal v-model:open="isModalOpen" />
-    <ReimbursementDetailDrawer v-model:open="isDrawerOpen" :request="selectedRequest" />
+    <HRExpenseModal v-model:open="isModalOpen" />
+    <ReimbursementDetailDrawer v-model:open="isDrawerOpen" :request="selectedRequest" is-admin />
 </template>

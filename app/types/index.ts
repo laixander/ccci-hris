@@ -149,8 +149,12 @@ export interface Reimbursement {
   dateOfExpense: string
   category: string
   merchant: string
+  merchantAddress?: string
+  merchantTIN?: string
   amount: string
   status: string
+  employeeName?: string
+  employeeAvatar?: string
 }
 
 export interface OKR {

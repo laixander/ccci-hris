@@ -131,10 +131,12 @@ register(open)
                             ><UIcon :name="option.value" class="size-5 transition-opacity duration-150" :class="formData.icon === option.value ? 'opacity-100' : 'opacity-20 group-hover/icon:opacity-100'" /></UButton>
                         </UTooltip>
                     </div>
-                    <p class="text-xs text-dimmed mt-1.5 flex items-center gap-1.5">
-                        <UIcon :name="formData.icon" class="size-3.5 text-primary" />
-                        {{ iconOptions.find(o => o.value === formData.icon)?.label ?? 'None selected' }}
-                    </p>
+                    <template #hint>
+                        <p class="text-xs text-dimmed flex items-center gap-1.5">
+                            <UIcon :name="formData.icon" class="size-3.5 text-primary" />
+                            {{ iconOptions.find(o => o.value === formData.icon)?.label ?? 'None selected' }}
+                        </p>
+                    </template>
                 </UFormField>
 
                 <UFormField label="Location Name" required :error="formErrors.name">

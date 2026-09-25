@@ -149,7 +149,7 @@ const performDelete = () => {
                     v-model="search"
                     placeholder="Search locations..."
                     icon="i-lucide-search"
-                    class="w-64"
+                    class="w-full"
                 />
             </div>
 

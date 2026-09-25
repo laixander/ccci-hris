@@ -12,6 +12,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '006-975-387-000',
       amount: '₱850.00',
       status: 'PENDING',
+      employeeName: 'John Doe',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=JohnDoe'
     },
     {
       id: 2,
@@ -23,6 +25,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '008-874-124-000',
       amount: '₱320.00',
       status: 'APPROVED',
+      employeeName: 'Jane Smith',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=JaneSmith'
     },
     {
       id: 3,
@@ -34,6 +38,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '000-098-999-000',
       amount: '₱1,200.00',
       status: 'APPROVED',
+      employeeName: 'Alice Johnson',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=AliceJohnson'
     },
     {
       id: 4,
@@ -45,6 +51,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '000-059-865-000',
       amount: '₱5,400.00',
       status: 'APPROVED',
+      employeeName: 'Bob Williams',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=BobWilliams'
     },
     {
       id: 5,
@@ -56,6 +64,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '000-111-222-000',
       amount: '₱640.00',
       status: 'DECLINED',
+      employeeName: 'John Doe',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=JohnDoe'
     },
     {
       id: 6,
@@ -67,6 +77,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '002-333-444-000',
       amount: '₱180.00',
       status: 'APPROVED',
+      employeeName: 'Jane Smith',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=JaneSmith'
     },
     {
       id: 7,
@@ -78,6 +90,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '000-456-789-000',
       amount: '₱450.00',
       status: 'PENDING',
+      employeeName: 'Alice Johnson',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=AliceJohnson'
     },
     {
       id: 8,
@@ -89,6 +103,8 @@ export default defineEventHandler((): Reimbursement[] => {
       merchantTIN: '004-567-890-000',
       amount: '₱390.00',
       status: 'APPROVED',
+      employeeName: 'Bob Williams',
+      employeeAvatar: 'https://api.dicebear.com/10.x/thumbs/svg?seed=BobWilliams'
     },
   ]
 })

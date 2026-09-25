@@ -244,9 +244,9 @@ const confirmDelete = () => {
                         </div>
                         <!-- Hover: View Details button -->
                         <div class="absolute inset-0 flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 gap-2">
-                            <UButton icon="i-lucide-qr-code" variant="soft" color="primary" @click.stop="openPrintModal(asset)" />
-                            <UButton icon="i-lucide-edit-3" variant="soft" color="primary" @click.stop="openEditModal(asset)" />
-                            <UButton icon="i-lucide-trash-2" variant="soft" color="error" @click.stop="openDeleteModal(asset)" />
+                            <UTooltip text="Print Label"><UButton icon="i-lucide-qr-code" variant="soft" color="primary" @click.stop="openPrintModal(asset)" /></UTooltip>
+                            <UTooltip text="Edit"><UButton icon="i-lucide-edit-3" variant="soft" color="primary" @click.stop="openEditModal(asset)" /></UTooltip>
+                            <UTooltip text="Delete"><UButton icon="i-lucide-trash-2" variant="soft" color="error" @click.stop="openDeleteModal(asset)" /></UTooltip>
                         </div>
                     </div>
                 </UCard>
