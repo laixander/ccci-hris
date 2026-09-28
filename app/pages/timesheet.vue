@@ -234,10 +234,10 @@ function nextWeek() {
 							<UButton icon="i-lucide-list" color="neutral"
 								:variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
 						</UFieldGroup>
-						<!-- <div class="flex gap-2">
+						<div v-if="viewMode === 'table'" class="flex gap-2">
 							<USelect v-model="month" :items="months" class="w-32" />
 							<USelect v-model="year" :items="years" class="w-24" />
-						</div> -->
+						</div>
 						<UButton variant="soft" color="neutral" @click="isDrawerOpen = true">
 							<UIcon name="i-lucide-clipboard-list" class="size-4" />
 							Adjustments List

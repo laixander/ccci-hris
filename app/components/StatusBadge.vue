@@ -36,6 +36,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
     PENDING:     { color: 'warning', icon: 'i-lucide-clock' },
     REJECTED:    { color: 'error',   icon: 'i-lucide-x-circle' },
     DECLINED:    { color: 'error',   icon: 'i-lucide-ban' },
+    DENIED:      { color: 'error',   icon: 'i-lucide-ban' },
 
     // Payslip statuses
     PROCESSING:  { color: 'info',    icon: 'i-lucide-loader-circle' },
