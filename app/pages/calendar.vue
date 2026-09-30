@@ -463,10 +463,16 @@ function nextDay() {
 					<!-- Day-of-week header -->
 					<div
 						class="grid grid-cols-7 gap-px bg-[var(--ui-border)] shrink-0 border-b border-[var(--ui-border)]">
-						<div v-for="wd in WEEK_DAYS" :key="wd"
-							class="bg-[var(--ui-bg)] py-2 text-center text-xs font-medium"
-							:class="wd === 'Sun' || wd === 'Sat' ? 'text-dimmed' : 'text-toned'">
-							{{ wd }}
+						<div v-for="(cell, idx) in (calendarWeeks[selectedWeekIndex] || [])"
+							:key="idx"
+							class="bg-[var(--ui-bg)] py-2 px-3 flex items-center justify-center gap-1.5 text-xs font-medium"
+							:class="cell?.isWeekend ? 'text-dimmed' : 'text-muted'">
+							<span>{{ WEEK_DAYS[idx] }}</span>
+							<span
+								class="font-semibold leading-none w-6 h-6 flex items-center justify-center rounded-full text-xs"
+								:class="cell?.isToday ? 'bg-primary text-white' : 'text-highlighted'">
+								{{ cell?.day }}
+							</span>
 						</div>
 					</div>
 
@@ -483,20 +489,7 @@ function nextDay() {
 							<template v-if="cell">
 								<!-- Week view: no popover, inline display -->
 								<div class="flex-1 flex flex-col min-h-0 w-full h-full">
-									<!-- Day number -->
-									<div class="flex items-center justify-between mb-4">
-										<span
-											class="text-sm font-medium leading-none w-8 h-8 flex items-center justify-center rounded-full"
-											:class="[
-												cell.isToday
-													? 'bg-primary text-white font-bold'
-													: cell.isWeekend
-														? 'text-dimmed'
-														: 'text-highlighted',
-												]">
-												{{ cell.day }}
-											</span>
-									</div>
+
 									<!-- Events -->
 									<div class="flex flex-col gap-2 flex-1 overflow-y-auto scrollbar">
 										<UCard
@@ -510,7 +503,7 @@ function nextDay() {
 											]"
 											:ui="{ body: 'relative p-2 sm:p-2' }">
 											<!-- Left indicator -->
-											<div class="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-md"
+											<div class="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-md"
 												:class="[
 													leave.status.toLowerCase() === 'approved' ? 'bg-green-500' :
 													leave.status.toLowerCase() === 'pending' ? 'bg-yellow-500' :

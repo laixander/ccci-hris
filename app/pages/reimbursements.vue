@@ -1,6 +1,19 @@
 <script setup lang="ts">
 import { h, resolveComponent } from 'vue'
 import type { Reimbursement } from '~~/app/types'
+import { Doughnut, Bar } from 'vue-chartjs'
+import {
+    Chart as ChartJS,
+    Title,
+    Tooltip as ChartTooltip,
+    Legend,
+    ArcElement,
+    BarElement,
+    CategoryScale,
+    LinearScale,
+} from 'chart.js'
+
+ChartJS.register(Title, ChartTooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
 definePageMeta({
     isTable: true
@@ -48,6 +61,7 @@ const { height: headerHeight } = useElementSize(header, undefined, { box: 'borde
 const viewMode = ref<'grid' | 'table'>('table')
 const isModalOpen = ref(false)
 const isDrawerOpen = ref(false)
+const isAnalyticsOpen = ref(false)
 const selectedRequest = ref<Reimbursement | null>(null)
 
 const openDetails = (request: Reimbursement) => {
@@ -58,6 +72,7 @@ const openDetails = (request: Reimbursement) => {
 const { register } = useOverlayVisibility()
 register(isModalOpen)
 register(isDrawerOpen)
+register(isAnalyticsOpen)
 
 const status = ref('All Status')
 const period = ref('Monthly')
@@ -140,6 +155,134 @@ const kpis = computed(() => [
 ])
 
 const viewStats = ref(true)
+
+// ─── Analytics Drawer ─────────────────────────────────────────────────────────
+const chartColors = {
+    category: [
+        'rgba(99,102,241,0.85)',
+        'rgba(16,185,129,0.85)',
+        'rgba(245,158,11,0.85)',
+        'rgba(236,72,153,0.85)',
+        'rgba(14,165,233,0.85)',
+        'rgba(139,92,246,0.85)',
+    ],
+    status: [
+        'rgba(245,158,11,0.85)',
+        'rgba(16,185,129,0.85)',
+        'rgba(239,68,68,0.85)',
+    ],
+}
+
+const chartBase = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            position: 'bottom' as const,
+            labels: { color: '#9ca3af', font: { family: 'Inter', size: 12 }, padding: 16, boxWidth: 12, boxHeight: 12 },
+        },
+        tooltip: {
+            backgroundColor: 'rgba(15,23,42,0.95)',
+            titleFont: { family: 'Inter', size: 13 },
+            bodyFont: { family: 'Inter', size: 13 },
+            padding: 12,
+            cornerRadius: 8,
+        },
+    },
+}
+
+const doughnutOptions = {
+    ...chartBase,
+    cutout: '65%',
+    plugins: {
+        ...chartBase.plugins,
+        legend: { ...chartBase.plugins.legend, position: 'bottom' as const },
+    },
+}
+
+const categoryChartData = computed(() => {
+    const map = new Map<string, number>()
+    filteredReimbursements.value.forEach(r => {
+        const cat = r.category || 'Others'
+        map.set(cat, (map.get(cat) ?? 0) + parseAmount(r.amount))
+    })
+    const labels = [...map.keys()]
+    const values = labels.map(l => map.get(l)!)
+    return {
+        labels,
+        datasets: [{
+            data: values,
+            backgroundColor: chartColors.category.slice(0, labels.length),
+            borderWidth: 0,
+        }],
+    }
+})
+
+const statusChartData = computed(() => {
+    const pending = filteredReimbursements.value.filter(r => r.status === 'PENDING').length
+    const approved = filteredReimbursements.value.filter(r => r.status === 'APPROVED').length
+    const declined = filteredReimbursements.value.filter(r => r.status === 'DECLINED').length
+    return {
+        labels: ['Pending', 'Approved', 'Declined'],
+        datasets: [{
+            data: [pending, approved, declined],
+            backgroundColor: chartColors.status,
+            borderWidth: 0,
+        }],
+    }
+})
+
+const timelineChartData = computed(() => {
+    const monthMap = new Map<string, Map<string, number>>()
+    const catSet = new Set<string>()
+
+    filteredReimbursements.value.forEach(r => {
+        const d = new Date(r.dateOfExpense)
+        const key = `${d.toLocaleString('default', { month: 'short' })} ${d.getFullYear()}`
+        const cat = r.category || 'Others'
+        catSet.add(cat)
+        if (!monthMap.has(key)) monthMap.set(key, new Map())
+        const m = monthMap.get(key)!
+        m.set(cat, (m.get(cat) ?? 0) + parseAmount(r.amount))
+    })
+
+    const labels = [...monthMap.keys()].sort((a, b) => new Date('1 ' + a).getTime() - new Date('1 ' + b).getTime())
+    const categories = [...catSet]
+    const datasets = categories.map((cat, i) => ({
+        label: cat,
+        data: labels.map(l => monthMap.get(l)?.get(cat) ?? 0),
+        backgroundColor: chartColors.category[i % chartColors.category.length],
+        borderRadius: 2,
+        stack: 'expenses',
+    }))
+
+    return { labels, datasets }
+})
+
+const timelineOptions = computed(() => ({
+    ...chartBase,
+    plugins: {
+        ...chartBase.plugins,
+        legend: { ...chartBase.plugins.legend },
+    },
+    scales: {
+        x: {
+            stacked: true,
+            grid: { display: false },
+            ticks: { color: '#9ca3af', font: { family: 'Inter', size: 11 } },
+        },
+        y: {
+            stacked: true,
+            border: { color: 'rgba(156,163,175,0.1)' },
+            grid: { color: 'rgba(156,163,175,0.1)' },
+            ticks: {
+                color: '#9ca3af',
+                font: { family: 'Inter', size: 11 },
+                callback: (v: number | string) => `₱${Number(v).toLocaleString()}`,
+            },
+        },
+    },
+}))
 </script>
 
 <template>
@@ -159,6 +302,9 @@ const viewStats = ref(true)
                             variant="ghost"
                             @click="viewStats = !viewStats"
                         />
+                    </UTooltip>
+                    <UTooltip text="View Analytics">
+                        <UButton icon="i-lucide-chart-pie" variant="outline" color="neutral" square @click="isAnalyticsOpen = true" />
                     </UTooltip>
                     <UFieldGroup>
                         <UButton icon="i-lucide-list" color="neutral" :variant="viewMode === 'table' ? 'subtle' : 'outline'" @click="viewMode = 'table'" />
@@ -287,4 +433,101 @@ const viewStats = ref(true)
     </div>
     <ApplyReimbursementModal v-model:open="isModalOpen" />
     <ReimbursementDetailDrawer v-model:open="isDrawerOpen" :request="selectedRequest" />
+
+    <!-- Analytics Drawer -->
+    <UDrawer
+        v-model:open="isAnalyticsOpen"
+        inset
+        direction="bottom"
+        :handle="true"
+        :close="{ icon: 'i-lucide-x', size: 'sm', color: 'neutral', variant: 'ghost' }"
+        :ui="{ container: 'p-0 gap-6', content: 'max-h-[85vh]', header: 'pt-4 px-4', body: 'overflow-y-auto p-0 sm:p-0 scrollbar' }"
+    >
+        <template #header>
+            <div class="flex items-center gap-4">
+                <div class="p-2 rounded-lg bg-indigo-500/10">
+                    <UIcon name="i-lucide-chart-pie" class="size-6 text-indigo-500 flex" />
+                </div>
+                <div>
+                    <div class="text-highlighted font-semibold">Expense Analytics</div>
+                    <div class="text-muted text-sm">Breakdown for selected period</div>
+                </div>
+            </div>
+        </template>
+
+        <template #body>
+            <div class="space-y-6 px-4 pb-4 pt-[1px]">
+                <!-- Row 1: Doughnut charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- By Category -->
+                    <UCard :ui="{ root: 'shadow-sm', body: 'sm:p-4' }">
+                        <template #header>
+                            <div>
+                                <div class="font-semibold text-sm">By Category</div>
+                                <div class="text-xs text-dimmed">Total amount per expense category</div>
+                            </div>
+                        </template>
+                        <div class="relative h-[220px] flex items-center justify-center">
+                            <Doughnut
+                                v-if="filteredReimbursements.length > 0"
+                                :data="categoryChartData"
+                                :options="doughnutOptions"
+                            />
+                            <UEmpty
+                                v-else
+                                icon="i-lucide-chart-pie"
+                                title="No data"
+                                description="No expenses for the selected period."
+                                variant="naked"
+                            />
+                        </div>
+                    </UCard>
+
+                    <!-- By Status -->
+                    <UCard :ui="{ root: 'shadow-sm', body: 'sm:p-4' }">
+                        <template #header>
+                            <div>
+                                <div class="font-semibold text-sm">By Status</div>
+                                <div class="text-xs text-dimmed">Number of requests per status</div>
+                            </div>
+                        </template>
+                        <div class="relative h-[220px] flex items-center justify-center">
+                            <Doughnut
+                                v-if="filteredReimbursements.length > 0"
+                                :data="statusChartData"
+                                :options="doughnutOptions"
+                            />
+                            <UEmpty
+                                v-else
+                                icon="i-lucide-pie-chart"
+                                title="No data"
+                                description="No expenses for the selected period."
+                                variant="naked"
+                            />
+                        </div>
+                    </UCard>
+                </div>
+
+                <!-- Row 2: Expenses Over Time -->
+                <UCard :ui="{ root: 'shadow-sm', body: 'sm:p-4' }">
+                    <template #header>
+                        <div>
+                            <div class="font-semibold text-sm">Expenses Over Time</div>
+                            <div class="text-xs text-dimmed">Stacked expense amount by category per month</div>
+                        </div>
+                    </template>
+                    <div class="relative h-[240px]">
+                        <Bar
+                            v-if="filteredReimbursements.length > 0"
+                            :data="timelineChartData"
+                            :options="timelineOptions"
+                        />
+                        <div v-else class="h-full flex items-center justify-center">
+                            <UEmpty icon="i-lucide-bar-chart-2" title="No data" description="No expenses for the selected period." variant="naked" />
+                        </div>
+                    </div>
+                </UCard>
+            </div>
+        </template>
+    </UDrawer>
 </template>

@@ -352,10 +352,16 @@ function nextWeek() {
 					<!-- Day-of-week header -->
 					<div
 						class="grid grid-cols-7 gap-px bg-[var(--ui-border)] shrink-0 border-b border-[var(--ui-border)]">
-						<div v-for="wd in WEEK_DAYS" :key="wd"
-							class="bg-[var(--ui-bg)] py-2 text-center text-xs font-medium"
-							:class="wd === 'Sun' || wd === 'Sat' ? 'text-dimmed' : 'text-toned'">
-							{{ wd }}
+						<div v-for="(cell, idx) in (calendarWeeks[selectedWeekIndex] || [])"
+							:key="idx"
+							class="bg-[var(--ui-bg)] py-2 px-3 flex items-center justify-center gap-1.5 text-xs font-medium"
+							:class="cell?.isWeekend ? 'text-dimmed' : 'text-muted'">
+							<span>{{ WEEK_DAYS[idx] }}</span>
+							<span
+								class="font-semibold leading-none w-6 h-6 flex items-center justify-center rounded-full text-xs"
+								:class="cell?.isToday ? 'bg-primary text-white' : 'text-highlighted'">
+								{{ cell?.day }}
+							</span>
 						</div>
 					</div>
 
@@ -370,20 +376,7 @@ function nextWeek() {
 										: 'bg-[var(--ui-bg)] hover:bg-primary/5 cursor-pointer',
 							]" @click="if (cell && !cell.isWeekend && cell.record) { selectedRecord = cell.record; isModalOpen = true }">
 							<template v-if="cell">
-								<!-- Day number -->
-								<div class="flex items-center justify-between mb-4">
-									<span
-										class="text-sm font-medium leading-none w-8 h-8 flex items-center justify-center rounded-full"
-										:class="[
-											cell.isToday
-												? 'bg-primary text-white font-bold'
-												: cell.isWeekend
-													? 'text-dimmed'
-													: 'text-highlighted',
-										]">
-										{{ cell.day }}
-									</span>
-								</div>
+
 
 								<!-- Record content -->
 								<template v-if="cell.record">

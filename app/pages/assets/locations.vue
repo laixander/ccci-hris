@@ -43,7 +43,8 @@ const columns: TableColumn<AssetLocation>[] = [
     {
         accessorKey: 'description',
         header: 'Description',
-        cell: ({ row }) => h('span', { class: 'text-dimmed' }, row.original.description)
+        meta: { class: { td: 'min-w-48 max-w-md whitespace-normal break-words' } },
+        cell: ({ row }) => h('span', { class: 'text-dimmed', title: row.original.description }, row.original.description)
     },
     {
         id: 'actions',
